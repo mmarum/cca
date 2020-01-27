@@ -1,11 +1,14 @@
 <html>
 <head>
 <style>
-div {
+form div {
   padding: 5px;
 }
 #test_form {
   display: none;
+}
+.event_details {
+  margin-left: 10px;
 }
 </style>
 </head>
@@ -22,9 +25,9 @@ div {
 <p id="add_new_link"><a href="" onclick="showAddNewEvent(); return false;">Add New Event</a></p>
 
 {% for key, val in data.items() %}
-  <b>{{key}}</b><br/>
+  <div class="event_date_time">{{key}} <a href="/app/admin/events/edit?date_time={{key}}">Edit</a></div>
   {% for k, v in val.items() %}
-    {{k}}: {{v}}<br/>
+    <div class="event_details">{{k}}: {{v}}</div>
   {% endfor %}
 {% endfor %}
 

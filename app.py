@@ -7,6 +7,9 @@ import re
 # https://jinja.palletsprojects.com/en/2.10.x/api/
 from jinja2 import Template
 
+# https://wtforms.readthedocs.io/en/stable/index.html
+from forms import AdminForm
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 def read_file(file_name):
@@ -26,14 +29,26 @@ def app(environ, start_response):
 
     if environ['REQUEST_METHOD'] == "GET":
 
+        data = json.loads(read_file("data.json"))
+
+        form = AdminForm()
+
         if environ['PATH_INFO'] == '/app/admin/events':
-            data = json.loads(read_file("data.json"))
             t = Template(read_file("templates/form.html"))
             response = t.render(data=data)
+
+        elif environ['PATH_INFO'] == '/app/admin/events/edit':
+            t = Template(read_file("templates/form-edit.html"))
+            date_time = environ['QUERY_STRING'].split("=")[1]
+            event_data = data[date_time]
+            response = t.render(event_data=event_data, date_time=date_time)
         else:
             response = "<a href='/app/admin/events'>Admin/Events</a>"
 
     elif environ['REQUEST_METHOD'] == "POST":
+
+        form = AdminForm()
+
         post_input = ""
 
         try:
@@ -60,7 +75,7 @@ def app(environ, start_response):
     else:
         response = "barf"
 
-    #response += str(environ)
+    response += f"<hr>{str(environ)}"
 
     return [response.encode()]
 
