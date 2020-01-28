@@ -15,11 +15,10 @@ form div {
 <body>
 
 <form action="/app" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
-<div><input type="text" name="date_time" value="2020-02-01 10:00"/></div>
-<div><input type="text" name="one"/></div>
-<div><input type="text" name="two"/></div>
-<div><textarea name="three"></textarea></div>
-<div><input type="submit" name="submit"/> <a href="" onclick="hideAddNewEvent(); return false;">Cancel</a></div>
+{% for field in form %}
+  <div>{{ field.label }} {{ field }}</div>
+{% endfor %}
+<div><a href="" onclick="hideAddNewEvent(); return false;">Cancel</a></div>
 </form>
 
 <p id="add_new_link"><a href="" onclick="showAddNewEvent(); return false;">Add New Event</a></p>

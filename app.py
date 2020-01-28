@@ -35,7 +35,7 @@ def app(environ, start_response):
 
         if environ['PATH_INFO'] == '/app/admin/events':
             t = Template(read_file("templates/form.html"))
-            response = t.render(data=data)
+            response = t.render(data=data, form=form)
 
         elif environ['PATH_INFO'] == '/app/admin/events/edit':
             t = Template(read_file("templates/form-edit.html"))
