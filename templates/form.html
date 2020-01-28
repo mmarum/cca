@@ -27,7 +27,7 @@ form div {
 
 {% if data %}
   {% for key, val in data.items() %}
-    <div class="event_date_time">{{key}} <a href="/app/admin/events/edit?date_time={{key}}">Edit</a></div>
+    <div class="event_id">{{key}} <a href="/app/admin/events/edit?eid={{key}}">Edit</a></div>
     {% for k, v in val.items() %}
       <div class="event_details">{{k}}: {{v}}</div>
     {% endfor %}

@@ -37,10 +37,10 @@ def app(environ, start_response):
             response = t.render(data=data, form=form)
 
         elif environ['PATH_INFO'] == '/app/admin/events/edit':
-            date_time = environ['QUERY_STRING'].split("=")[1]
-            event_data = data[date_time]
+            eid = environ['QUERY_STRING'].split("=")[1]
+            event_data = data[eid]
             form = AdminForm(**event_data)
-            response = t.render(form=form, event_data=event_data, date_time=date_time)
+            response = t.render(form=form, event_data=event_data)
         else:
             response = "<a href='/app/admin/events'>Admin/Events</a>"
 
@@ -49,19 +49,18 @@ def app(environ, start_response):
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
         data = json.loads(read_file("data.json"))
-        date_time = re.sub(r'^.*name="date_time"(.*?)------.*$', r"\1", post_input, flags=re.DOTALL).strip()
-        data[date_time] = {}
+        eid = re.sub(r'^.*name="eid"(.*?)------.*$', r"\1", post_input, flags=re.DOTALL).strip()
+        data[eid] = {}
         data_array = post_input.split('------')
 
         for d in data_array:
             post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
             post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            data[date_time]["date_time"] = date_time
-            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and post_data_key != "date_time":
-                data[date_time][post_data_key] = post_data_val
+            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
+                data[eid][post_data_key] = post_data_val
 
         # Invoking the object in order to validate form field values
-        form = AdminForm(**data[date_time])
+        form = AdminForm(**data[eid])
 
         write_file("data.json", json.dumps(data, indent=4))
         response = f"{data}"
@@ -69,7 +68,7 @@ def app(environ, start_response):
     else:
         response = "barf"
 
-    response += f"<hr>{str(environ)}"
+    #response += f"<hr>{str(environ)}"
 
     return [response.encode()]
 
