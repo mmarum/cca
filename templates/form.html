@@ -4,9 +4,11 @@
 form div {
   padding: 5px;
 }
+{% if data %}
 #test_form {
   display: none;
 }
+{% endif %}
 .event_details {
   margin-left: 10px;
 }
@@ -23,12 +25,14 @@ form div {
 
 <p id="add_new_link"><a href="" onclick="showAddNewEvent(); return false;">Add New Event</a></p>
 
-{% for key, val in data.items() %}
-  <div class="event_date_time">{{key}} <a href="/app/admin/events/edit?date_time={{key}}">Edit</a></div>
-  {% for k, v in val.items() %}
-    <div class="event_details">{{k}}: {{v}}</div>
+{% if data %}
+  {% for key, val in data.items() %}
+    <div class="event_date_time">{{key}} <a href="/app/admin/events/edit?date_time={{key}}">Edit</a></div>
+    {% for k, v in val.items() %}
+      <div class="event_details">{{k}}: {{v}}</div>
+    {% endfor %}
   {% endfor %}
-{% endfor %}
+{% endif %}
 
 <script>
 function showAddNewEvent() {
