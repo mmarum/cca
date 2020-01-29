@@ -50,6 +50,13 @@ def app(environ, start_response):
 
         data = json.loads(read_file("data.json"))
         eid = re.sub(r'^.*name="eid"(.*?)------.*$', r"\1", post_input, flags=re.DOTALL).strip()
+
+        # If no eid then its a new entry
+        # And must create a new eid
+        if eid == "":
+            keys_array = sorted(list(data.keys()))
+            eid = int(keys_array[-1]) + 1
+
         data[eid] = {}
         data_array = post_input.split('------')
 
@@ -59,8 +66,12 @@ def app(environ, start_response):
             if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
                 data[eid][post_data_key] = post_data_val
 
+        if data[eid]["eid"] == "":
+            data[eid]["eid"] = eid
+
         # Invoking the object in order to validate form field values
         form = AdminForm(**data[eid])
+        # Todo: some validation 
 
         write_file("data.json", json.dumps(data, indent=4))
         response = f"{data}"
