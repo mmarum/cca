@@ -1,0 +1,113 @@
+<html>
+<head>
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+
+}
+form div {
+  padding: 5px;
+}
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+{% if data %}
+#test_form {
+  display: none;
+}
+{% else %}
+#add_new_link {
+  display: none;
+}
+{% endif %}
+#submit {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: YellowGreen;
+}
+#header_row {
+  background-color: WhiteSmoke;
+}
+td {
+  border-bottom: 1px solid LightGray;
+  border-right: 1px solid LightGray;
+  margin: 10px;
+  padding: 10px;
+}
+
+input, #description {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+}
+input {
+    height: 34px;
+}
+</style>
+</head>
+<body>
+
+<form action="/app" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+{% for field in form %}
+  {% if field.name != "eid" and field.name != "submit" %}
+    {{ field.label }}
+  {% endif %}
+  <div class="field">{{ field }}</div>
+{% endfor %}
+<div><a href="/app/admin/events" onclick="hideAddNewEvent(); return false;">Cancel</a></div>
+</form>
+
+<p id="add_new_link"><a href="" onclick="showAddNewEvent(); return false;">Add New Event</a></p>
+
+{% if data %}
+  <table id="events_list">
+  <tr id="header_row"><td></td></tr>
+  {% for key, val in data.items() %}
+    <tr>
+    <td>{{ loop.index }}</td>
+    {% set rowloop = loop %}
+    {% for k, v in val.items() %}
+      {% if rowloop.index == 1 %}
+        <script>document.getElementById("header_row").innerHTML += "<td>{{ k }}</td>";</script>
+      {% endif %}
+      <td>{{ v[0:30] }}</td>
+    {% endfor %}
+    <td><a href="/app/admin/events/edit?eid={{key}}">Edit</a></td>
+    </tr>
+  {% endfor %}
+  </table>
+  <script>document.getElementById("header_row").innerHTML += "<td></td>";</script>
+{% endif %}
+
+<script>
+function showAddNewEvent() {
+  document.getElementById("test_form").style.display = "block";
+  document.getElementById("add_new_link").style.display = "none";
+  document.getElementById("events_list").style.display = "none";
+}
+function hideAddNewEvent() {
+  document.getElementById("test_form").style.display = "none";
+  document.getElementById("add_new_link").style.display = "block";
+  document.getElementById("events_list").style.display = "block";
+}
+</script>
+</body>
+</html>

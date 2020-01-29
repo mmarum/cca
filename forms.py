@@ -6,7 +6,7 @@ from datetime import datetime
 
 #default_date_time = "2020-02-01-10-00"
 
-class AdminForm(Form):
+class EventsForm(Form):
     #date_time = DateTimeField('Date Time', description='DateTime', default=default_date_time, format='%Y-%m-%d-%H-%M')
     eid = HiddenField('eid', description='eid')
     date_time = StringField('Date Time', description='DateTime')

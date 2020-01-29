@@ -1,0 +1,52 @@
+{
+    "1001": {
+        "eid": "1001",
+        "date_time": "2020-02-01 10:00",
+        "duration": "2",
+        "title": "Fluid Art",
+        "price": "$20",
+        "location": "Studio",
+        "image": "fluid-painting.jpg",
+        "description": "This is a special note in the description field"
+    },
+    "1002": {
+        "eid": "1002",
+        "date_time": "2020-02-02 10:00",
+        "duration": "2",
+        "title": "Water Marbling",
+        "price": "$22",
+        "location": "Studio",
+        "image": "water-marbling.jpeg",
+        "description": "Some grand description in the description field"
+    },
+    "1003": {
+        "eid": "1003",
+        "date_time": "2020-02-03 10:00",
+        "duration": "1",
+        "title": "Beginner Watercolor: Fox",
+        "price": "$18",
+        "location": "Studio",
+        "image": "water-color.jpg",
+        "description": "This great excellent thing is bound to be beautiful"
+    },
+    "1004": {
+        "eid": "1004",
+        "date_time": "2020-02-04 11:00",
+        "duration": "1.5",
+        "title": "Cookie Decorating",
+        "price": "$15",
+        "location": "Taco Restaurant",
+        "image": "cookie-decorating.jpg",
+        "description": "Eat tacos then decorate cookies"
+    },
+    "1005": {
+        "eid": "1005",
+        "date_time": "2020-02-05-10-00",
+        "duration": "2.5",
+        "title": "Couples Fused Glass",
+        "price": "$25",
+        "location": "Studio",
+        "image": "fused-glass.jpg",
+        "description": "This is the best description in the world"
+    }
+}
