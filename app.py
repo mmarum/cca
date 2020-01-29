@@ -67,7 +67,7 @@ def app(environ, start_response):
                 data[eid][post_data_key] = post_data_val
 
         if data[eid]["eid"] == "":
-            data[eid]["eid"] = eid
+            data[eid]["eid"] = str(eid)
 
         # Invoking the object in order to validate form field values
         form = AdminForm(**data[eid])

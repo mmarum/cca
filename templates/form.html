@@ -1,8 +1,18 @@
 <html>
 <head>
 <style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+
+}
 form div {
   padding: 5px;
+}
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 {% if data %}
 #test_form {
@@ -12,13 +22,21 @@ form div {
 .event_details {
   margin-left: 10px;
 }
+#submit {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: YellowGreen;
+}
 </style>
 </head>
 <body>
 
 <form action="/app" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
-  <div>{{ field.label }} {{ field }}</div>
+  {% if field.name != "eid" and field.name != "submit" %}
+    {{ field.label }}
+  {% endif %}
+  <div class="field">{{ field }}</div>
 {% endfor %}
 <div><a href="" onclick="hideAddNewEvent(); return false;">Cancel</a></div>
 </form>
@@ -26,22 +44,26 @@ form div {
 <p id="add_new_link"><a href="" onclick="showAddNewEvent(); return false;">Add New Event</a></p>
 
 {% if data %}
+  <div id="events_list">
   {% for key, val in data.items() %}
     <div class="event_id">{{key}} <a href="/app/admin/events/edit?eid={{key}}">Edit</a></div>
     {% for k, v in val.items() %}
       <div class="event_details">{{k}}: {{v}}</div>
     {% endfor %}
   {% endfor %}
+  </div>
 {% endif %}
 
 <script>
 function showAddNewEvent() {
   document.getElementById("test_form").style.display = "block";
   document.getElementById("add_new_link").style.display = "none";
+  document.getElementById("events_list").style.display = "none";
 }
 function hideAddNewEvent() {
   document.getElementById("test_form").style.display = "none";
   document.getElementById("add_new_link").style.display = "block";
+  document.getElementById("events_list").style.display = "block";
 }
 </script>
 </body>
