@@ -1,5 +1,20 @@
 <html>
 <head>
+<title>Events</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<!-- https://jqueryui.com/datepicker/ -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+$( function() {
+  $( "#date" ).datepicker();
+} );
+</script>
+
 <style>
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -14,6 +29,37 @@ p {
   margin-top: 0;
   margin-bottom: 1rem;
 }
+a {
+  text-decoration: none;
+  color: Blue;
+}
+#add_new_link a {
+  display: inline;
+  padding: 5px;
+  background-color: White;
+  border: 1px solid Blue;
+  border-radius: 4px;
+}
+td {
+  border-bottom: 1px solid LightGray;
+  border-right: 1px solid LightGray;
+  margin: 10px;
+  padding: 10px;
+}
+
+@media only screen and (max-width: 480px) {
+  .extra_column {
+    display: none;
+  }
+  td {
+    margin: 5px;
+    padding: 5px;
+  }
+  #add_new_link a {
+    padding: 2px;
+  }
+}
+
 {% if data %}
 #test_form {
   display: none;
@@ -30,12 +76,6 @@ p {
 }
 #header_row {
   background-color: WhiteSmoke;
-}
-td {
-  border-bottom: 1px solid LightGray;
-  border-right: 1px solid LightGray;
-  margin: 10px;
-  padding: 10px;
 }
 
 input, #description {
@@ -70,31 +110,35 @@ input {
   {% if field.name != "eid" and field.name != "submit" %}
     {{ field.label }}
   {% endif %}
-  <div class="field">{{ field }}</div>
+  <div class="field">{{ field(autocomplete="off") }}</div>
 {% endfor %}
 <div><a href="/app/admin/events" onclick="hideAddNewEvent(); return false;">Cancel</a></div>
 </form>
 
-<p id="add_new_link"><a href="" onclick="showAddNewEvent(); return false;">Add New Event</a></p>
-
 {% if data %}
   <table id="events_list">
-  <tr id="header_row"><td></td></tr>
+  <tr id="header_row">
+    <td><div id="add_new_link"><a href="" onclick="showAddNewEvent(); return false;">+</a></div></td>
+  </tr>
   {% for key, val in data.items() %}
     <tr>
     <td>{{ loop.index }}</td>
     {% set rowloop = loop %}
     {% for k, v in val.items() %}
       {% if rowloop.index == 1 %}
-        <script>document.getElementById("header_row").innerHTML += "<td>{{ k }}</td>";</script>
+        <script>document.getElementById("header_row").innerHTML += "<td{% if loop.index > 4 %} class='extra_column'{% endif %}>{{ k }}</td>";</script>
       {% endif %}
-      <td>{{ v[0:30] }}</td>
+      <td{% if loop.index > 4 %} class='extra_column'{% endif %}>
+      {% if k == "eid" %}
+        <a href="/app/admin/events/edit?eid={{ key }}">{{ v }}</a>
+      {% else %}
+        {{ v|replace('/',' ') }}
+      {% endif %}
+      </td>
     {% endfor %}
-    <td><a href="/app/admin/events/edit?eid={{key}}">Edit</a></td>
     </tr>
   {% endfor %}
   </table>
-  <script>document.getElementById("header_row").innerHTML += "<td></td>";</script>
 {% endif %}
 
 <script>

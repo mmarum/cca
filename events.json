@@ -1,52 +1,46 @@
 {
     "1001": {
         "eid": "1001",
-        "date_time": "2020-02-01 10:00",
-        "duration": "2",
+        "date": "01/30/2020",
+        "time": "7:00 pm",
         "title": "Fluid Art",
+        "duration": "2",
         "price": "$20",
         "location": "Studio",
         "image": "fluid-painting.jpg",
-        "description": "This is a special note in the description field"
+        "description": "This is a special note in the description field."
     },
     "1002": {
         "eid": "1002",
-        "date_time": "2020-02-02 10:00",
-        "duration": "2",
-        "title": "Water Marbling",
-        "price": "$22",
+        "date": "01/31/2020",
+        "time": "5:00 pm",
+        "title": "Pottery Painting",
+        "duration": "1.5",
+        "price": "$20",
         "location": "Studio",
-        "image": "water-marbling.jpeg",
-        "description": "Some grand description in the description field"
+        "image": "pottery-painting.jpg",
+        "description": "This is a description and it is not very long word-wise."
     },
     "1003": {
         "eid": "1003",
-        "date_time": "2020-02-03 10:00",
-        "duration": "1",
-        "title": "Beginner Watercolor: Fox",
-        "price": "$18",
-        "location": "Studio",
-        "image": "water-color.jpg",
-        "description": "This great excellent thing is bound to be beautiful"
+        "date": "02/02/2020",
+        "time": "4:30 pm",
+        "title": "Cookie Decorating",
+        "duration": "4",
+        "price": "$30",
+        "location": "Taco Restaurant",
+        "image": "cookie-decorating.jpg",
+        "description": "Cookie Monster eats lots of cookies every day."
     },
     "1004": {
         "eid": "1004",
-        "date_time": "2020-02-04 11:00",
-        "duration": "1.5",
-        "title": "Cookie Decorating",
+        "date": "02/03/2020",
+        "time": "5 pm",
+        "title": "Fused Glass",
+        "duration": "4",
         "price": "$15",
-        "location": "Taco Restaurant",
-        "image": "cookie-decorating.jpg",
-        "description": "Eat tacos then decorate cookies"
-    },
-    "1005": {
-        "eid": "1005",
-        "date_time": "2020-02-05-10-00",
-        "duration": "2.5",
-        "title": "Couples Fused Glass",
-        "price": "$25",
         "location": "Studio",
         "image": "fused-glass.jpg",
-        "description": "This is the best description in the world"
+        "description": "Glass is transparent or translucent or opaque."
     }
 }
