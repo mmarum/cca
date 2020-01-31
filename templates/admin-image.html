@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>Events</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<!-- https://jqueryui.com/datepicker/ -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+$( function() {
+  $( "#date" ).datepicker();
+} );
+</script>
+
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+
+}
+form div {
+  padding: 5px;
+}
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+a {
+  text-decoration: none;
+  color: Blue;
+}
+#submit {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: YellowGreen;
+}
+input, #description {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+}
+input {
+    height: 34px;
+}
+.image_upload {
+  border-top: 1px dotted #ccc;
+}
+</style>
+</head>
+<body>
+
+{% if event_data %}
+  {% for k, v in event_data.items() %}
+    <div>{{ k }}: {{ v }}</div>
+  {% endfor %}
+{% endif %}
+
+<form action="/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+{% for field in image_form %}
+  {% if field.name != "eid" and field.name != "submit" %}
+    {{ field.label }}
+  {% endif %}
+  <div class="field">{{ field(class="image_upload") }}</div>
+{% endfor %}
+</form>
+
+<script>
+document.getElementById("eid").value = "{{ event_data.eid }}";
+</script>
+
+</body>
+</html>

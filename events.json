@@ -1,46 +1,5 @@
 {
-    "1001": {
-        "eid": "1001",
-        "date": "01/30/2020",
-        "time": "7:00 pm",
-        "title": "Fluid Art",
-        "duration": "2",
-        "price": "$20",
-        "location": "Studio",
-        "image": "fluid-painting.jpg",
-        "description": "This is a special note in the description field."
-    },
-    "1002": {
-        "eid": "1002",
-        "date": "01/31/2020",
-        "time": "5:00 pm",
-        "title": "Pottery Painting",
-        "duration": "1.5",
-        "price": "$20",
-        "location": "Studio",
-        "image": "pottery-painting.jpg",
-        "description": "This is a description and it is not very long word-wise."
-    },
-    "1003": {
-        "eid": "1003",
-        "date": "02/02/2020",
-        "time": "4:30 pm",
-        "title": "Cookie Decorating",
-        "duration": "4",
-        "price": "$30",
-        "location": "Taco Restaurant",
-        "image": "cookie-decorating.jpg",
-        "description": "Cookie Monster eats lots of cookies every day."
-    },
-    "1004": {
-        "eid": "1004",
-        "date": "02/03/2020",
-        "time": "5 pm",
-        "title": "Fused Glass",
-        "duration": "4",
-        "price": "$15",
-        "location": "Studio",
-        "image": "fused-glass.jpg",
-        "description": "Glass is transparent or translucent or opaque."
+    "1000":
+        {
     }
 }

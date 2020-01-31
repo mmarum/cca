@@ -110,9 +110,15 @@ input {
   {% if field.name != "eid" and field.name != "submit" %}
     {{ field.label }}
   {% endif %}
+  {% if field.name == "image_path" %}
+    <div>You can change this image in the next step.</div>
+  {% endif %}
   <div class="field">{{ field(autocomplete="off") }}</div>
 {% endfor %}
 <div><a href="/app/admin/events" onclick="hideAddNewEvent(); return false;">Cancel</a></div>
+{% if event_data %}
+  <div><a href="/app/admin/events/delete?eid={{ event_data.eid }}" onclick="return confirm('Are you sure?');">Delete this event</a></div>
+{% endif %}
 </form>
 
 {% if data %}

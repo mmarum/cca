@@ -1,4 +1,4 @@
-from wtforms import Form, DateTimeField, StringField, SubmitField, HiddenField, RadioField, BooleanField, TextAreaField, validators
+from wtforms import Form, DateTimeField, StringField, SubmitField, HiddenField, RadioField, BooleanField, TextAreaField, FileField, validators
 from wtforms.validators import InputRequired, DataRequired, ValidationError, url
 from datetime import datetime
 
@@ -15,7 +15,11 @@ class EventsForm(Form):
     duration = StringField("Duration (Hours)", description="Duration")
     price = StringField("Price", description="Price")
     location = StringField("Location", description="Location")
-    image = StringField("Image", description="Image")
+    image_path = HiddenField("Image Path", description="Image Path")
     description = TextAreaField("Description", description="Description")
-    submit = SubmitField("Submit", description="Submit")
+    submit = SubmitField("Next", description="Next")
 
+class ImageForm(Form):
+    eid = HiddenField("eid", description="eid")
+    image = FileField("Upload File")
+    submit = SubmitField("Submit", description="Submit")
