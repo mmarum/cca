@@ -14,6 +14,7 @@ class EventsForm(Form):
     title = StringField("Title", description="Title")
     duration = StringField("Duration", description="Duration")
     price = StringField("Price", description="Price")
+    limit = StringField("Limit", description="Limit")
     location = StringField("Location", description="Location")
     image_path = HiddenField("Image Path", description="Image Path")
     description = TextAreaField("Description", description="Description")
@@ -23,3 +24,12 @@ class ImageForm(Form):
     eid = HiddenField("eid", description="eid")
     image = FileField("Upload File")
     submit = SubmitField("Submit", description="Submit")
+
+class BookingForm(Form):
+    eid = HiddenField("eid", description="eid")
+    name = StringField("Name", description="Name")
+    phone = StringField("Phone", description="Phone")
+    quantity = StringField("Quantity", description="Quantity")
+    receipt = HiddenField("Receipt", description="Receipt")
+    submit = SubmitField("Submit", description="Submit")
+

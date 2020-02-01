@@ -9,7 +9,7 @@ import base64
 from jinja2 import Template
 
 # https://wtforms.readthedocs.io/en/stable/index.html
-from forms import EventsForm, ImageForm
+from forms import EventsForm, ImageForm, BookingForm
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -30,8 +30,17 @@ def app(environ, start_response):
 
     if environ['REQUEST_METHOD'] == "GET":
 
+        if environ['PATH_INFO'].startswith('/app/admin/'):
+            template_file = "templates/admin-events.html"
+        elif environ['PATH_INFO'].startswith('/app/list/'):
+            template_file = "templates/list-events.html"
+        elif environ['PATH_INFO'].startswith('/app/book/'):
+            template_file = "templates/book-events.html"
+        else:
+            template_file = "templates/main.html"
+
+        t = Template(read_file(template_file))
         data = json.loads(read_file("events.json"))
-        t = Template(read_file("templates/admin-events.html"))
 
         if environ['PATH_INFO'] == '/app/admin/events':
             form = EventsForm()
@@ -49,8 +58,17 @@ def app(environ, start_response):
             write_file("events.json", json.dumps(data, indent=4))
             response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
 
+        elif environ['PATH_INFO'] == '/app/list/events':
+            form = BookingForm()
+            response = t.render(form=form, data=data)
+
+        elif environ['PATH_INFO'] == '/app/book/event':
+            eid = environ['QUERY_STRING'].split("=")[1]
+            form = BookingForm()
+            response = t.render(form=form, event_data=data[eid])
+
         else:
-            response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
+            response = t.render()
 
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/app/image/upload":
 

@@ -7,18 +7,40 @@
         "duration": "2",
         "price": "20",
         "location": "Studio-B",
-        "image_path": "fluid-art.jpg",
-        "description": "Good for your heart"
+        "image_path": "20200123_084415.jpg",
+        "description": "Good for your heart fart fart"
     },
     "1001": {
         "eid": "1001",
         "date": "02/01/2020",
         "time": "6pm",
-        "title": "toitle",
+        "title": "Chips and Guacamole",
         "duration": "3",
         "price": "33",
-        "location": "pods",
-        "image_path": "",
-        "description": "desc"
+        "location": "Right Place",
+        "image_path": "pwi-square-logo.jpg",
+        "description": "Eating time is fun"
+    },
+    "1002": {
+        "eid": "1002",
+        "date": "02/01/2020",
+        "time": "7pm",
+        "title": "Eggs and Bacon",
+        "duration": "1",
+        "price": "5",
+        "location": "Lounge",
+        "image_path": "20200104_122222.jpg",
+        "description": "Healthy treats"
+    },
+    "1003": {
+        "eid": "1003",
+        "date": "02/01/2020",
+        "time": "8pm",
+        "title": "Pop Tarts and Farts",
+        "duration": "3pm",
+        "price": "10",
+        "location": "Local Diner",
+        "image_path": "image.jpg",
+        "description": "Food for thoughts"
     }
 }

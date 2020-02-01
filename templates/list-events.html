@@ -1,0 +1,174 @@
+<html>
+<head>
+<title>Events</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+
+}
+form div {
+  padding: 5px;
+}
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+a {
+  text-decoration: none;
+  color: Blue;
+}
+a.event_link {
+  color: #505050;
+}
+#add_new_link a {
+  display: inline;
+  padding: 5px;
+  background-color: White;
+  border: 1px solid Blue;
+  border-radius: 4px;
+}
+td {
+  border-bottom: 1px solid LightGray;
+  border-right: 1px solid LightGray;
+  margin: 10px;
+  padding: 10px;
+}
+
+@media only screen and (max-width: 480px) {
+  .extra_column {
+    display: none;
+  }
+  td {
+    margin: 5px;
+    padding: 5px;
+  }
+  #add_new_link a {
+    padding: 2px;
+  }
+}
+
+{% if data %}
+#test_form {
+  display: none;
+}
+label[for=image_path] {
+  display: none;
+}
+{% else %}
+#add_new_link {
+  display: none;
+}
+{% endif %}
+#submit {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: YellowGreen;
+}
+#header_row {
+  background-color: WhiteSmoke;
+}
+
+input, #description {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+}
+input {
+    height: 34px;
+}
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+.column {
+  float: left;
+  padding: 5px;
+  margin: 5px;
+}
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.row {
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  border-bottom: 1px dashed Gray;
+}
+.event_image {
+  border: 1px dashed Gray;
+  width: 150px;
+}
+h1 {
+  border: 0px;
+  margin: 0px;
+}
+span.book {
+  display: inline;
+  padding: 2px 8px 2px 8px;
+  background-color: White;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #505050;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+{#
+<form action="/app" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+{% for field in form %}
+  {% if field.name != "submit" %}
+    {{ field.label }}
+  {% endif %}
+  <div class="field">{{ field(autocomplete="off") }}</div>
+{% endfor %}
+</form>
+#}
+
+{% if data %}
+  {% for key, val in data.items() %}
+
+    <div class="row">
+    <a href="/app/book/event?eid={{ val.eid }}" class="event_link">
+    <div class="column">
+      <img alt="/img/{{ val.image_path }}" src="/img/placeholder.gif" class="event_image">
+    </div>
+    <div class="column">
+      <div>{{ val.date }} {{ val.time }} {{ val.duration }} hrs <span class="book">Book Now</span></div>
+      <h1>{{ val.title }}</h1>
+      <div>${{ val.price }} per person, Max: {{ val.limit }} people, At: {{ val.location }} {{ val.description }}</div>
+    </div>
+    </a>
+    </div>
+
+  {% endfor %}
+{% endif %}
+
+</div>
+
+</body>
+</html>
