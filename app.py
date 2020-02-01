@@ -46,7 +46,7 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == "/app/admin/events/delete":
             eid = environ['QUERY_STRING'].split("=")[1]
             del data[eid]
-            write_file("events.json", data)
+            write_file("events.json", json.dumps(data, indent=4))
             response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
 
         else:

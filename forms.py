@@ -12,7 +12,7 @@ class EventsForm(Form):
     date = StringField("Date", description="Date")
     time = StringField("Time", description="Time")
     title = StringField("Title", description="Title")
-    duration = StringField("Duration (Hours)", description="Duration")
+    duration = StringField("Duration", description="Duration")
     price = StringField("Price", description="Price")
     location = StringField("Location", description="Location")
     image_path = HiddenField("Image Path", description="Image Path")

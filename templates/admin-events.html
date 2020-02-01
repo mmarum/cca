@@ -64,6 +64,9 @@ td {
 #test_form {
   display: none;
 }
+label[for=image_path] {
+  display: none;
+}
 {% else %}
 #add_new_link {
   display: none;
@@ -110,7 +113,7 @@ input {
   {% if field.name != "eid" and field.name != "submit" %}
     {{ field.label }}
   {% endif %}
-  {% if field.name == "image_path" %}
+  {% if field.name == "image_path" and event_data %}
     <div>You can change this image in the next step.</div>
   {% endif %}
   <div class="field">{{ field(autocomplete="off") }}</div>
