@@ -4,7 +4,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta charset="utf-8">
-
 <style>
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -23,9 +22,6 @@ a {
   text-decoration: none;
   color: Blue;
 }
-a.event_link {
-  color: #505050;
-}
 #add_new_link a {
   display: inline;
   padding: 5px;
@@ -39,38 +35,12 @@ td {
   margin: 10px;
   padding: 10px;
 }
-
-@media only screen and (max-width: 480px) {
-  .extra_column {
-    display: none;
-  }
-  td {
-    margin: 5px;
-    padding: 5px;
-  }
-  #add_new_link a {
-    padding: 2px;
-  }
-}
-
-{% if data %}
-#test_form {
-  display: none;
-}
-label[for=image_path] {
-  display: none;
-}
-{% else %}
-#add_new_link {
-  display: none;
-}
-{% endif %}
 #submit {
   font-size: 16px;
   font-weight: bold;
   background-color: YellowGreen;
 }
-#header_row {
+.header_row {
   background-color: WhiteSmoke;
 }
 
@@ -97,58 +67,36 @@ input, #description {
 input {
     height: 34px;
 }
-.container {
-  max-width: 800px;
-  margin: auto;
-}
-.column {
-  float: left;
-  padding: 5px;
-  margin: 5px;
-}
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-.row {
-  padding-bottom: 5px;
-  margin-bottom: 5px;
-  border-bottom: 1px dashed Gray;
-}
-.event_image {
-  border: 1px dashed Gray;
-  width: 150px;
-}
-h1 {
-  border: 0px;
-  margin: 0px;
-}
-span.book {
-  display: inline;
-  padding: 2px 8px 2px 8px;
-  background-color: White;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  color: #505050;
+.event_item {
+  padding: 10px;
+  margin: 10px;
+  border-bottom: 1px dashed Orange;
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-
-<h1>Thank you for booking. See you soon.</h1>
-
-{% for k, v in booking_data.items() %}
-  <div>{{ k }}: {{ v }}</div>
+<h3>Summary of Orders</h3>
+{% for key, val in booking_data.items() %}
+  <table class="event_item">
+  <tr>
+    <td colspan="5">{{ data[key].title }} {{ data[key].date }}</td>
+  </tr>
+  <tr class="header_row">
+    <td></td><td>Name</td><td>Phone</td><td>Quantity</td><td>Recpeipt</td>
+  </tr>
+  {% for purchase in val %}
+    <tr>
+    <td>{{ loop.index }}</td>
+    {% for k, v in purchase.items() %}
+      {% if k != "eid" %}
+        <td>{{ v }}</td>
+      {% endif %}
+    {% endfor %}
+    </tr>
+  {% endfor %}
+  </table>
 {% endfor %}
-
-{% for k, v in event_data.items() %}
-  <div>{{ k }}: {{ v }}</div>
-{% endfor %}
-
-</div>
 
 </body>
 </html>

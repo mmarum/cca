@@ -30,12 +30,14 @@ def app(environ, start_response):
 
     if environ['REQUEST_METHOD'] == "GET":
 
-        if environ['PATH_INFO'].startswith('/app/admin/'):
+        if environ['PATH_INFO'].startswith('/app/admin/events'):
             template_file = "templates/admin-events.html"
         elif environ['PATH_INFO'].startswith('/app/list/'):
             template_file = "templates/list-events.html"
         elif environ['PATH_INFO'].startswith('/app/book/'):
             template_file = "templates/book-events.html"
+        elif environ['PATH_INFO'].startswith('/app/admin/booking'):
+            template_file = "templates/admin-booking.html"
         else:
             template_file = "templates/main.html"
 
@@ -66,6 +68,10 @@ def app(environ, start_response):
             eid = environ['QUERY_STRING'].split("=")[1]
             form = BookingForm()
             response = t.render(form=form, event_data=data[eid])
+
+        elif environ['PATH_INFO'] == '/app/admin/booking':
+            booking_data = json.loads(read_file("booking.json"))
+            response = t.render(data=data, booking_data=booking_data)
 
         else:
             response = t.render()
@@ -117,10 +123,16 @@ def app(environ, start_response):
                 booking_object[post_data_key] = post_data_val
 
         # Just to validate if necessary...
-        booking_form = BookingForm(**booking_object)
+        #booking_form = BookingForm(**booking_object)
 
         # booking.json should start out looking like this:
         # { "1000": [], "1001": [] }
+
+        # If item does not yet exist in booking.json
+        try:
+            print(booking_data[eid]) # Checking for existence
+        except:
+            booking_data[eid] = [] # If not create it
 
         booking_data[eid].append(booking_object)
 
@@ -128,7 +140,7 @@ def app(environ, start_response):
 
         t = Template(read_file("templates/booked-thanks.html"))
         #response = str(post_input)
-        response = t.render(event_data=data[eid], booking_form=booking_form)
+        response = t.render(event_data=data[eid], booking_data=booking_object)
 
     elif environ['REQUEST_METHOD'] == "POST":
         length = int(environ.get('CONTENT_LENGTH', '0'))
@@ -168,7 +180,7 @@ def app(environ, start_response):
     else:
         response = "barf"
 
-    response += f"<hr>{str(environ)}"
+    #response += f"<hr>{str(environ)}"
 
     return [response.encode()]
 
