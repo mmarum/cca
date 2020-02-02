@@ -28,6 +28,8 @@ def write_file(file_name, content):
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
 
+    ####
+    ####
     if environ['REQUEST_METHOD'] == "GET":
 
         if environ['PATH_INFO'].startswith('/app/admin/events'):
@@ -76,6 +78,19 @@ def app(environ, start_response):
         else:
             response = t.render()
 
+    ####
+    ####
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/app/paypal-transaction-complete":
+
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+
+        write_file("paypal-transaction-complete.json", str(post_input))
+
+        response = "200"
+
+    ####
+    ####
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/app/image/upload":
 
         length = int(environ.get('CONTENT_LENGTH', '0'))
@@ -100,6 +115,8 @@ def app(environ, start_response):
         #response = str(image_contents)
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
 
+    ####
+    ####
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/app/booking/process":
 
         booking_data = json.loads(read_file("booking.json"))
@@ -142,6 +159,8 @@ def app(environ, start_response):
         #response = str(post_input)
         response = t.render(event_data=data[eid], booking_data=booking_object)
 
+    ####
+    ####
     elif environ['REQUEST_METHOD'] == "POST":
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
@@ -177,6 +196,8 @@ def app(environ, start_response):
         image_form = ImageForm()
         response = t.render(event_data=data[eid], image_form=image_form)
 
+    ####
+    ####
     else:
         response = "barf"
 

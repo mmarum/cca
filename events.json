@@ -58,5 +58,41 @@
         "location": "Studio",
         "image_path": "water-marbling-2.jpg",
         "description": "Sandwich Shoppe"
+    },
+    "1005": {
+        "eid": "1005",
+        "date": "02/03/2020",
+        "time": "7:00 pm",
+        "title": "2 fish",
+        "duration": "2 hours",
+        "price": "$35",
+        "limit": "30",
+        "location": "",
+        "image_path": "",
+        "description": "2 fish, acrylic painting on 16x20 inch canvas"
+    },
+    "1006": {
+        "eid": "1006",
+        "date": "02/02/2020",
+        "time": "3pm",
+        "title": "Good Morning Sunday",
+        "duration": "1",
+        "price": "20",
+        "limit": "25",
+        "location": "Studio",
+        "image_path": "alcohol-ink-1.jpg",
+        "description": "Description is here here here"
+    },
+    "1007": {
+        "eid": "1007",
+        "date": "02/02/2020",
+        "time": "2pm",
+        "title": "Art Class",
+        "duration": "3",
+        "price": "30",
+        "limit": "40",
+        "location": "Studio",
+        "image_path": "dot-mandala-1.jpg",
+        "description": "Fun Art Stuff"
     }
 }
