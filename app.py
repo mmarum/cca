@@ -59,7 +59,7 @@ def app(environ, start_response):
             response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
 
         elif environ['PATH_INFO'] == '/app/list/events':
-            form = BookingForm()
+            form = BookingForm() # Might not need this...
             response = t.render(form=form, data=data)
 
         elif environ['PATH_INFO'] == '/app/book/event':
@@ -73,8 +73,10 @@ def app(environ, start_response):
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/app/image/upload":
 
         length = int(environ.get('CONTENT_LENGTH', '0'))
+        # NOTICE: NOT DECODING post_input below FOR IMAGES
         post_input = environ['wsgi.input'].read(length)
 
+        # NOTICE BYTES STRING below FOR IMAGES
         image_eid = post_input.split(b'------')[1]
         eid = re.sub(b'^.*name="eid"(.*)$', r"\1", image_eid, flags=re.DOTALL).strip()
 
@@ -91,6 +93,42 @@ def app(environ, start_response):
 
         #response = str(image_contents)
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
+
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/app/booking/process":
+
+        booking_data = json.loads(read_file("booking.json"))
+
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+
+        booking_eid = post_input.split('------')[1]
+        eid = re.sub('^.*name="eid"(.*)$', r"\1", booking_eid, flags=re.DOTALL).strip()
+
+        data = json.loads(read_file("events.json"))
+        event_data = data[eid]
+
+        booking_object = {}
+        booking_data_array = post_input.split('------')
+
+        for d in booking_data_array:
+            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
+            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
+            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
+                booking_object[post_data_key] = post_data_val
+
+        # Just to validate if necessary...
+        booking_form = BookingForm(**booking_object)
+
+        # booking.json should start out looking like this:
+        # { "1000": [], "1001": [] }
+
+        booking_data[eid].append(booking_object)
+
+        write_file("booking.json", json.dumps(booking_data, indent=4))
+
+        t = Template(read_file("templates/booked-thanks.html"))
+        #response = str(post_input)
+        response = t.render(event_data=data[eid], booking_form=booking_form)
 
     elif environ['REQUEST_METHOD'] == "POST":
         length = int(environ.get('CONTENT_LENGTH', '0'))
@@ -118,8 +156,8 @@ def app(environ, start_response):
             data[eid]["eid"] = str(eid)
 
         # Invoking the object in order to validate form field values
-        form = EventsForm(**data[eid])
-        # Todo: some validation 
+        # Todo: some validation:
+        # validated_event_data = EventsForm(**data[eid])
 
         write_file("events.json", json.dumps(data, indent=4))
 
@@ -130,7 +168,7 @@ def app(environ, start_response):
     else:
         response = "barf"
 
-    #response += f"<hr>{str(environ)}"
+    response += f"<hr>{str(environ)}"
 
     return [response.encode()]
 

@@ -58,18 +58,24 @@ input {
 </head>
 <body>
 
-<form action="/app" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+{% if event_data %}
+  {% for k, v in event_data.items() %}
+    <div>{{ k }}: {{ v }}</div>
+  {% endfor %}
+{% endif %}
+
+<form action="/app/booking/process" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
-  {{ field.label }}
+  {% if field.name != "eid" and field.name != "receipt" and field.name != "submit" %}
+    {{ field.label }}
+  {% endif %}
   <div class="field">{{ field(autocomplete="off") }}</div>
 {% endfor %}
 </form>
 
-{% if event_data %}
-  {% for item in event_data %}
-    {{ item }}
-  {% endfor %}
-{% endif %}
+<script>
+document.getElementById("eid").value = "{{ event_data.eid }}";
+</script>
 
 </body>
 </html>
