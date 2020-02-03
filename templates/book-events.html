@@ -58,7 +58,7 @@ input {
 </head>
 <body>
 <script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
-// Required. Replace SB_CLIENT_ID with your sandbox client ID.
+// sandbox client ID
 </script>
 <div id="app"><a href="/app">/app</a></div>
 
@@ -68,82 +68,48 @@ input {
   {% endfor %}
 {% endif %}
 
-<form action="/app/booking/process" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
-{% for field in form %}
-  {% if field.name != "eid" and field.name != "receipt" and field.name != "submit" %}
-    {{ field.label }}
-  {% endif %}
-
-  {% if field.name == "submit"%}
-    <div id="paypal-button-container"></div>
-    <script>
-      //paypal.Buttons().render('#paypal-button-container');
-      // This function displays Smart Payment Buttons on your web page.
-    </script>
-    {{ field }}
-  {% else %}
-    <div class="field">{{ field(autocomplete="off") }}</div>
-  {% endif %}
-
-{% endfor %}
-</form>
-
-<script>
-document.getElementById("eid").value = "{{ event_data.eid }}";
-</script>
-
-<!-- https://developer.paypal.com/docs/checkout/integrate/ -->
-
 {#
-<script>
-// Set up the transaction:
-  paypal.Buttons({
-    createOrder: function(data, actions) {
-      // This function sets up the details of the transaction, including the amount and line item details.
-      return actions.order.create({
-        purchase_units: [{
-          amount: {
-            value: '0.01'
-          }
-        }]
-      });
-    }
-  }).render('#paypal-button-container');
-</script>
+TODO: instead of just plain range below do
+range minus number of already-seats-purchased
 
-<script>
-// Capture the transaction
-  paypal.Buttons({
-    createOrder: function(data, actions) {
-      // This function sets up the details of the transaction, including the amount and line item details.
-      return actions.order.create({
-        purchase_units: [{
-          amount: {
-            value: '0.01'
-          }
-        }]
-      });
-    },
-    onApprove: function(data, actions) {
-      // This function captures the funds from the transaction.
-      return actions.order.capture().then(function(details) {
-        // This function shows a transaction success message to your buyer.
-        alert('Transaction completed by ' + details.payer.name.given_name);
-      });
-    }
-  }).render('#paypal-button-container');
-  //This function displays Smart Payment Buttons on your web page.
-</script>
+ADD: JS to assure user chooses a quantity
+
 #}
 
+<form>
+<select name="quantity" id="quantity" onchange="quant();">
+<option value="">Choose quantity</option>
+{% set x=event_data.limit|int %}
+{% for n in range(1, x+1) %}
+  <option value="{{ n }}">{{ n }}</option>
+{% endfor %}
+</select>
+<form>
+
 <script>
+function quant() {
+  var quantity = 1; // default
+  var q = document.getElementById("quantity");
+  quantity = q.options[q.selectedIndex].value;
+  console.log(quantity);
+  return quantity;
+}
+</script>
+
+<div id="paypal-button-container"></div>
+
+<script>
+// https://developer.paypal.com/docs/checkout/integrate/
+// View orders at PayPal here: https://developer.paypal.com/developer/dashboard/sandbox/
 // Verify the transaction
+// mmarum-buyer@gmail.com
   paypal.Buttons({
     createOrder: function(data, actions) {
       return actions.order.create({
         purchase_units: [{
           amount: {
-            value: '0.01'
+            //value: '0.01'
+            value: quant() * {{ event_data.price }}
           }
         }]
       });
@@ -151,6 +117,7 @@ document.getElementById("eid").value = "{{ event_data.eid }}";
     onApprove: function(data, actions) {
       return actions.order.capture().then(function(details) {
         alert('Transaction completed by ' + details.payer.name.given_name);
+        console.log(details);
         // Call your server to save the transaction
         return fetch('/app/paypal-transaction-complete', {
           method: 'post',
@@ -158,12 +125,15 @@ document.getElementById("eid").value = "{{ event_data.eid }}";
             'content-type': 'application/json'
           },
           body: JSON.stringify({
-            orderID: data.orderID
+            orderID: data.orderID,
+            event_id: {{ event_data.eid }},
+            details: details
           })
         });
       });
     }
   }).render('#paypal-button-container');
+// https://developer.paypal.com/docs/api/orders/v2/#orders_get
 </script>
 
 </body>

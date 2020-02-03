@@ -9,7 +9,7 @@ import base64
 from jinja2 import Template
 
 # https://wtforms.readthedocs.io/en/stable/index.html
-from forms import EventsForm, ImageForm, BookingForm
+from forms import EventsForm, ImageForm
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -63,13 +63,11 @@ def app(environ, start_response):
             response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
 
         elif environ['PATH_INFO'] == '/app/list/events':
-            form = BookingForm() # Might not need this...
-            response = t.render(form=form, data=data)
+            response = t.render(data=data)
 
         elif environ['PATH_INFO'] == '/app/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
-            form = BookingForm()
-            response = t.render(form=form, event_data=data[eid])
+            response = t.render(event_data=data[eid])
 
         elif environ['PATH_INFO'] == '/app/admin/booking':
             booking_data = json.loads(read_file("booking.json"))
@@ -114,50 +112,6 @@ def app(environ, start_response):
 
         #response = str(image_contents)
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
-
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/app/booking/process":
-
-        booking_data = json.loads(read_file("booking.json"))
-
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-
-        booking_eid = post_input.split('------')[1]
-        eid = re.sub('^.*name="eid"(.*)$', r"\1", booking_eid, flags=re.DOTALL).strip()
-
-        data = json.loads(read_file("events.json"))
-        event_data = data[eid]
-
-        booking_object = {}
-        booking_data_array = post_input.split('------')
-
-        for d in booking_data_array:
-            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
-            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
-                booking_object[post_data_key] = post_data_val
-
-        # Just to validate if necessary...
-        #booking_form = BookingForm(**booking_object)
-
-        # booking.json should start out looking like this:
-        # { "1000": [], "1001": [] }
-
-        # If item does not yet exist in booking.json
-        try:
-            print(booking_data[eid]) # Checking for existence
-        except:
-            booking_data[eid] = [] # If not create it
-
-        booking_data[eid].append(booking_object)
-
-        write_file("booking.json", json.dumps(booking_data, indent=4))
-
-        t = Template(read_file("templates/booked-thanks.html"))
-        #response = str(post_input)
-        response = t.render(event_data=data[eid], booking_data=booking_object)
 
     ####
     ####

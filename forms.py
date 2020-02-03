@@ -25,11 +25,3 @@ class ImageForm(Form):
     image = FileField("Upload File")
     submit = SubmitField("Submit", description="Submit")
 
-class BookingForm(Form):
-    eid = HiddenField("eid", description="eid")
-    name = StringField("Name", description="Name")
-    phone = StringField("Phone", description="Phone")
-    quantity = StringField("Quantity", description="Quantity")
-    receipt = HiddenField("Receipt", description="Receipt")
-    submit = SubmitField("Submit", description="Submit")
-
