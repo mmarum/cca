@@ -1,16 +1,4 @@
 {
-    "1000": {
-        "eid": "1000",
-        "date": "01/31/2020",
-        "time": "3pm",
-        "title": "Beans and Rice",
-        "duration": "2",
-        "price": "20",
-        "limit": "20",
-        "location": "Studio-B",
-        "image_path": "20200123_084415.jpg",
-        "description": "Good for your heart fart fart"
-    },
     "1001": {
         "eid": "1001",
         "date": "02/01/2020",

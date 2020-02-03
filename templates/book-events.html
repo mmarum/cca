@@ -14,6 +14,12 @@ body {
 form div {
   padding: 5px;
 }
+form select {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px dashed Gray;
+  font-size: 16px;
+}
 p {
   margin-top: 0;
   margin-bottom: 1rem;
@@ -29,6 +35,34 @@ a {
 }
 #header_row {
   background-color: WhiteSmoke;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+.column {
+  float: left;
+  padding: 5px;
+  margin: 5px;
+}
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.row {
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+  /* border-bottom: 1px dashed Gray; */
+}
+.event_image {
+  border: 1px dashed Gray;
+  width: 150px;
+}
+h1 {
+  border: 0px;
+  margin: 0px;
 }
 
 input, #description {
@@ -54,49 +88,68 @@ input, #description {
 input {
     height: 34px;
 }
+#paypal-button-container {
+ display: none;
+}
 </style>
 </head>
 <body>
+<div id="app"><a href="/app">/app</a></div>
+
 <script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
 // sandbox client ID
 </script>
-<div id="app"><a href="/app">/app</a></div>
 
-{% if event_data %}
-  {% for k, v in event_data.items() %}
-    {{ v }}
-  {% endfor %}
-{% endif %}
+<div class="container">
+
+<div class="row">
+<div class="column">
+  <img alt="/img/{{ event_data.image_path }}" src="/img/placeholder.gif" class="event_image">
+</div>
+<div class="column">
+  <div>{{ event_data.date }} {{ event_data.time }} {{ event_data.duration }} hrs <span class="book">Book Now</span></div>
+  <h1>{{ event_data.title }}</h1>
+  <div>
+    ${{ event_data.price }} per person, 
+    Max: {{ event_data.limit }} people, 
+    At: {{ event_data.location }} 
+    {{ event_data.description }}
+
+    <form>
+    <select name="quantity" id="quantity" onchange="quant();">
+    <option value="">Choose quantity</option>
+    {% set x=event_data.limit|int %}
+    {% for n in range(1, x+1) %}
+      <option value="{{ n }}">{{ n }}</option>
+    {% endfor %}
+    </select>
+    <form>
+
+  </div>
+</div>
+</div>
 
 {#
 TODO: instead of just plain range below do
 range minus number of already-seats-purchased
-
 ADD: JS to assure user chooses a quantity
-
 #}
-
-<form>
-<select name="quantity" id="quantity" onchange="quant();">
-<option value="">Choose quantity</option>
-{% set x=event_data.limit|int %}
-{% for n in range(1, x+1) %}
-  <option value="{{ n }}">{{ n }}</option>
-{% endfor %}
-</select>
-<form>
 
 <script>
 function quant() {
+  document.getElementById("paypal-button-container").style.display = "block";
   var quantity = 1; // default
   var q = document.getElementById("quantity");
   quantity = q.options[q.selectedIndex].value;
   console.log(quantity);
+  if (quantity == "") { alert("Please choose quantity"); }
   return quantity;
 }
 </script>
 
 <div id="paypal-button-container"></div>
+
+</div>
 
 <script>
 // https://developer.paypal.com/docs/checkout/integrate/

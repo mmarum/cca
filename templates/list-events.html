@@ -139,17 +139,6 @@ span.book {
 
 <div class="container">
 
-{#
-<form action="/app" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
-{% for field in form %}
-  {% if field.name != "submit" %}
-    {{ field.label }}
-  {% endif %}
-  <div class="field">{{ field(autocomplete="off") }}</div>
-{% endfor %}
-</form>
-#}
-
 {% if data %}
   {% for key, val in data.items() %}
 
