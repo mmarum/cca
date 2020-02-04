@@ -72,31 +72,37 @@ input {
   margin: 10px;
   border-bottom: 1px dashed Orange;
 }
+.order_data {
+  padding-left: 20px;
+}
+.event_id {
+  border-top: 1px dashed Gray;
+  padding-top: 10px;
+  margin-top: 10px;
+}
 </style>
 </head>
 <body>
 <div id="app"><a href="/app">/app</a></div>
 
 <h3>Summary of Orders</h3>
-{% for key, val in booking_data.items() %}
-  <table class="event_item">
-  <tr>
-    <td colspan="5">{{ data[key].title }} {{ data[key].date }}</td>
-  </tr>
-  <tr class="header_row">
-    <td></td><td>Name</td><td>Phone</td><td>Quantity</td><td>Recpeipt</td>
-  </tr>
-  {% for purchase in val %}
-    <tr>
-    <td>{{ loop.index }}</td>
-    {% for k, v in purchase.items() %}
-      {% if k != "eid" %}
-        <td>{{ v }}</td>
-      {% endif %}
+
+{% for key, val in orders_data.items() %}
+  <div class="event_id">event_id: {{ key }}</div>
+  <div>
+  {{ data[key].title }}
+  {{ data[key].date }}
+  {{ data[key].time }}
+  </div>
+  <div class="order_data">
+  {% for k, v in val.items() %}
+    <!-- {{ k }} -->
+    <div class="loop_index">{{ loop.index }}</div>
+      {% for x, y in v.items() %}
+        <div>{{ x }}: {{ y }}</div>
     {% endfor %}
-    </tr>
   {% endfor %}
-  </table>
+  </div>
 {% endfor %}
 
 </body>

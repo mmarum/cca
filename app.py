@@ -11,6 +11,9 @@ from jinja2 import Template
 # https://wtforms.readthedocs.io/en/stable/index.html
 from forms import EventsForm, ImageForm
 
+from os import listdir
+from os.path import isfile, join
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 def read_file(file_name):
@@ -70,8 +73,36 @@ def app(environ, start_response):
             response = t.render(event_data=data[eid])
 
         elif environ['PATH_INFO'] == '/app/admin/booking':
-            booking_data = json.loads(read_file("data/booking.json"))
-            response = t.render(data=data, booking_data=booking_data)
+
+            # List, sort, then read all files in the orders/ folder
+            files = [f for f in listdir("orders/") if isfile(join("orders/", f))]
+
+            # Reminder: Orders data files are saved as event_eid_value.json
+            orders_data = {}
+            for f in files:
+                eid = f.replace(".json", "").strip()
+                event_orders_data = json.loads(read_file(f"orders/{f}"))
+
+                orders_data[eid] = {}
+                for order in event_orders_data:
+                    order_id = order['orderID']
+
+                    # We don't necessarily want all data from orders/event_eid_value.json
+                    # So let's pick and choose what data we want to keep:
+
+                    this_order = {}
+                    this_order['order_id'] = order['orderID']
+                    this_order['create_time'] = order['details']['create_time']
+                    this_order['email_address'] = order['details']['payer']['email_address']
+                    this_order['first_name'] = order['details']['payer']['name']['given_name']
+                    this_order['last_name'] = order['details']['payer']['name']['surname']
+
+                    # Notice zero after purchase_units
+                    this_order['amount'] = order['details']['purchase_units'][0]['amount']['value']
+
+                    orders_data[eid][order_id] = this_order
+
+            response = t.render(data=data, orders_data=orders_data)
 
         else:
             response = t.render()
