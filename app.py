@@ -37,14 +37,14 @@ def app(environ, start_response):
         elif environ['PATH_INFO'].startswith('/app/list/'):
             template_file = "templates/list-events.html"
         elif environ['PATH_INFO'].startswith('/app/book/'):
-            template_file = "templates/book-events.html"
+            template_file = "templates/book-event.html"
         elif environ['PATH_INFO'].startswith('/app/admin/booking'):
             template_file = "templates/admin-booking.html"
         else:
             template_file = "templates/main.html"
 
         t = Template(read_file(template_file))
-        data = json.loads(read_file("events.json"))
+        data = json.loads(read_file("data/events.json"))
 
         if environ['PATH_INFO'] == '/app/admin/events':
             form = EventsForm()
@@ -59,7 +59,7 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == "/app/admin/events/delete":
             eid = environ['QUERY_STRING'].split("=")[1]
             del data[eid]
-            write_file("events.json", json.dumps(data, indent=4))
+            write_file("data/events.json", json.dumps(data, indent=4))
             response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
 
         elif environ['PATH_INFO'] == '/app/list/events':
@@ -70,7 +70,7 @@ def app(environ, start_response):
             response = t.render(event_data=data[eid])
 
         elif environ['PATH_INFO'] == '/app/admin/booking':
-            booking_data = json.loads(read_file("booking.json"))
+            booking_data = json.loads(read_file("data/booking.json"))
             response = t.render(data=data, booking_data=booking_data)
 
         else:
@@ -82,8 +82,17 @@ def app(environ, start_response):
 
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+        form_orders = json.loads(post_input)
+        event_id = str(form_orders['event_id'])
 
-        write_file("paypal-transaction-complete.json", str(post_input))
+        try:
+            orders = json.loads(read_file(f"orders/{event_id}.json"))
+        except:
+            orders = []
+
+        orders.append(form_orders)
+
+        write_file(f"orders/{event_id}.json", json.dumps(orders, indent=4))
 
         response = "200"
 
@@ -106,9 +115,9 @@ def app(environ, start_response):
         open(image_filename.decode('UTF-8'), 'wb').write(image_contents)
 
         # Attach this image filename to event object
-        data = json.loads(read_file("events.json"))
+        data = json.loads(read_file("data/events.json"))
         data[eid.decode('UTF-8')]["image_path"] = image_filename.decode('UTF-8')
-        write_file("events.json", json.dumps(data, indent=4))
+        write_file("data/events.json", json.dumps(data, indent=4))
 
         #response = str(image_contents)
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
@@ -119,7 +128,7 @@ def app(environ, start_response):
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
-        data = json.loads(read_file("events.json"))
+        data = json.loads(read_file("data/events.json"))
         eid = re.sub(r'^.*name="eid"(.*?)------.*$', r"\1", post_input, flags=re.DOTALL).strip()
 
         # If no eid then its a new entry
@@ -144,7 +153,7 @@ def app(environ, start_response):
         # Todo: some validation:
         # validated_event_data = EventsForm(**data[eid])
 
-        write_file("events.json", json.dumps(data, indent=4))
+        write_file("data/events.json", json.dumps(data, indent=4))
 
         t = Template(read_file("templates/admin-image.html"))
         image_form = ImageForm()
