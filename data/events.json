@@ -5,7 +5,7 @@
         "time": "6pm",
         "title": "Chips and Guacamole",
         "duration": "3",
-        "price": "33",
+        "price": "$33",
         "limit": "10",
         "location": "Right Place",
         "image_path": "pwi-square-logo.jpg",
@@ -53,7 +53,7 @@
         "time": "7:00 pm",
         "title": "2 fish",
         "duration": "2 hours",
-        "price": "$35",
+        "price": "35",
         "limit": "30",
         "location": "",
         "image_path": "",
@@ -82,5 +82,17 @@
         "location": "Studio",
         "image_path": "dot-mandala-1.jpg",
         "description": "Fun Art Stuff"
+    },
+    "1008": {
+        "eid": "1008",
+        "date": "02/29/2020",
+        "time": "10:00 pm to 11:59 pm",
+        "title": "studio calendar test event",
+        "duration": "2 hours",
+        "price": "35",
+        "limit": "50",
+        "location": "can we have a google tag here?",
+        "image_path": "",
+        "description": "test test test"
     }
 }

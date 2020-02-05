@@ -14,6 +14,9 @@ from forms import EventsForm, ImageForm
 from os import listdir
 from os.path import isfile, join
 
+# https://pillow.readthedocs.io/en/stable/
+#from PIL import Image
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 def read_file(file_name):
@@ -35,13 +38,13 @@ def app(environ, start_response):
     ####
     if environ['REQUEST_METHOD'] == "GET":
 
-        if environ['PATH_INFO'].startswith('/app/admin/events'):
+        if environ['PATH_INFO'].startswith('/admin/events'):
             template_file = "templates/admin-events.html"
-        elif environ['PATH_INFO'].startswith('/app/list/'):
+        elif environ['PATH_INFO'].startswith('/list/'):
             template_file = "templates/list-events.html"
-        elif environ['PATH_INFO'].startswith('/app/book/'):
+        elif environ['PATH_INFO'].startswith('/book/'):
             template_file = "templates/book-event.html"
-        elif environ['PATH_INFO'].startswith('/app/admin/booking'):
+        elif environ['PATH_INFO'].startswith('/admin/booking'):
             template_file = "templates/admin-booking.html"
         else:
             template_file = "templates/main.html"
@@ -49,30 +52,31 @@ def app(environ, start_response):
         t = Template(read_file(template_file))
         data = json.loads(read_file("data/events.json"))
 
-        if environ['PATH_INFO'] == '/app/admin/events':
+        if environ['PATH_INFO'] == '/admin/events':
             form = EventsForm()
             response = t.render(form=form, data=data)
 
-        elif environ['PATH_INFO'] == '/app/admin/events/edit':
+        elif environ['PATH_INFO'] == '/admin/events/edit':
             eid = environ['QUERY_STRING'].split("=")[1]
             event_data = data[eid]
             form = EventsForm(**event_data)
             response = t.render(form=form, event_data=event_data)
 
-        elif environ['PATH_INFO'] == "/app/admin/events/delete":
+        elif environ['PATH_INFO'] == "/admin/events/delete":
             eid = environ['QUERY_STRING'].split("=")[1]
             del data[eid]
             write_file("data/events.json", json.dumps(data, indent=4))
-            response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
+            #response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
+            response = 'TEMPORARY: (delete event complete)'
 
-        elif environ['PATH_INFO'] == '/app/list/events':
+        elif environ['PATH_INFO'] == '/list/events':
             response = t.render(data=data)
 
-        elif environ['PATH_INFO'] == '/app/book/event':
+        elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
             response = t.render(event_data=data[eid])
 
-        elif environ['PATH_INFO'] == '/app/admin/booking':
+        elif environ['PATH_INFO'] == '/admin/booking':
 
             # List, sort, then read all files in the orders/ folder
             files = [f for f in listdir("orders/") if isfile(join("orders/", f))]
@@ -109,7 +113,7 @@ def app(environ, start_response):
 
     ####
     ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/app/paypal-transaction-complete":
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/paypal-transaction-complete":
 
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
@@ -127,9 +131,10 @@ def app(environ, start_response):
 
         response = "200"
 
+
     ####
     ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/app/image/upload":
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/image/upload":
 
         length = int(environ.get('CONTENT_LENGTH', '0'))
         # NOTICE: NOT DECODING post_input below FOR IMAGES
@@ -143,7 +148,14 @@ def app(environ, start_response):
         image_filename = re.sub(b'^.*filename="(.*?)".*$', r"\1", image_data, flags=re.DOTALL).strip()
         image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
 
-        open(image_filename.decode('UTF-8'), 'wb').write(image_contents)
+        #img_name = image_filename.decode('UTF-8')
+        #open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
+
+
+        #image = Image.open(f"../www/img/orig/{img_name}")
+        #image.thumbnail((350, 350), Image.ANTIALIAS)
+        #image.save(f"../www/img/small/{img_name}", 'JPEG')
+
 
         # Attach this image filename to event object
         data = json.loads(read_file("data/events.json"))
@@ -151,7 +163,9 @@ def app(environ, start_response):
         write_file("data/events.json", json.dumps(data, indent=4))
 
         #response = str(image_contents)
-        response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
+        #response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
+        response = 'TEMPORARY: (upload complete)'
+
 
     ####
     ####
@@ -195,7 +209,7 @@ def app(environ, start_response):
     else:
         response = "barf"
 
-    #response += f"<hr>{str(environ)}"
+    response += f"<hr>{str(environ)}"
 
     return [response.encode()]
 
