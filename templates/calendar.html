@@ -6,31 +6,31 @@
 <meta charset="utf-8">
 <style>
 body {
-  background-image: url("/img/store-cartoon.jpg");
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 20px;
   line-height: 1.5;
 }
-.nav {
-  width: 200px;
-  background-color: Black;
-  opacity: 0.5;
-  border-radius: 6px;
-  padding: 15px;
-}
 a {
-  color: LightGray;
+  color: Blue;
   text-decoration: none;
 }
-.placeholder {
-  height: 1500px;
+.sun, .mon, .tue, .wed, .thu, .fri, .sat, .noday {
+  border-bottom: 1px solid LightGray;
+  border-left: 1px solid LightGray;
+  padding: 10px;
+  margin: 10px;
+}
+.event a {
+  background-color: LightGray;
+  padding: 5px;
+  margin: 5px;
 }
 </style>
 </head>
 <body>
 <div id="app"><a href="/app/">/app/</a></div>
 
-{{ cal }}
+{{ html["html"]|safe }}
 
 </body>
 </html>

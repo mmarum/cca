@@ -116,8 +116,16 @@ def app(environ, start_response):
             htmlStr = myCal.formatmonth(2020, 2)
             htmlStr = htmlStr.replace("&nbsp;"," ")
 
-            #response = t.render(cal=cal)
-            response = htmlStr
+            event_dates = set()
+            for key, val in data.items(): 
+                this_event_date = val["date"].split("/")[1].strip("0")
+                event_dates.add(this_event_date)
+                htmlStr = htmlStr.replace(f'">{this_event_date}<', f' event"><a href="#" >{this_event_date}</a><')
+
+            html = { "html": htmlStr }
+
+            response = t.render(data=data, html=html, event_dates=event_dates)
+            #response = htmlStr
 
 
         else:

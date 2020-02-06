@@ -39,7 +39,6 @@ td {
   margin: auto;
 }
 .event_image {
-  border: 1px dashed Gray;
   width: 220px;
 }
 h1 {
@@ -54,6 +53,33 @@ h1 {
   border-radius: 4px;
   color: #505050;
 }
+
+.left {
+    float: left;
+    width: 250px;
+}
+.right {
+    /* float: right; */
+    width: auto;
+}
+.group:after {
+    content:"";
+    display: table;
+    clear: both;
+}
+img {
+    max-width: 100%;
+    height: auto;
+}
+@media screen and (max-width: 480px) {
+  .left, .right {
+    float: none;
+    width: auto;
+  }
+  .event_image {
+    width: 100%;
+  }
+}
 </style>
 </head>
 <body>
@@ -61,30 +87,30 @@ h1 {
 
 <div class="container">
 
-{% if data %}
-  <table>
-  {% for key, val in data.items() %}
-    <tr>
-    <td>
+{% for key, val in data.items() %}
+  <div class="group">
+
+    <div class="left">
       <a href="/app/book/event?eid={{ val.eid }}" class="event_link">
-      <img alt="{{ val.image_path }}" src="/img/small/{{ val.image_path }}" class="event_image"/>
+        <img alt="{{ val.image_path }}" src="/img/small/{{ val.image_path }}" class="event_image"/>
       </a>
-    </td>
-    <td>
+    </div>
+
+    <div class="right">
       <a href="/app/book/event?eid={{ val.eid }}" class="event_link">
       <div>{{ val.date }} {{ val.time }} {{ val.duration }} hrs</div>
       <h1>{{ val.title }}</h1>
-      <div>${{ val.price }} per person,</div>
-      <div>Max: {{ val.limit }} people, X seats remaining.</div>
+      <div>${{ val.price }} per person, Max: {{ val.limit }} people, X seats remaining.</div>
       <div>At: {{ val.location }}</div>
       <div class="book_now">Book Now</div>
       <div>{{ val.description }}</div>
       </a>
-    </td>
-    </tr>
-  {% endfor %}
-  </table>
-{% endif %}
+    </div>
+
+  </div>
+
+  <hr>
+{% endfor %}
 
 </div>
 
