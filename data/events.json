@@ -5,11 +5,11 @@
         "time": "6pm",
         "title": "Chips and Guacamole",
         "duration": "3",
-        "price": "$33",
+        "price": "33",
         "limit": "10",
         "location": "Right Place",
-        "image_path": "pwi-square-logo.jpg",
-        "description": "Eating time is fun"
+        "image_path": "water-marbling-2.jpg",
+        "description": "Eating time is fun in the sun bun fun many words big long description"
     },
     "1002": {
         "eid": "1002",
@@ -20,8 +20,8 @@
         "price": "5",
         "limit": "22",
         "location": "Lounge",
-        "image_path": "20200104_122222.jpg",
-        "description": "Healthy treats"
+        "image_path": "alcohol-ink-1.jpg",
+        "description": "Healthy treats sometimes things happen that you don't understand"
     },
     "1003": {
         "eid": "1003",
@@ -32,8 +32,8 @@
         "price": "10",
         "limit": "21",
         "location": "Local Diner",
-        "image_path": "image.jpg",
-        "description": "Food for thoughts"
+        "image_path": "watercolor-1.jpg",
+        "description": "Food for thoughts about marvelous beings on Earth on the time of your life"
     },
     "1004": {
         "eid": "1004",
@@ -44,8 +44,8 @@
         "price": "12",
         "limit": "20",
         "location": "Studio",
-        "image_path": "water-marbling-2.jpg",
-        "description": "Sandwich Shoppe"
+        "image_path": "acrylic-1.jpg",
+        "description": "Sandwich Shoppe I am adding more words here to see what happens"
     },
     "1005": {
         "eid": "1005",
@@ -55,8 +55,8 @@
         "duration": "2 hours",
         "price": "35",
         "limit": "30",
-        "location": "",
-        "image_path": "",
+        "location": "Front Office Back behind the fridge",
+        "image_path": "dot-mandala-1.jpg",
         "description": "2 fish, acrylic painting on 16x20 inch canvas"
     },
     "1006": {
@@ -86,13 +86,25 @@
     "1008": {
         "eid": "1008",
         "date": "02/29/2020",
-        "time": "10:00 pm to 11:59 pm",
+        "time": "10:00",
         "title": "studio calendar test event",
         "duration": "2 hours",
         "price": "35",
         "limit": "50",
         "location": "can we have a google tag here?",
-        "image_path": "",
+        "image_path": "water-marbling-1.jpg",
         "description": "test test test"
+    },
+    "1009": {
+        "eid": "1009",
+        "date": "02/06/2020",
+        "time": "9pm",
+        "title": "Color Your Fingers in Paint",
+        "duration": "3",
+        "price": "13",
+        "limit": "30",
+        "location": "Studio",
+        "image_path": "acrylic-1.jpg",
+        "description": "Finger paining is fun and smelly"
     }
 }

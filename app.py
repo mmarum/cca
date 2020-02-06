@@ -4,6 +4,7 @@ import json
 #import urllib.parse
 import re
 import base64
+import calendar
 
 # https://jinja.palletsprojects.com/en/2.10.x/api/
 from jinja2 import Template
@@ -15,7 +16,7 @@ from os import listdir
 from os.path import isfile, join
 
 # https://pillow.readthedocs.io/en/stable/
-#from PIL import Image
+from PIL import Image
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -46,6 +47,8 @@ def app(environ, start_response):
             template_file = "templates/book-event.html"
         elif environ['PATH_INFO'].startswith('/admin/booking'):
             template_file = "templates/admin-booking.html"
+        elif environ['PATH_INFO'].startswith('/calendar'):
+            template_file = "templates/calendar.html"
         else:
             template_file = "templates/main.html"
 
@@ -66,8 +69,7 @@ def app(environ, start_response):
             eid = environ['QUERY_STRING'].split("=")[1]
             del data[eid]
             write_file("data/events.json", json.dumps(data, indent=4))
-            #response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
-            response = 'TEMPORARY: (delete event complete)'
+            response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
 
         elif environ['PATH_INFO'] == '/list/events':
             response = t.render(data=data)
@@ -107,6 +109,16 @@ def app(environ, start_response):
                     orders_data[eid][order_id] = this_order
 
             response = t.render(data=data, orders_data=orders_data)
+
+        elif environ['PATH_INFO'] == '/calendar':
+
+            myCal = calendar.HTMLCalendar(calendar.SUNDAY)
+            htmlStr = myCal.formatmonth(2020, 2)
+            htmlStr = htmlStr.replace("&nbsp;"," ")
+
+            #response = t.render(cal=cal)
+            response = htmlStr
+
 
         else:
             response = t.render()
@@ -148,14 +160,14 @@ def app(environ, start_response):
         image_filename = re.sub(b'^.*filename="(.*?)".*$', r"\1", image_data, flags=re.DOTALL).strip()
         image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
 
-        #img_name = image_filename.decode('UTF-8')
-        #open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
+        img_name = image_filename.decode('UTF-8')
+        open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
 
-
-        #image = Image.open(f"../www/img/orig/{img_name}")
-        #image.thumbnail((350, 350), Image.ANTIALIAS)
-        #image.save(f"../www/img/small/{img_name}", 'JPEG')
-
+        # Now create a thumbnail of the original
+        size = 300, 300
+        image = Image.open(f"../www/img/orig/{img_name}")
+        image.thumbnail(size)
+        image.save(f"../www/img/small/{img_name}", 'JPEG')
 
         # Attach this image filename to event object
         data = json.loads(read_file("data/events.json"))
@@ -163,8 +175,7 @@ def app(environ, start_response):
         write_file("data/events.json", json.dumps(data, indent=4))
 
         #response = str(image_contents)
-        #response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
-        response = 'TEMPORARY: (upload complete)'
+        response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
 
 
     ####
@@ -209,7 +220,7 @@ def app(environ, start_response):
     else:
         response = "barf"
 
-    response += f"<hr>{str(environ)}"
+    #response += f"<hr>{str(environ)}"
 
     return [response.encode()]
 
