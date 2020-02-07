@@ -59,50 +59,43 @@ def app(environ, start_response):
     ####
     if environ['REQUEST_METHOD'] == "GET":
 
-        if environ['PATH_INFO'].startswith('/admin/events'):
-            template_file = "templates/admin-events.html"
-        elif environ['PATH_INFO'].startswith('/list/'):
-            template_file = "templates/list-events.html"
-        elif environ['PATH_INFO'].startswith('/book/'):
-            template_file = "templates/book-event.html"
-        elif environ['PATH_INFO'].startswith('/admin/booking'):
-            template_file = "templates/admin-booking.html"
-        elif environ['PATH_INFO'].startswith('/calendar'):
-            template_file = "templates/calendar.html"
-        else:
-            template_file = "templates/main.html"
-
-        t = Template(read_file(template_file))
         data = json.loads(read_file("data/events.json"))
 
-        if environ['PATH_INFO'] == '/admin/events':
+        if environ['PATH_INFO'] == '/admin/events/list':
             c = db.cursor()
             c.execute("select * from events")
             allrows = c.fetchall()
-            form = EventsForm()
-            response = t.render(form=form, data=data, allrows=allrows)
+            t = Template(read_file("templates/admin-events-list.html"))
+            response = t.render(allrows=allrows)
 
-        elif environ['PATH_INFO'] == '/admin/events/edit':
-            eid = environ['QUERY_STRING'].split("=")[1]
-            event_data = data[eid]
-            form = EventsForm(**event_data)
-            response = t.render(form=form, event_data=event_data)
+        elif environ['PATH_INFO'] == '/admin/events/add-edit':
+            if len(environ['QUERY_STRING']) > 1:
+                eid = environ['QUERY_STRING'].split("=")[1]
+                db.query(f"select * from events where eid = {eid}")
+                r = db.store_result()
+                row = r.fetch_row(maxrows=1, how=1)[0]
+                form = EventsForm(**row)
+            else:
+                form = EventsForm()
+            t = Template(read_file("templates/admin-events-add-edit.html"))
+            response = t.render(form=form)
 
         elif environ['PATH_INFO'] == "/admin/events/delete":
             eid = environ['QUERY_STRING'].split("=")[1]
             del data[eid]
             write_file("data/events.json", json.dumps(data, indent=4))
-            response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
+            response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
         elif environ['PATH_INFO'] == '/list/events':
+            t = Template(read_file("templates/list-events.html"))
             response = t.render(data=data)
 
         elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
+            t = Template(read_file("templates/book-event.html"))
             response = t.render(event_data=data[eid])
 
         elif environ['PATH_INFO'] == '/admin/booking':
-
             # List, sort, then read all files in the orders/ folder
             files = [f for f in listdir("orders/") if isfile(join("orders/", f))]
 
@@ -131,6 +124,7 @@ def app(environ, start_response):
 
                     orders_data[eid][order_id] = this_order
 
+            t = Template(read_file("templates/admin-booking.html"))
             response = t.render(data=data, orders_data=orders_data)
 
         elif environ['PATH_INFO'] == '/calendar':
@@ -147,11 +141,13 @@ def app(environ, start_response):
 
             html = { "html": htmlStr }
 
+            t = Template(read_file("templates/calendar.html"))
             response = t.render(data=data, html=html, event_dates=event_dates)
             #response = htmlStr
 
 
         else:
+            t = Template(read_file("templates/main.html"))
             response = t.render()
 
     ####
@@ -205,7 +201,7 @@ def app(environ, start_response):
         c = db.cursor()
         c.execute(sql)
 
-        response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
+        response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
 
     ####
@@ -259,7 +255,7 @@ def app(environ, start_response):
     else:
         response = "barf"
 
-    #response += f"<hr>{str(environ)}"
+    response += f"<hr>{str(environ)}"
 
     #db.close()
 
