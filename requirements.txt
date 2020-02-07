@@ -3,3 +3,5 @@ requests
 jinja2
 WTForms
 Pillow
+mysql
+mysqlclient

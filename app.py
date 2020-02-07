@@ -18,6 +18,20 @@ from os.path import isfile, join
 # https://pillow.readthedocs.io/en/stable/
 from PIL import Image
 
+# https://github.com/PyMySQL/mysqlclient-python
+# https://mysqlclient.readthedocs.io/
+# https://mysqlclient.readthedocs.io/user_guide.html#some-mysql-examples
+
+#from MySQLdb import _mysql
+import MySQLdb
+
+#db =_mysql.connect(host="localhost", user="jedmarum_cca",
+#    passwd=passwd, db="jedmarum_events")
+#db.query("""select * from events""")
+#r=db.store_result()
+#r.fetch_row(maxrows=100, how=1)
+#db.close()
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 def read_file(file_name):
@@ -31,6 +45,19 @@ def write_file(file_name, content):
     f.write(content)
     f.close()
     return True
+
+# = = = = 
+# mysql -u jedmarum_cca jedmarum_events -p
+passwd = json.loads(read_file("data/passwords.json"))["jedmarum_events"]
+db = MySQLdb.connect(host="localhost", user="jedmarum_cca",
+    passwd=passwd, db="jedmarum_events")
+fields = "edate, time, title, duration, price, elimit, location, image, description"
+vals = '"2020-02-07", "19:00:00", "This is the Title 2", "1", 20, 20, "Studio B", "image-2.jpg", "description two"'
+sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
+c = db.cursor()
+c.execute(sql)
+# = = = =
+
 
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
