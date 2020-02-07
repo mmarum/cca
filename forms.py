@@ -4,19 +4,28 @@ from datetime import datetime
 
 # https://wtforms.readthedocs.io/en/stable/fields.html
 
-#default_date_time = "2020-02-01-10-00"
+"""
+| eid         | int(11)      | NO   | PRI | NULL                | auto_increment                |
+| datetime    | timestamp    | NO   |     | current_timestamp() | on update current_timestamp() |
+| title       | varchar(200) | NO   |     | NULL                |                               |
+| duration    | varchar(20)  | NO   |     | NULL                |                               |
+| price       | int(11)      | NO   |     | NULL                |                               |
+| elimit      | int(11)      | YES  |     | NULL                |                               |
+| location    | varchar(200) | NO   |     | NULL                |                               |
+| image       | varchar(200) | YES  |     | NULL                |                               |
+| description | varchar(500) | YES  |     | NULL                |                               |
+
+"""
 
 class EventsForm(Form):
-    #date_time = DateTimeField("Date Time", description="DateTime", default=default_date_time, format="%Y-%m-%d-%H-%M")
     eid = HiddenField("eid", description="eid")
-    date = StringField("Date", description="Date")
-    time = StringField("Time", description="Time")
+    datetime = DateTimeField("Date", description="Date", format="%Y-%m-%d %H:%M:%S")
     title = StringField("Title", description="Title")
     duration = StringField("Duration", description="Duration")
     price = StringField("Price", description="Price")
-    limit = StringField("Limit", description="Limit")
+    elimit = StringField("Limit", description="Limit")
     location = StringField("Location", description="Location")
-    image_path = HiddenField("Image Path", description="Image Path")
+    image = HiddenField("Image Path", description="Image Path")
     description = TextAreaField("Description", description="Description")
     submit = SubmitField("Next", description="Next")
 

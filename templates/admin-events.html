@@ -11,7 +11,7 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
 $( function() {
-  $( "#date" ).datepicker();
+  $( "#datetime" ).datepicker({ dateFormat: 'yy-mm-dd' });
 } );
 </script>
 
@@ -109,6 +109,18 @@ input {
 <body>
 <div id="app"><a href="/app/">/app/</a></div>
 
+<script>
+function appendTime() {
+  var append_time = document.getElementById("append_time");
+  var datetime = document.getElementById("datetime");
+  datetime.value = datetime.value.split(' ')[0] + " " + append_time.value;
+}
+</script>
+
+{% for row in allrows %}
+  <div>{{ row }}</div>
+{% endfor %}
+
 <form action="/app/" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
   {% if field.name != "eid" and field.name != "submit" %}
@@ -117,7 +129,14 @@ input {
   {% if field.name == "image_path" and event_data %}
     <div>You can change this image in the next step.</div>
   {% endif %}
-  <div class="field">{{ field(autocomplete="off") }}</div>
+  {% if field.name == "datetime" %}
+    <div class="field">{{ field(autocomplete="off") }}</div>
+    <div class="field">
+      <input id="append_time" name="append_time" type="text" value="00:00:00" onblur="appendTime()">
+    </div>
+  {% else %}
+    <div class="field">{{ field(autocomplete="off") }}</div>
+  {% endif %}
 {% endfor %}
 <div><a href="/app/admin/events" onclick="hideAddNewEvent(); return false;">Cancel</a></div>
 {% if event_data %}

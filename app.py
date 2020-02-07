@@ -21,16 +21,13 @@ from PIL import Image
 # https://github.com/PyMySQL/mysqlclient-python
 # https://mysqlclient.readthedocs.io/
 # https://mysqlclient.readthedocs.io/user_guide.html#some-mysql-examples
-
-#from MySQLdb import _mysql
 import MySQLdb
 
-#db =_mysql.connect(host="localhost", user="jedmarum_cca",
-#    passwd=passwd, db="jedmarum_events")
+#from MySQLdb import _mysql
+#db = mysql.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
 #db.query("""select * from events""")
 #r=db.store_result()
 #r.fetch_row(maxrows=100, how=1)
-#db.close()
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -46,19 +43,15 @@ def write_file(file_name, content):
     f.close()
     return True
 
-# = = = = 
+
 # mysql -u jedmarum_cca jedmarum_events -p
-passwd = json.loads(read_file("data/passwords.json"))["jedmarum_events"]
-db = MySQLdb.connect(host="localhost", user="jedmarum_cca",
-    passwd=passwd, db="jedmarum_events")
-fields = "edate, time, title, duration, price, elimit, location, image, description"
-vals = '"2020-02-07", "19:00:00", "This is the Title 2", "1", 20, 20, "Studio B", "image-2.jpg", "description two"'
-sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
-c = db.cursor()
-c.execute(sql)
-# = = = =
+dbuser = "jedmarum_cca"
+passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
 
+db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
+
+ 
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
 
@@ -83,8 +76,11 @@ def app(environ, start_response):
         data = json.loads(read_file("data/events.json"))
 
         if environ['PATH_INFO'] == '/admin/events':
+            c = db.cursor()
+            c.execute("select * from events")
+            allrows = c.fetchall()
             form = EventsForm()
-            response = t.render(form=form, data=data)
+            response = t.render(form=form, data=data, allrows=allrows)
 
         elif environ['PATH_INFO'] == '/admin/events/edit':
             eid = environ['QUERY_STRING'].split("=")[1]
@@ -190,6 +186,7 @@ def app(environ, start_response):
         # NOTICE BYTES STRING below FOR IMAGES
         image_eid = post_input.split(b'------')[1]
         eid = re.sub(b'^.*name="eid"(.*)$', r"\1", image_eid, flags=re.DOTALL).strip()
+        eid = int(eid.decode('UTF-8'))
 
         image_data = post_input.split(b'------')[2]
         image_filename = re.sub(b'^.*filename="(.*?)".*$', r"\1", image_data, flags=re.DOTALL).strip()
@@ -204,12 +201,10 @@ def app(environ, start_response):
         image.thumbnail(size)
         image.save(f"../www/img/small/{img_name}", 'JPEG')
 
-        # Attach this image filename to event object
-        data = json.loads(read_file("data/events.json"))
-        data[eid.decode('UTF-8')]["image_path"] = image_filename.decode('UTF-8')
-        write_file("data/events.json", json.dumps(data, indent=4))
+        sql = f"UPDATE events SET image = '{img_name}' WHERE eid = {eid}"
+        c = db.cursor()
+        c.execute(sql)
 
-        #response = str(image_contents)
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events" />'
 
 
@@ -219,36 +214,45 @@ def app(environ, start_response):
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
-        data = json.loads(read_file("data/events.json"))
-        eid = re.sub(r'^.*name="eid"(.*?)------.*$', r"\1", post_input, flags=re.DOTALL).strip()
+        data_object = {}
+        data_array = []
 
-        # If no eid then its a new entry
-        # And must create a new eid
-        if eid == "":
-            keys_array = sorted(list(data.keys()))
-            eid = int(keys_array[-1]) + 1
+        post_input_array = post_input.split('------')
 
-        data[eid] = {}
-        data_array = post_input.split('------')
-
-        for d in data_array:
+        for d in post_input_array:
             post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
             post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
             if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
-                data[eid][post_data_key] = post_data_val
+                data_object[post_data_key] = post_data_val
+                data_array.append(post_data_val)
 
-        if data[eid]["eid"] == "":
-            data[eid]["eid"] = str(eid)
+        # Remove "eid"
+        del data_object['eid']
+        del data_array[0]
 
-        # Invoking the object in order to validate form field values
-        # Todo: some validation:
-        # validated_event_data = EventsForm(**data[eid])
+        # Remove "append_time"
+        del data_object['append_time']
+        del data_array[1]
 
-        write_file("data/events.json", json.dumps(data, indent=4))
+        # Todo: More validation
+        events_form = EventsForm(**data_object)
+
+        fields = "datetime, title, duration, price, elimit, location, image, description"
+        vals = str(data_array).lstrip('[').rstrip(']')
+
+        sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
+        c = db.cursor()
+        c.execute(sql)
+
+        # Now retrieve the eid from the item we just added
+        sql = f"""select eid from events where datetime = '{data_object["datetime"]}' and title = '{data_object["title"]}'"""
+        c.execute(sql)
+        eid = int(c.fetchone()[0])
 
         t = Template(read_file("templates/admin-image.html"))
         image_form = ImageForm()
-        response = t.render(event_data=data[eid], image_form=image_form)
+        response = t.render(event_data=data_object, image_form=image_form, sql={"sql":sql}, eid={"eid":eid})
+
 
     ####
     ####
@@ -256,6 +260,8 @@ def app(environ, start_response):
         response = "barf"
 
     #response += f"<hr>{str(environ)}"
+
+    #db.close()
 
     return [response.encode()]
 
