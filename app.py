@@ -189,7 +189,9 @@ def app(environ, start_response):
         image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
 
         img_name = image_filename.decode('UTF-8')
-        open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
+
+        if img_name:
+            open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
 
         # Now create a thumbnail of the original
         size = 300, 300
@@ -222,28 +224,49 @@ def app(environ, start_response):
                 data_object[post_data_key] = post_data_val
                 data_array.append(post_data_val)
 
-        # Remove "eid"
+        # If form passes an eid value then query
+        # is an update as opposed to an insert
+
+        try:
+            if int(data_object['eid']) > 0:
+                eid = data_object['eid']
+        except:
+            pass
+
+        # Cleanup: Remove "eid"
         del data_object['eid']
         del data_array[0]
 
-        # Remove "append_time"
+        # Cleanup: Remove "append_time"
         del data_object['append_time']
         del data_array[1]
 
         # Todo: More validation
         events_form = EventsForm(**data_object)
 
-        fields = "datetime, title, duration, price, elimit, location, image, description"
-        vals = str(data_array).lstrip('[').rstrip(']')
+        # Set query based on update vs insert
+        keys_vals = ""
+        if eid:
+            for k, v in data_object.items():
+                keys_vals += str(f"{k}='{v}', ")
+            keys_vals = keys_vals.rstrip(', ')
+            sql = f"UPDATE events SET {keys_vals} WHERE eid = {eid}"
+        else:
+            fields = "datetime, title, duration, price, elimit, location, image, description"
+            vals = str(data_array).lstrip('[').rstrip(']')
+            sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
 
-        sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
         c = db.cursor()
         c.execute(sql)
 
-        # Now retrieve the eid from the item we just added
-        sql = f"""select eid from events where datetime = '{data_object["datetime"]}' and title = '{data_object["title"]}'"""
-        c.execute(sql)
-        eid = int(c.fetchone()[0])
+        # Next template needs to know the eid
+        if eid:
+            pass
+        else:
+            # Now retrieve the eid from the item we just added
+            sql = f"""select eid from events where datetime = '{data_object["datetime"]}' and title = '{data_object["title"]}'"""
+            c.execute(sql)
+            eid = int(c.fetchone()[0])
 
         t = Template(read_file("templates/admin-image.html"))
         image_form = ImageForm()
