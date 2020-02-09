@@ -29,6 +29,8 @@ import MySQLdb
 #r=db.store_result()
 #r.fetch_row(maxrows=100, how=1)
 
+error_log = ""
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 def read_file(file_name):
@@ -65,6 +67,7 @@ def app(environ, start_response):
             c = db.cursor()
             c.execute("select * from events")
             allrows = c.fetchall()
+            c.close()
             t = Template(read_file("templates/admin-events-list.html"))
             response = t.render(allrows=allrows)
 
@@ -82,18 +85,34 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == "/admin/events/delete":
             eid = environ['QUERY_STRING'].split("=")[1]
-            del data[eid]
-            write_file("data/events.json", json.dumps(data, indent=4))
+            sql = f"DELETE FROM events where eid = {eid}"
+            c = db.cursor()
+            c.execute(sql)
+            c.close()
             response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
         elif environ['PATH_INFO'] == '/list/events':
+            #c = db.cursor()
+            #c.execute("select * from events")
+            #allrows = c.fetchall()
+            #c.close()
+
+            db.query("select * from events")
+            r = db.store_result()
+            allrows = r.fetch_row(maxrows=100, how=1)
+
             t = Template(read_file("templates/list-events.html"))
-            response = t.render(data=data)
+            response = t.render(events=allrows)
 
         elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
+
+            db.query(f"select * from events where eid = {eid}")
+            r = db.store_result()
+            row = r.fetch_row(maxrows=1, how=1)[0]
+
             t = Template(read_file("templates/book-event.html"))
-            response = t.render(event_data=data[eid])
+            response = t.render(event_data=row)
 
         elif environ['PATH_INFO'] == '/admin/booking':
             # List, sort, then read all files in the orders/ folder
@@ -165,9 +184,7 @@ def app(environ, start_response):
             orders = []
 
         orders.append(form_orders)
-
         write_file(f"orders/{event_id}.json", json.dumps(orders, indent=4))
-
         response = "200"
 
 
@@ -190,18 +207,19 @@ def app(environ, start_response):
 
         img_name = image_filename.decode('UTF-8')
 
-        if img_name:
+        if img_name and image_contents:
             open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
 
-        # Now create a thumbnail of the original
-        size = 300, 300
-        image = Image.open(f"../www/img/orig/{img_name}")
-        image.thumbnail(size)
-        image.save(f"../www/img/small/{img_name}", 'JPEG')
+            # Now create a thumbnail of the original
+            size = 300, 300
+            image = Image.open(f"../www/img/orig/{img_name}")
+            image.thumbnail(size)
+            image.save(f"../www/img/small/{img_name}", 'JPEG')
 
-        sql = f"UPDATE events SET image = '{img_name}' WHERE eid = {eid}"
-        c = db.cursor()
-        c.execute(sql)
+            sql = f"UPDATE events SET image = '{img_name}' WHERE eid = {eid}"
+            c = db.cursor()
+            c.execute(sql)
+            c.close()
 
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
@@ -229,9 +247,12 @@ def app(environ, start_response):
 
         try:
             if int(data_object['eid']) > 0:
+                action = "Update"
                 eid = data_object['eid']
+            else:
+                action = "Insert"
         except:
-            pass
+            action = "Insert"
 
         # Cleanup: Remove "eid"
         del data_object['eid']
@@ -245,40 +266,46 @@ def app(environ, start_response):
         events_form = EventsForm(**data_object)
 
         # Set query based on update vs insert
-        keys_vals = ""
-        if eid:
+        if action == "Update":
+            keys_vals = ""
             for k, v in data_object.items():
                 keys_vals += str(f"{k}='{v}', ")
             keys_vals = keys_vals.rstrip(', ')
             sql = f"UPDATE events SET {keys_vals} WHERE eid = {eid}"
+
         else:
-            fields = "datetime, title, duration, price, elimit, location, image, description"
+            fields = "edatetime, title, duration, price, elimit, location, image, description"
             vals = str(data_array).lstrip('[').rstrip(']')
             sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
 
         c = db.cursor()
         c.execute(sql)
+        c.close()
 
         # Next template needs to know the eid
-        if eid:
-            pass
-        else:
+        if action == "Insert":
             # Now retrieve the eid from the item we just added
-            sql = f"""select eid from events where datetime = '{data_object["datetime"]}' and title = '{data_object["title"]}'"""
-            c.execute(sql)
-            eid = int(c.fetchone()[0])
+            e = data_object['edatetime']
+            t = data_object['title']
+            sql2 = f"select eid from events where edatetime = '{e}' and title = '{t}'"
+            d = db.cursor()
+            d.execute(sql2)
+            eid = int(d.fetchone()[0])
+            d.close()
+        else:
+            sql2 = "just an update"
 
         t = Template(read_file("templates/admin-image.html"))
         image_form = ImageForm()
-        response = t.render(event_data=data_object, image_form=image_form, sql={"sql":sql}, eid={"eid":eid})
-
+        response = t.render(event_data=data_object, image_form=image_form, 
+            sql={"sql":sql}, eid={"eid":eid}, sql2={"sql2":sql2})
 
     ####
     ####
     else:
         response = "barf"
 
-    response += f"<hr>{str(environ)}"
+    #response += f"<hr>{str(environ)}"
 
     #db.close()
 

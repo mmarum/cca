@@ -104,21 +104,21 @@ input {
 
 <div class="row">
 <div class="column">
-  <img alt="/img/{{ event_data.image_path }}" src="/img/placeholder.gif" class="event_image">
+  <img src="/img/small/{{ event_data.image }}" class="event_image">
 </div>
 <div class="column">
-  <div>{{ event_data.date }} {{ event_data.time }} {{ event_data.duration }} hrs <span class="book">Book Now</span></div>
+  <div>{{ event_data.edatetime }} {{ event_data.duration }} hrs <span class="book">Book Now</span></div>
   <h1>{{ event_data.title }}</h1>
   <div>
     ${{ event_data.price }} per person, 
-    Max: {{ event_data.limit }} people, 
+    Max: {{ event_data.elimit }} people, 
     At: {{ event_data.location }} 
     {{ event_data.description }}
 
     <form>
     <select name="quantity" id="quantity" onchange="quant();">
     <option value="">Choose quantity</option>
-    {% set x=event_data.limit|int %}
+    {% set x=event_data.elimit|int %}
     {% for n in range(1, x+1) %}
       <option value="{{ n }}">{{ n }}</option>
     {% endfor %}

@@ -87,30 +87,32 @@ img {
 
 <div class="container">
 
-{% for key, val in data.items() %}
+{% for event in events %}
+
   <div class="group">
 
     <div class="left">
-      <a href="/app/book/event?eid={{ val.eid }}" class="event_link">
-        <img alt="{{ val.image_path }}" src="/img/small/{{ val.image_path }}" class="event_image"/>
+      <a href="/app/book/event?eid={{ event.eid }}" class="event_link">
+        <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
       </a>
     </div>
 
     <div class="right">
-      <a href="/app/book/event?eid={{ val.eid }}" class="event_link">
-      <div>{{ val.date }} {{ val.time }} {{ val.duration }} hrs</div>
-      <h1>{{ val.title }}</h1>
-      <div>${{ val.price }} per person, Max: {{ val.limit }} people, X seats remaining.</div>
-      <div>At: {{ val.location }}</div>
+      <a href="/app/book/event?eid={{ event.eid }}" class="event_link">
+      <div>{{ event.date }} {{ event.time }} {{ event.duration }} hrs</div>
+      <h1>{{ event.title }}</h1>
+      <div>${{ event.price }} per person, Max: {{ event.limit }} people, X seats remaining.</div>
+      <div>At: {{ event.location }}</div>
       <div class="book_now">Book Now</div>
-      <div>{{ val.description }}</div>
+      <div>{{ event.description }}</div>
       </a>
     </div>
 
   </div>
-
   <hr>
+
 {% endfor %}
+
 
 </div>
 

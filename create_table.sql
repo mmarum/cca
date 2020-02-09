@@ -1,6 +1,6 @@
 CREATE TABLE events (
 eid INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-datetime timestamp NOT NULL,
+edatetime datetime UNIQUE NOT NULL,
 title VARCHAR (200) NOT NULL,
 duration VARCHAR (20) NOT NULL,
 price INT NOT NULL,
