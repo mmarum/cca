@@ -84,23 +84,18 @@ def app(environ, start_response):
             response = t.render(form=form)
 
         elif environ['PATH_INFO'] == "/admin/events/delete":
-            eid = environ['QUERY_STRING'].split("=")[1]
-            sql = f"DELETE FROM events where eid = {eid}"
-            c = db.cursor()
-            c.execute(sql)
-            c.close()
-            response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
+            eid = int(environ['QUERY_STRING'].split("=")[1])
+            if type(eid) == int:
+                sql = f"DELETE FROM events where eid = {eid}"
+                c = db.cursor()
+                c.execute(sql)
+                c.close()
+                response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
         elif environ['PATH_INFO'] == '/list/events':
-            #c = db.cursor()
-            #c.execute("select * from events")
-            #allrows = c.fetchall()
-            #c.close()
-
             db.query("select * from events")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
-
             t = Template(read_file("templates/list-events.html"))
             response = t.render(events=allrows)
 
@@ -149,19 +144,27 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == '/calendar':
 
             myCal = calendar.HTMLCalendar(calendar.SUNDAY)
-            htmlStr = myCal.formatmonth(2020, 2)
+
+            # TODO: Identify current year and month
+            # to replace hard-coded values
+            this_year = 2020
+            this_month = 2
+            htmlStr = myCal.formatmonth(this_year, this_month)
             htmlStr = htmlStr.replace("&nbsp;"," ")
 
-            event_dates = set()
-            for key, val in data.items(): 
-                this_event_date = val["date"].split("/")[1].strip("0")
-                event_dates.add(this_event_date)
-                htmlStr = htmlStr.replace(f'">{this_event_date}<', f' event"><a href="#" >{this_event_date}</a><')
+            c = db.cursor()
+            c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {this_month} AND YEAR(edatetime) = {this_year}")
+            allrows = c.fetchall()
+            c.close()
+
+            for d in allrows:
+                day = str(d[0])
+                day = day.split(' ')[0].split('-')[2].lstrip('0')
+                htmlStr = htmlStr.replace(f'">{day}<', f' event"><a href="#" >{day}</a><')
 
             html = { "html": htmlStr }
-
             t = Template(read_file("templates/calendar.html"))
-            response = t.render(data=data, html=html, event_dates=event_dates)
+            response = t.render(events=allrows, html=html)
             #response = htmlStr
 
 

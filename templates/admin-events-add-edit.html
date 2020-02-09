@@ -117,7 +117,7 @@ function appendTime() {
     {{ field.label }}
   {% endif %}
   {% if field.name == "image" %}
-    <div>You can change this image in the next step.</div>
+    <div>You can change the image in the next step.</div>
   {% endif %}
   {% if field.name == "edatetime" %}
     <div class="field">{{ field(autocomplete="off") }}</div>
@@ -131,7 +131,9 @@ function appendTime() {
 
 <div><a href="/app/admin/events/list" onclick="hideAddNewEvent(); return false;">Cancel</a></div>
 
-<div><a href="/app/admin/events/delete?eid={{ form.eid.data }}" onclick="return confirm('Are you sure?');">Delete this event</a></div>
+{% if form.eid.data %}
+  <div><a href="/app/admin/events/delete?eid={{ form.eid.data }}" onclick="return confirm('Are you sure?');">Delete this event</a></div>
+{% endif %}
 
 </form>
 
