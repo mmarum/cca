@@ -25,12 +25,27 @@ a {
   padding: 5px;
   margin: 5px;
 }
+#month2 {
+  display: block;
+}
+#month3, #month4 {
+  display: none;
+}
+
 </style>
 </head>
 <body>
 <div id="app"><a href="/app/">/app/</a></div>
 
 {{ html["html"]|safe }}
+
+<script>
+function nextMonth(next_month) {
+  var this_month = next_month - 1;
+  var next_month_html = document.getElementById("month"+next_month).innerHTML;
+  document.getElementById("month2").innerHTML = next_month_html;
+}
+</script>
 
 </body>
 </html>

@@ -53,7 +53,32 @@ passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
 db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
 
- 
+def make_cal(month=2, year=2020):
+
+    myCal = calendar.HTMLCalendar(calendar.SUNDAY)
+
+    # TODO: Identify current year and month
+    # to replace hard-coded values
+    this_year = year #2020
+    this_month = month #2
+    htmlStr = myCal.formatmonth(this_year, this_month)
+    htmlStr = htmlStr.replace("&nbsp;"," ")
+    next_link = f"<div><a href='' onclick='nextMonth({month+1}); return false;'>Next</a>\n"
+    htmlStr = f"<div id='month{month}'>\n{htmlStr}\n{next_link}\n</div>\n"
+
+    c = db.cursor()
+    c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {this_month} AND YEAR(edatetime) = {this_year}")
+    allrows = c.fetchall()
+    c.close()
+
+    for d in allrows:
+        day = str(d[0])
+        day = day.split(' ')[0].split('-')[2].lstrip('0')
+        htmlStr = htmlStr.replace(f'">{day}<', f' event"><a href="#" >{day}</a><')
+
+    return htmlStr
+
+
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
 
@@ -143,28 +168,13 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/calendar':
 
-            myCal = calendar.HTMLCalendar(calendar.SUNDAY)
+            htmlStr = ""
+            for n in range(2,5):
+                htmlStr += make_cal(n, 2020)
 
-            # TODO: Identify current year and month
-            # to replace hard-coded values
-            this_year = 2020
-            this_month = 2
-            htmlStr = myCal.formatmonth(this_year, this_month)
-            htmlStr = htmlStr.replace("&nbsp;"," ")
-
-            c = db.cursor()
-            c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {this_month} AND YEAR(edatetime) = {this_year}")
-            allrows = c.fetchall()
-            c.close()
-
-            for d in allrows:
-                day = str(d[0])
-                day = day.split(' ')[0].split('-')[2].lstrip('0')
-                htmlStr = htmlStr.replace(f'">{day}<', f' event"><a href="#" >{day}</a><')
-
-            html = { "html": htmlStr }
+            html = { "html": htmlStr}
             t = Template(read_file("templates/calendar.html"))
-            response = t.render(events=allrows, html=html)
+            response = t.render(html=html)
             #response = htmlStr
 
 
