@@ -180,6 +180,7 @@ function quant() {
           body: JSON.stringify({
             orderID: data.orderID,
             event_id: {{ event_data.eid }},
+            quantity: quant(),
             details: details
           })
         });

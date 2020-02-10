@@ -25,11 +25,9 @@ import MySQLdb
 
 #from MySQLdb import _mysql
 #db = mysql.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
-#db.query("""select * from events""")
+#db.query("""SELECT * FROM events""")
 #r=db.store_result()
 #r.fetch_row(maxrows=100, how=1)
-
-error_log = ""
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -51,9 +49,7 @@ dbuser = "jedmarum_cca"
 passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
 
-db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
-
-def make_cal(month=2, year=2020):
+def make_cal(db, month=2, year=2020):
 
     myCal = calendar.HTMLCalendar(calendar.SUNDAY)
 
@@ -82,24 +78,27 @@ def make_cal(month=2, year=2020):
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
 
+    db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
+
     ####
     ####
     if environ['REQUEST_METHOD'] == "GET":
 
-        data = json.loads(read_file("data/events.json"))
+        #data = json.loads(read_file("data/events.json"))
 
         if environ['PATH_INFO'] == '/admin/events/list':
             c = db.cursor()
-            c.execute("select * from events")
+            c.execute("SELECT * FROM events ORDER BY edatetime")
             allrows = c.fetchall()
             c.close()
             t = Template(read_file("templates/admin-events-list.html"))
             response = t.render(allrows=allrows)
 
+
         elif environ['PATH_INFO'] == '/admin/events/add-edit':
             if len(environ['QUERY_STRING']) > 1:
                 eid = environ['QUERY_STRING'].split("=")[1]
-                db.query(f"select * from events where eid = {eid}")
+                db.query(f"SELECT * FROM events WHERE eid = {eid}")
                 r = db.store_result()
                 row = r.fetch_row(maxrows=1, how=1)[0]
                 form = EventsForm(**row)
@@ -108,69 +107,89 @@ def app(environ, start_response):
             t = Template(read_file("templates/admin-events-add-edit.html"))
             response = t.render(form=form)
 
+
         elif environ['PATH_INFO'] == "/admin/events/delete":
             eid = int(environ['QUERY_STRING'].split("=")[1])
             if type(eid) == int:
-                sql = f"DELETE FROM events where eid = {eid}"
+                sql = f"DELETE FROM events WHERE eid = {eid}"
                 c = db.cursor()
                 c.execute(sql)
                 c.close()
                 response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
+            else:
+                response = ""
+
 
         elif environ['PATH_INFO'] == '/list/events':
-            db.query("select * from events")
+            db.query("SELECT * FROM events ORDER BY edatetime")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
             t = Template(read_file("templates/list-events.html"))
             response = t.render(events=allrows)
 
+
         elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
-
-            db.query(f"select * from events where eid = {eid}")
+            db.query(f"SELECT * FROM events WHERE eid = {eid}")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
-
             t = Template(read_file("templates/book-event.html"))
             response = t.render(event_data=row)
 
+
         elif environ['PATH_INFO'] == '/admin/booking':
+
             # List, sort, then read all files in the orders/ folder
             files = [f for f in listdir("orders/") if isfile(join("orders/", f))]
 
+            # PART-1: Load new orders into database:
             # Reminder: Orders data files are saved as event_eid_value.json
-            orders_data = {}
             for f in files:
                 eid = f.replace(".json", "").strip()
                 event_orders_data = json.loads(read_file(f"orders/{f}"))
 
-                orders_data[eid] = {}
+                data_array = []
                 for order in event_orders_data:
-                    order_id = order['orderID']
-
                     # We don't necessarily want all data from orders/event_eid_value.json
                     # So let's pick and choose what data we want to keep:
+                    data_array.append(order['orderID'])
+                    data_array.append(eid)
+                    data_array.append(order['details']['create_time'])
+                    data_array.append(order['details']['payer']['email_address'])
+                    data_array.append(order['details']['payer']['name']['given_name'])
+                    data_array.append(order['details']['payer']['name']['surname'])
+                    data_array.append(order['quantity'])
+                    # Notice zero after purchase_units:
+                    data_array.append(order['details']['purchase_units'][0]['amount']['value'])
+                    data_array.append(order['details']['purchase_units'][0]['payments']['captures'][0]['amount']['value'])
 
-                    this_order = {}
-                    this_order['order_id'] = order['orderID']
-                    this_order['create_time'] = order['details']['create_time']
-                    this_order['email_address'] = order['details']['payer']['email_address']
-                    this_order['first_name'] = order['details']['payer']['name']['given_name']
-                    this_order['last_name'] = order['details']['payer']['name']['surname']
+            """
+                    # Load database:
+                    fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid"
+                    vals = str(data_array).lstrip('[').rstrip(']')
+                    sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
 
-                    # Notice zero after purchase_units
-                    this_order['amount'] = order['details']['purchase_units'][0]['amount']['value']
+                # Now move the file to /orders/loaded/event_eid_value.json
+                # So that it doesn't get processed again
+                os.rename(f"orders/{f}"), f"orders/loaded/{f}"))
 
-                    orders_data[eid][order_id] = this_order
+            # PART-2: Select future-date orders from database for admin view
+            c = db.cursor()
+            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o ORDER BY e.edatetime")
+            allrows = c.fetchall()
+            c.close()
 
             t = Template(read_file("templates/admin-booking.html"))
-            response = t.render(data=data, orders_data=orders_data)
+            response = t.render(orders=allrows)
+            """
+            response = "200"
+
 
         elif environ['PATH_INFO'] == '/calendar':
 
             htmlStr = ""
             for n in range(2,5):
-                htmlStr += make_cal(n, 2020)
+                htmlStr += make_cal(db, n, 2020)
 
             html = { "html": htmlStr}
             t = Template(read_file("templates/calendar.html"))
@@ -300,7 +319,7 @@ def app(environ, start_response):
             # Now retrieve the eid from the item we just added
             e = data_object['edatetime']
             t = data_object['title']
-            sql2 = f"select eid from events where edatetime = '{e}' and title = '{t}'"
+            sql2 = f"SELECT eid FROM events WHERE edatetime = '{e}' AND title = '{t}'"
             d = db.cursor()
             d.execute(sql2)
             eid = int(d.fetchone()[0])

@@ -99,9 +99,9 @@ img {
 
     <div class="right">
       <a href="/app/book/event?eid={{ event.eid }}" class="event_link">
-      <div>{{ event.date }} {{ event.time }} {{ event.duration }} hrs</div>
+      <div>{{ event.edatetime }} {{ event.duration }} hrs</div>
       <h1>{{ event.title }}</h1>
-      <div>${{ event.price }} per person, Max: {{ event.limit }} people, X seats remaining.</div>
+      <div>${{ event.price }} per person, Max: {{ event.elimit }} people, X seats remaining.</div>
       <div>At: {{ event.location }}</div>
       <div class="book_now">Book Now</div>
       <div>{{ event.description }}</div>
