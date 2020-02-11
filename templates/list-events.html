@@ -80,12 +80,55 @@ img {
     width: 100%;
   }
 }
+.topnav {
+  text-align: center;
+  word-spacing: 15px;
+  padding: 10 2 10 2;
+  margin: 10 2 10 2;
+  background-color: #F8F8F8;
+}
+.date {
+  font-size: 20px;
+  padding: 5px;
+  border: 1px solid LightGray;
+  background-color: LightYellow;
+}
 </style>
 </head>
 <body>
 <div id="app"><a href="/app/">/app/</a></div>
 
 <div class="container">
+
+<img src="/img/logo.png" class="logo"/>
+
+<div class="topnav">
+<span>calendar</span><!-- (includes CC processing) -->
+<span>private-events</span><!-- (info and pics) -->
+<span>about/contact</span><!-- (info + email form) -->
+<span>commissioned-art</span><!-- (info and pics) -->
+<span>after-school/summer-camp</span><!-- (info and pics and calendar link) -->
+<span>crafts/services</span> <!-- galleries -->
+</div>
+
+<!--
+crafts/services galleries:
+acrylic painting
+watercolor painting
+PYOP
+Artist Guided Family Painting
+alcohol ink
+fluid art
+handbuilt pottery
+paint your own pottery
+fused glass
+leathercraft
+resin crafts
+water marbling
+specialty classes
+custom built tables, counter tops, art panels
+-->
+
 
 {% for event in events %}
 
@@ -99,9 +142,15 @@ img {
 
     <div class="right">
       <a href="/app/book/event?eid={{ event.eid }}" class="event_link">
-      <div>{{ event.edatetime }} {{ event.duration }} hrs</div>
+      <div>
+        <span class="date">{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</span>
+         {{ event.duration }} hrs
+      </div>
       <h1>{{ event.title }}</h1>
-      <div>${{ event.price }} per person, Max: {{ event.elimit }} people, X seats remaining.</div>
+      <div>
+        ${{ event.price }} per person,
+        <span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining.
+      </div>
       <div>At: {{ event.location }}</div>
       <div class="book_now">Book Now</div>
       <div>{{ event.description }}</div>
@@ -113,6 +162,17 @@ img {
 
 {% endfor %}
 
+<script>
+var orders_count = {{ orders_count }};
+for (var key in orders_count) {
+  if (orders_count.hasOwnProperty(key)) {
+    sr = document.getElementById("seats_remaining_"+key);
+    new_value = sr.innerHTML-orders_count[key];
+    console.log(key + " -> " + orders_count[key] + " old-val: " + sr.innerHTML + " new-val: " + new_value);
+    sr.innerHTML = new_value;
+  }
+}
+</script>
 
 </div>
 

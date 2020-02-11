@@ -116,9 +116,6 @@ function appendTime() {
   {% if field.name != "eid" and field.name != "submit" %}
     {{ field.label }}
   {% endif %}
-  {% if field.name == "image" %}
-    <div>You can change the image in the next step.</div>
-  {% endif %}
   {% if field.name == "edatetime" %}
     <div class="field">{{ field(autocomplete="off") }}</div>
     <div class="field">

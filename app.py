@@ -121,11 +121,24 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/list/events':
+
             db.query("SELECT * FROM events ORDER BY edatetime")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
+
+            db.query("SELECT eid, count(eid) as count_eid FROM orders group by eid")
+            r = db.store_result()
+            orders_count = r.fetch_row(maxrows=100, how=1)
+
+            orders_count_object = {}
+            for item in orders_count:
+                key = item['eid']
+                val = item['count_eid']
+
+                orders_count_object[key] = val
+
             t = Template(read_file("templates/list-events.html"))
-            response = t.render(events=allrows)
+            response = t.render(events=allrows, orders_count=orders_count_object)
 
 
         elif environ['PATH_INFO'] == '/book/event':
@@ -138,6 +151,13 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/booking':
+
+            # TODO: This first part should be call-able separately
+            # And should be called about once per minute 
+
+            # OR EVEN BETTER:
+            # Maybe this chunk should be moved to the
+            # /paypal-transaction-complete section
 
             # List, sort, then read all files in the orders/ folder
             files = [f for f in listdir("orders/") if isfile(join("orders/", f))]
@@ -179,7 +199,7 @@ def app(environ, start_response):
 
             # PART-2: Select future-date orders from database for admin view
             c = db.cursor()
-            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid ORDER BY e.edatetime")
+            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid ORDER BY o.eid")
             allrows = c.fetchall()
             c.close()
 
@@ -341,7 +361,7 @@ def app(environ, start_response):
 
     #response += f"<hr>{str(environ)}"
 
-    #db.close()
+    db.close()
 
     return [response.encode()]
 
