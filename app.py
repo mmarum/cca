@@ -142,47 +142,49 @@ def app(environ, start_response):
             # List, sort, then read all files in the orders/ folder
             files = [f for f in listdir("orders/") if isfile(join("orders/", f))]
 
-            # PART-1: Load new orders into database:
-            # Reminder: Orders data files are saved as event_eid_value.json
-            for f in files:
-                eid = f.replace(".json", "").strip()
-                event_orders_data = json.loads(read_file(f"orders/{f}"))
+            if len(files) > 0:
+                # PART-1: Load new orders into database:
+                # Reminder: Orders data files are saved as event_eid_value.json
+                for f in files:
+                    eid = f.replace(".json", "").strip()
+                    event_orders_data = json.loads(read_file(f"orders/{f}"))
 
-                data_array = []
-                for order in event_orders_data:
-                    # We don't necessarily want all data from orders/event_eid_value.json
-                    # So let's pick and choose what data we want to keep:
-                    data_array.append(order['orderID'])
-                    data_array.append(eid)
-                    data_array.append(order['details']['create_time'])
-                    data_array.append(order['details']['payer']['email_address'])
-                    data_array.append(order['details']['payer']['name']['given_name'])
-                    data_array.append(order['details']['payer']['name']['surname'])
-                    data_array.append(order['quantity'])
-                    # Notice zero after purchase_units:
-                    data_array.append(order['details']['purchase_units'][0]['amount']['value'])
-                    data_array.append(order['details']['purchase_units'][0]['payments']['captures'][0]['amount']['value'])
+                    data_array = []
+                    for order in event_orders_data:
+                        # We don't necessarily want all data from orders/event_eid_value.json
+                        # So let's pick and choose what data we want to keep:
+                        data_array.append(order['orderID'])
+                        data_array.append(eid)
+                        data_array.append(order['details']['create_time'])
+                        data_array.append(order['details']['payer']['email_address'])
+                        data_array.append(order['details']['payer']['name']['given_name'])
+                        data_array.append(order['details']['payer']['name']['surname'])
+                        data_array.append(order['quantity'])
+                        # Notice zero after purchase_units:
+                        data_array.append(order['details']['purchase_units'][0]['amount']['value'])
+                        data_array.append(order['details']['purchase_units'][0]['payments']['captures'][0]['amount']['value'])
 
-            """
-                    # Load database:
-                    fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid"
-                    vals = str(data_array).lstrip('[').rstrip(']')
-                    sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
+                        # Load database:
+                        fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid"
+                        vals = str(data_array).lstrip('[').rstrip(']')
+                        sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
 
-                # Now move the file to /orders/loaded/event_eid_value.json
-                # So that it doesn't get processed again
-                os.rename(f"orders/{f}"), f"orders/loaded/{f}"))
+                        c = db.cursor()
+                        c.execute(sql)
+                        c.close()
+
+                    # Now move the file to /orders/loaded/event_eid_value.json
+                    # So that it doesn't get processed again
+                    os.rename(f"orders/{f}", f"orders/loaded/{f}")
 
             # PART-2: Select future-date orders from database for admin view
             c = db.cursor()
-            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o ORDER BY e.edatetime")
+            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid ORDER BY e.edatetime")
             allrows = c.fetchall()
             c.close()
 
             t = Template(read_file("templates/admin-booking.html"))
             response = t.render(orders=allrows)
-            """
-            response = "200"
 
 
         elif environ['PATH_INFO'] == '/calendar':

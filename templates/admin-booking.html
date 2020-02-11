@@ -87,32 +87,22 @@ input {
 
 <h3>Summary of Orders</h3>
 
-{{ data }}
-<hr>
-{{ orders_data }}
-<hr>
-
-{% for key, val in orders_data.items() %}
-  <div class="event_id">event_id: {{ key }}</div>
-  <div>
-  {#
-  {{ data[key].title }}
-  {{ data[key].date }}
-  {{ data[key].time }}
-  #}
-  </div>
-  <div class="order_data">
-  {#
-  {% for k, v in val.items() %}
-    <!-- {{ k }} -->
-    <div class="loop_index">{{ loop.index }}</div>
-      {% for x, y in v.items() %}
-        <div>{{ x }}: {{ y }}</div>
-    {% endfor %}
-  {% endfor %}
-  #}
-  </div>
+<table>
+<tr class="header_row">
+{% for i in ["title", "event date", "limit", "id", 
+  "order id", "event id", "create time", "email", 
+  "first name", "last name", "quantity", "total", "paid"] %}
+  <td>{{ i }}</td>
 {% endfor %}
+</tr>
+{% for order in orders %}
+  <tr>
+    {% for o in order %}
+      <td>{{ o }}</td>
+    {% endfor %}
+  </tr>
+{% endfor %}
+</table>
 
 </body>
 </html>
