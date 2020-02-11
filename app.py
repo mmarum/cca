@@ -88,7 +88,7 @@ def app(environ, start_response):
 
         if environ['PATH_INFO'] == '/admin/events/list':
             c = db.cursor()
-            c.execute("SELECT * FROM events ORDER BY edatetime")
+            c.execute("SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime")
             allrows = c.fetchall()
             c.close()
             t = Template(read_file("templates/admin-events-list.html"))
@@ -122,11 +122,13 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/list/events':
 
-            db.query("SELECT * FROM events ORDER BY edatetime")
+            db.query("SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
             db.query("SELECT eid, count(eid) as count_eid FROM orders group by eid")
+            # TODO: May need to add join to events table above
+            # so as to only pull future event dates
             r = db.store_result()
             orders_count = r.fetch_row(maxrows=100, how=1)
 
@@ -199,7 +201,7 @@ def app(environ, start_response):
 
             # PART-2: Select future-date orders from database for admin view
             c = db.cursor()
-            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid ORDER BY o.eid")
+            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime > CURDATE() ORDER BY o.eid")
             allrows = c.fetchall()
             c.close()
 
