@@ -23,6 +23,8 @@ from PIL import Image
 # https://mysqlclient.readthedocs.io/user_guide.html#some-mysql-examples
 import MySQLdb
 
+from gallery import Gallery
+
 #from MySQLdb import _mysql
 #db = mysql.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
 #db.query("""SELECT * FROM events""")
@@ -150,6 +152,14 @@ def app(environ, start_response):
             row = r.fetch_row(maxrows=1, how=1)[0]
             t = Template(read_file("templates/book-event.html"))
             response = t.render(event_data=row)
+
+
+        elif environ['PATH_INFO'] == '/gallery/slideshow':
+            #eid = environ['QUERY_STRING'].split("=")[1]
+            g = Gallery()
+            images = g.get_images()
+            t = Template(read_file("templates/gallery-slideshow.html"))
+            response = t.render(images=images)
 
 
         elif environ['PATH_INFO'] == '/admin/booking':
