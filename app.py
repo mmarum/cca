@@ -157,9 +157,10 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == '/gallery/slideshow':
             #eid = environ['QUERY_STRING'].split("=")[1]
             g = Gallery()
+            gallery = g.get_gallery()
             images = g.get_images()
             t = Template(read_file("templates/gallery-slideshow.html"))
-            response = t.render(images=images)
+            response = t.render(gallery=gallery, images=images)
 
 
         elif environ['PATH_INFO'] == '/admin/booking':
