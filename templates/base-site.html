@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="stylesheet" 
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
+    crossorigin="anonymous">
+
+<title>{% block title %}{% endblock %}</title>
+
+{% block html_head %}{% endblock %}
+
+</head>
+
+<body>
+<div id="app"><a href="/app/">/app/</a></div>
+
+<div id="content">
+
+<div class="container">
+
+<div class="topnav text-center">
+  <p><img src="/img/logo.png" class="logo"/></p>
+
+<nav class="navbar navbar-expand-sm bg-light navbar-light">
+  <ul class="navbar-nav">
+  {% for i in ["calendar", "private-events", "about/contact", "commissioned-art", "after-school/summer-camp"] %}
+    <li class="nav-item"><a class="nav-link" href="#">{{ i }}</a></li>
+  {% endfor%}
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop(); return false;" data-toggle="dropdown">crafts/services</a>
+      <div class="dropdown-menu"  id="dropdown-menu">
+      {% for i in ["acrylic painting", "watercolor painting", "PYOP", "Artist Guided Family Painting", "alcohol ink", "fluid art", "handbuilt pottery", "paint your own pottery", "fused glass", "leathercraft", "resin crafts", "water marbling", "specialty classes", "custom built tables, counter tops, art panels"] %}
+        <a class="dropdown-item" href="{{ i|replace(' ', '-')|replace(',', '')|lower }}">{{ i }}</a>
+      {% endfor %}
+      </div>
+    </li>
+  </ul>
+</nav>
+
+</div><!-- close topnav -->
+
+{% block content %}{% endblock %}
+
+</div><!-- close container -->
+
+<div id="footer" class="text-center bg-light">
+{% block footer %}
+<h2>400 E. Division St. Ste 100 Arlington, TX 76011 | (972) 446-0444</h2>
+<h3><a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a></h3>
+<a href="https://www.facebook.com/PaintingWithInfluence" alt="Facebook">Facebook</a>
+<a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a>
+<a href="hhtps://www.instagram.com/paintingwithinfluence" alt="Instagram">Instagram</a>
+<a href="mailto:contact@paintingwithinfluence.com" alt="Mail">Mailto</a>
+{% endblock %}
+</div>
+
+</div><!-- close content -->
+
+<script>
+function navbardrop() {
+  var navbardrop_state = document.getElementById("dropdown-menu").style.display;
+  //alert(navbardrop_state);
+  if (navbardrop_state == "block") {
+    navbardrop_state = "none";
+  } else {
+    navbardrop_state = "block";
+  }
+  document.getElementById("dropdown-menu").style.display = navbardrop_state;
+}
+</script>
+
+</body>
+
+</html>

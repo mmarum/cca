@@ -1,62 +1,17 @@
-<html>
-<head>
-<title>Events</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta charset="utf-8">
+{% extends "base-admin.html" %}
+{% block title %}Admin Events List{% endblock %}
 
+{% block html_head %}
 <style>
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-}
-a {
-  text-decoration: none;
-  color: Blue;
-}
-#add_new_link a {
-  display: inline;
-  padding: 5px;
-  background-color: White;
-  border: 1px solid Blue;
-  border-radius: 4px;
-}
-td {
-  border-bottom: 1px solid LightGray;
-  border-right: 1px solid LightGray;
-  margin: 10px;
-  padding: 10px;
-}
-
-@media only screen and (max-width: 480px) {
-  .extra_column {
-    display: none;
-  }
-  td {
-    margin: 5px;
-    padding: 5px;
-  }
-  #add_new_link a {
-    padding: 2px;
-  }
-  table {
-    width: 100%;
-  }
-}
-
-#header_row {
-  background-color: WhiteSmoke;
-}
+/* specific css */
 </style>
-</head>
-<body>
-<div id="app"><a href="/app/">/app/</a></div>
+{% endblock %}
 
+{% block content %}
 <table>
 <tr id="header_row">
   <td><div id="add_new_link"><a href="/app/admin/events/add-edit">+</a></div></td>
-  <td>Date & Time</td>
+  <td>Date / Time</td>
   <td>Title</td>
   <td class='extra_column'>Duration</td>
   <td class='extra_column'>Price</td>
@@ -78,6 +33,4 @@ td {
   </tr>
 {% endfor %}
 </table>
-
-</body>
-</html>
+{% endblock %}

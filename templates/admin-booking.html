@@ -1,92 +1,14 @@
-<html>
-<head>
-<title>Events</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta charset="utf-8">
+{% extends "base-admin.html" %}
+{% block title %}Admin View Orders{% endblock %}
+
+{% block html_head %}
 <style>
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-
-}
-form div {
-  padding: 5px;
-}
-p {
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
-a {
-  text-decoration: none;
-  color: Blue;
-}
-#add_new_link a {
-  display: inline;
-  padding: 5px;
-  background-color: White;
-  border: 1px solid Blue;
-  border-radius: 4px;
-}
-td {
-  border-bottom: 1px solid LightGray;
-  border-right: 1px solid LightGray;
-  margin: 10px;
-  padding: 10px;
-}
-#submit {
-  font-size: 16px;
-  font-weight: bold;
-  background-color: YellowGreen;
-}
-.header_row {
-  background-color: WhiteSmoke;
-}
-
-input, #description {
-    display: block;
-    width: 100%;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-}
-input {
-    height: 34px;
-}
-.event_item {
-  padding: 10px;
-  margin: 10px;
-  border-bottom: 1px dashed Orange;
-}
-.order_data {
-  padding-left: 20px;
-}
-.event_id {
-  border-top: 1px dashed Gray;
-  padding-top: 10px;
-  margin-top: 10px;
-}
+/* specific css */
 </style>
-</head>
-<body>
-<div id="app"><a href="/app/">/app/</a></div>
+{% endblock %}
 
-<h3>Summary of Orders</h3>
-
+{% block content %}
+<h1>Summary of Orders</h1>
 <table>
 <tr class="header_row">
 {% for i in ["title", "event date", "limit", "id", 
@@ -103,6 +25,4 @@ input {
   </tr>
 {% endfor %}
 </table>
-
-</body>
-</html>
+{% endblock %}

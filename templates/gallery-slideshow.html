@@ -1,86 +1,17 @@
-<html>
-<head>
-<title>Events</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta charset="utf-8">
+{% extends "base-site.html" %}
+{% block title %}Gallery slideshow{% endblock %}
 
+{% block html_head %}
 <style>
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-
-}
-.container {
-  max-width: 800px;
-  margin: auto;
-}
-.left {
-    float: left;
-    width: 250px;
-}
-.right {
-    /* float: right; */
-    width: auto;
-}
-.group:after {
-    content:"";
-    display: table;
-    clear: both;
-}
-.gallery_image {
-    max-width: 190px;
-    height: auto;
-}
-@media screen and (max-width: 480px) {
-  .left, .right {
-    float: none;
-    width: auto;
-  }
-  .event_image {
-    width: 100%;
-  }
-}
-.topnav {
-  text-align: center;
-  word-spacing: 15px;
-  padding: 10 2 10 2;
-  margin: 10 2 10 2;
-  background-color: #F8F8F8;
-}
-.logo {
-  max-width: 100%;
-  height: auto;
-}
+/* specific css */
 </style>
-</head>
-<body>
+{% endblock %}
 
-<div id="app"><a href="/app/">/app/</a></div>
-
-<div class="container">
-
-<img src="/img/logo.png" class="logo"/>
-
-<div class="topnav">
-<span>calendar</span><!-- (includes CC processing) -->
-<span>private-events</span><!-- (info and pics) -->
-<span>about/contact</span><!-- (info + email form) -->
-<span>commissioned-art</span><!-- (info and pics) -->
-<span>after-school/summer-camp</span><!-- (info and pics and calendar link) -->
-<span>crafts/services</span> <!-- galleries -->
-</div>
-
+{% block content %}
 <center>{{ gallery.name }}</center>
 <p>{{ gallery.comment }}</p>
-
 {% for i in images %}
   <img class="gallery_image" src="/gallery/{{ i[5]|replace('./', '') }}"/>
 {% endfor %}
-
-</div>
-
-</body>
-</html>
+{% endblock %}
 

@@ -1,106 +1,17 @@
-<html>
-<head>
-<title>Events</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta charset="utf-8">
+{% extends "base-site.html" %}
+{% block title %}Book an event{% endblock %}
+
+{% block html_head %}
 <style>
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-
-}
-form div {
-  padding: 5px;
-}
-form select {
-  margin-top: 10px;
-  padding: 10px;
-  border: 1px dashed Gray;
-  font-size: 16px;
-}
-p {
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
-a {
-  text-decoration: none;
-  color: Blue;
-}
-#submit {
-  font-size: 16px;
-  font-weight: bold;
-  background-color: YellowGreen;
-}
-#header_row {
-  background-color: WhiteSmoke;
-}
-
-.container {
-  max-width: 800px;
-  margin: auto;
-}
-.column {
-  float: left;
-  padding: 5px;
-  margin: 5px;
-}
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-.row {
-  padding-bottom: 5px;
-  margin-bottom: 5px;
-  /* border-bottom: 1px dashed Gray; */
-}
-.event_image {
-  border: 1px dashed Gray;
-  width: 150px;
-}
-h1 {
-  border: 0px;
-  margin: 0px;
-}
-
-input, #description {
-    display: block;
-    width: 100%;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-}
-input {
-    height: 34px;
-}
-#paypal-button-container {
- display: none;
-}
+/* specific css */
 </style>
-</head>
-<body>
-<div id="app"><a href="/app/">/app/</a></div>
+{% endblock %}
+
+{% block content %}
 
 <script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
 // sandbox client ID
 </script>
-
-<div class="container">
 
 <div class="row">
 <div class="column">
@@ -149,8 +60,6 @@ function quant() {
 
 <div id="paypal-button-container"></div>
 
-</div>
-
 <script>
 // https://developer.paypal.com/docs/checkout/integrate/
 // View orders at PayPal here: https://developer.paypal.com/developer/dashboard/sandbox/
@@ -190,5 +99,4 @@ function quant() {
 // https://developer.paypal.com/docs/api/orders/v2/#orders_get
 </script>
 
-</body>
-</html>
+{% endblock %}

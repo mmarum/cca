@@ -7,7 +7,12 @@ import base64
 import calendar
 
 # https://jinja.palletsprojects.com/en/2.10.x/api/
-from jinja2 import Template
+from jinja2 import Environment, PackageLoader, select_autoescape
+
+env = Environment(
+    loader=PackageLoader('app', 'templates'),
+    autoescape=select_autoescape(['html'])
+)
 
 # https://wtforms.readthedocs.io/en/stable/index.html
 from forms import EventsForm, ImageForm
@@ -25,11 +30,6 @@ import MySQLdb
 
 from gallery import Gallery
 
-#from MySQLdb import _mysql
-#db = mysql.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
-#db.query("""SELECT * FROM events""")
-#r=db.store_result()
-#r.fetch_row(maxrows=100, how=1)
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -53,16 +53,16 @@ passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
 def make_cal(db, month=2, year=2020):
 
-    myCal = calendar.HTMLCalendar(calendar.SUNDAY)
+    this_calendar = calendar.HTMLCalendar(calendar.SUNDAY)
 
     # TODO: Identify current year and month
     # to replace hard-coded values
     this_year = year #2020
     this_month = month #2
-    htmlStr = myCal.formatmonth(this_year, this_month)
-    htmlStr = htmlStr.replace("&nbsp;"," ")
-    next_link = f"<div><a href='' onclick='nextMonth({month+1}); return false;'>Next</a>\n"
-    htmlStr = f"<div id='month{month}'>\n{htmlStr}\n{next_link}\n</div>\n"
+    html_cal = this_calendar.formatmonth(this_year, this_month)
+    html_cal = html_cal.replace("&nbsp;"," ")
+    next_link = f"<div><a onclick='nextMonth({month+1}); return false;'>Next</a></div>\n"
+    html_cal = f"<div id='month{month}'>\n{html_cal}\n{next_link}\n</div>\n"
 
     c = db.cursor()
     c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {this_month} AND YEAR(edatetime) = {this_year}")
@@ -72,9 +72,9 @@ def make_cal(db, month=2, year=2020):
     for d in allrows:
         day = str(d[0])
         day = day.split(' ')[0].split('-')[2].lstrip('0')
-        htmlStr = htmlStr.replace(f'">{day}<', f' event"><a href="#" >{day}</a><')
+        html_cal = html_cal.replace(f'">{day}<', f' event"><a href="#" >{day}</a><')
 
-    return htmlStr
+    return html_cal
 
 
 def app(environ, start_response):
@@ -93,8 +93,9 @@ def app(environ, start_response):
             c.execute("SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime")
             allrows = c.fetchall()
             c.close()
-            t = Template(read_file("templates/admin-events-list.html"))
-            response = t.render(allrows=allrows)
+
+            template = env.get_template("admin-events-list.html")
+            response = template.render(allrows=allrows)
 
 
         elif environ['PATH_INFO'] == '/admin/events/add-edit':
@@ -106,9 +107,9 @@ def app(environ, start_response):
                 form = EventsForm(**row)
             else:
                 form = EventsForm()
-            t = Template(read_file("templates/admin-events-add-edit.html"))
-            response = t.render(form=form)
 
+            template = env.get_template("admin-events-add-edit.html")
+            response = template.render(form=form)
 
         elif environ['PATH_INFO'] == "/admin/events/delete":
             eid = int(environ['QUERY_STRING'].split("=")[1])
@@ -141,27 +142,26 @@ def app(environ, start_response):
 
                 orders_count_object[key] = val
 
-            t = Template(read_file("templates/list-events.html"))
-            response = t.render(events=allrows, orders_count=orders_count_object)
-
+            template = env.get_template("list-events.html")
+            response = template.render(events=allrows, orders_count=orders_count_object)
 
         elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
             db.query(f"SELECT * FROM events WHERE eid = {eid}")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
-            t = Template(read_file("templates/book-event.html"))
-            response = t.render(event_data=row)
 
+            template = env.get_template("book-event.html")
+            response = template.render(event_data=row)
 
         elif environ['PATH_INFO'] == '/gallery/slideshow':
-            #eid = environ['QUERY_STRING'].split("=")[1]
-            g = Gallery()
+            gid = int(environ['QUERY_STRING'].split("=")[1])
+            g = Gallery(gid)
             gallery = g.get_gallery()
             images = g.get_images()
-            t = Template(read_file("templates/gallery-slideshow.html"))
-            response = t.render(gallery=gallery, images=images)
 
+            template = env.get_template("gallery-slideshow.html")
+            response = template.render(gallery=gallery, images=images)
 
         elif environ['PATH_INFO'] == '/admin/booking':
 
@@ -216,25 +216,29 @@ def app(environ, start_response):
             allrows = c.fetchall()
             c.close()
 
-            t = Template(read_file("templates/admin-booking.html"))
-            response = t.render(orders=allrows)
+            template = env.get_template("admin-booking.html")
+            response = template.render(orders=allrows)
 
+        elif environ['PATH_INFO'] == '/home':
+            html_cal = ""
+            for n in range(2,5): # TODO: this is hard-coded for now
+                html_cal += make_cal(db, n, 2020)
 
-        elif environ['PATH_INFO'] == '/calendar':
+            #c = db.cursor()
+            #c.execute("SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
+            #allrows = c.fetchall()
+            #c.close()
 
-            htmlStr = ""
-            for n in range(2,5):
-                htmlStr += make_cal(db, n, 2020)
+            db.query(f"SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
+            r = db.store_result()
+            row = r.fetch_row(maxrows=1, how=1)[0]
 
-            html = { "html": htmlStr}
-            t = Template(read_file("templates/calendar.html"))
-            response = t.render(html=html)
-            #response = htmlStr
-
+            template = env.get_template("home.html")
+            response = template.render(next_event=row, calendar={"html": html_cal})
 
         else:
-            t = Template(read_file("templates/main.html"))
-            response = t.render()
+            template = env.get_template("main.html")
+            response = template.render()
 
     ####
     ####
@@ -362,9 +366,10 @@ def app(environ, start_response):
         else:
             sql2 = "just an update"
 
-        t = Template(read_file("templates/admin-image.html"))
         image_form = ImageForm()
-        response = t.render(event_data=data_object, image_form=image_form, 
+
+        template = env.get_template("admin-image.html")
+        response = template.render(event_data=data_object, image_form=image_form,
             sql={"sql":sql}, eid={"eid":eid}, sql2={"sql2":sql2})
 
     ####
