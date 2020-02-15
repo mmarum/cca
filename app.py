@@ -342,7 +342,7 @@ def app(environ, start_response):
             open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
 
             # Now create a thumbnail of the original
-            size = 300, 300
+            size = 350, 350
             image = Image.open(f"../www/img/orig/{img_name}")
             image.thumbnail(size)
             image.save(f"../www/img/small/{img_name}", 'JPEG')

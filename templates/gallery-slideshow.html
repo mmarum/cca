@@ -4,14 +4,12 @@
 {% block html_head %}
 <style>
 /* specific css */
-.gallery_image {
-  max-width: 220px;
-}
+.gallery_image { max-width: 220px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<center>{{ gallery.name }}</center>
+<h1 class="text-center">{{ gallery.name }}</h1>
 <p>{{ gallery.comment }}</p>
 <center>
 {% for i in images %}

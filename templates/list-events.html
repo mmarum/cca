@@ -4,19 +4,20 @@
 {% block html_head %}
 <style>
 /* specific css */
+.event_image { width: 100%; }
 </style>
 {% endblock %}
 
 {% block content %}
 
 {% for event in events %}
-  <div class="row">
-    <div class="col">
+  <div class="row top-buffer">
+    <div class="col-sm-4">
       <a href="/app/book/event?eid={{ event.eid }}" class="event_link">
         <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
       </a>
     </div>
-    <div class="col">
+    <div class="col-sm-8">
       <span class="date">{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</span>
       {{ event.duration }} hrs
       <a href="/app/book/event?eid={{ event.eid }}" class="event_link">

@@ -16,14 +16,13 @@
 {% block html_head %}{% endblock %}
 
 <style>
+.top-buffer { margin-top: 20px; }
+table { width: 100%; }
 td {
   border-bottom: 1px solid LightGray;
   border-right: 1px solid LightGray;
   padding: 5px;
   padding: 5px;
-}
-table {
-  width: 100%;
 }
 </style>
 
@@ -37,10 +36,10 @@ table {
 <div class="container">
 
 <div class="topnav text-center">
-  <p><img src="/img/logo.png" class="logo"/></p>
+  <p><img src="/img/logo.png" class="img-fluid"/></p>
 
-<nav class="navbar navbar-expand-sm bg-light navbar-light">
-  <ul class="navbar-nav">
+<nav class="navbar navbar-expand-sm bg-light navbar-light d-flex">
+  <ul class="navbar-nav list-inline mx-auto justify-content-center">
   {% for i in ["calendar", "private-events", "about/contact", "commissioned-art", "after-school/summer-camp"] %}
     <li class="nav-item"><a class="nav-link" href="/app/{{ i|replace('/', '-')|lower }}">{{ i }}</a></li>
   {% endfor%}
@@ -61,7 +60,7 @@ table {
 
 </div><!-- close container -->
 
-<div id="footer" class="text-center bg-light">
+<div id="footer" class="text-center bg-light top-buffer">
 {% block footer %}
 <h2>400 E. Division St. Ste 100 Arlington, TX 76011 | (972) 446-0444</h2>
 <h3><a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a></h3>
