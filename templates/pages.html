@@ -1,0 +1,14 @@
+{% extends "base-site.html" %}
+{% block title %}{{ page.name }}{% endblock %}
+
+{% block html_head %}
+<style>
+/* specific css */
+</style>
+{% endblock %}
+
+{% block content %}
+
+{{ page.content|safe }}
+
+{% endblock %}

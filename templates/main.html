@@ -5,18 +5,29 @@
 <style>
 /* specific css */
 div a {
-  font-size: 28px;
+  font-size: 25px;
   padding: 10px;
   text-decoration: none;
+}
+p {
+  padding: 10px;
+  margin: 0px;
+}
+.alert {
+  margin-bottom: 0px;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div><a href="/app/admin/events/list">Admin Events</a></div>
-<div><a href="/app/admin/booking">Admin Booking</a></div>
-<hr>
+<p class="alert alert-secondary" role="alert">Admin</p>
+<div><a href="/app/admin/events/list">Events</a></div>
+<div><a href="/app/admin/booking">Booking</a></div>
+<div><a href="/gallery/admin.php">Gallery</a></div>
+<div><a href="/app/admin/pages">Pages</a></div>
+<p class="alert alert-secondary" role="alert">Site</p>
 <div><a href="/app/home">Home</a></div>
-<div><a href="/app/list/events">Events</a></div>
-<div><a href="/app/gallery/slideshow?gid=1">Gallery</a></div>
+{% if path_info %}
+  <p class="alert alert-warning" role="alert">Error: {{ path_info }}</p>
+{% endif %}
 {% endblock %}

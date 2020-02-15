@@ -1,19 +1,7 @@
 {
-    "1001": {
-        "eid": "1001",
-        "date": "02/01/2020",
-        "time": "6pm",
-        "title": "Chips and Guacamole",
-        "duration": "3",
-        "price": "33",
-        "limit": "10",
-        "location": "Right Place",
-        "image_path": "water-marbling-2.jpg",
-        "description": "Eating time is fun in the sun bun fun many words big long description"
-    },
     "1002": {
         "eid": "1002",
-        "date": "02/01/2020",
+        "date": "03/12/2020",
         "time": "7pm",
         "title": "Eggs and Bacon",
         "duration": "1",
@@ -25,7 +13,7 @@
     },
     "1003": {
         "eid": "1003",
-        "date": "02/01/2020",
+        "date": "03/26/2020",
         "time": "8pm",
         "title": "Pop Tarts and Farts",
         "duration": "3pm",
@@ -37,7 +25,7 @@
     },
     "1004": {
         "eid": "1004",
-        "date": "02/01/2020",
+        "date": "03/30/2020",
         "time": "10pm",
         "title": "One for the Road",
         "duration": "3",
@@ -58,18 +46,6 @@
         "location": "Front Office Back behind the fridge",
         "image_path": "dot-mandala-1.jpg",
         "description": "2 fish, acrylic painting on 16x20 inch canvas"
-    },
-    "1006": {
-        "eid": "1006",
-        "date": "02/02/2020",
-        "time": "3pm",
-        "title": "Good Morning Sunday",
-        "duration": "1",
-        "price": "20",
-        "limit": "25",
-        "location": "Studio",
-        "image_path": "alcohol-ink-1.jpg",
-        "description": "Description is here here here"
     },
     "1007": {
         "eid": "1007",

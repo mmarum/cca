@@ -83,13 +83,14 @@ def app(environ, start_response):
 
     this_now = datetime.datetime.now()
 
+    pages = ["private-events", "about-contact", "commissioned-art", "custom-built-tables-counter-tops-art-panels"]
+    galleries = ["acrylic-painting", "watercolor-painting", "artist-guided-family-painting", "alcohol-ink", "fluid-art", "handbuilt-pottery", "paint-your-own-pottery", "fused-glass", "leathercraft", "resin-crafts", "water-marbling", "specialty-classes"]
+
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
 
     ####
     ####
     if environ['REQUEST_METHOD'] == "GET":
-
-        #data = json.loads(read_file("data/events.json"))
 
         if environ['PATH_INFO'] == '/admin/events/list':
             c = db.cursor()
@@ -157,14 +158,40 @@ def app(environ, start_response):
             template = env.get_template("book-event.html")
             response = template.render(event_data=row)
 
-        elif environ['PATH_INFO'] == '/gallery/slideshow':
-            gid = int(environ['QUERY_STRING'].split("=")[1])
-            g = Gallery(gid)
-            gallery = g.get_gallery()
-            images = g.get_images()
+        elif environ['PATH_INFO'] == '/gallery/slideshow' or environ['PATH_INFO'].lstrip('/') in galleries:
 
-            template = env.get_template("gallery-slideshow.html")
-            response = template.render(gallery=gallery, images=images)
+            if environ['PATH_INFO'] == '/gallery/slideshow':
+                gid = int(environ['QUERY_STRING'].split("=")[1])
+            else:
+                path_info = environ['PATH_INFO'].lstrip('/')
+                gallery_map = {
+                    "acrylic-painting": 1, 
+                    "watercolor-painting": 2, 
+                    "paint-your-pet": 3, 
+                    "fused-glass": 4, 
+                    "resin-crafts": 5, 
+                    "fluid-art": 6, 
+                    "after-school-summer-camp": 7,
+                    "artist-guided-family-painting": 8, 
+                    "alcohol-ink": 9, 
+                    "handbuilt-pottery": 10, 
+                    "paint-your-own-pottery": 11, 
+                    "leathercraft": 12, 
+                    "water-marbling": 13, 
+                    "specialty-classes": 14
+                }
+                gid = int(gallery_map[path_info])
+
+            try:
+                g = Gallery(gid)
+                gallery = g.get_gallery()
+                images = g.get_images()
+
+                template = env.get_template("gallery-slideshow.html")
+                response = template.render(gallery=gallery, images=images)
+            except:
+                template = env.get_template("main.html")
+                response = template.render(path_info=f"{path_info} gallery does not yet exist")
 
         elif environ['PATH_INFO'] == '/admin/booking':
 
@@ -222,6 +249,7 @@ def app(environ, start_response):
             template = env.get_template("admin-booking.html")
             response = template.render(orders=allrows)
 
+
         elif environ['PATH_INFO'] == '/home':
             html_cal = ""
             for n in range(2,5): # TODO: this is hard-coded for now
@@ -239,17 +267,38 @@ def app(environ, start_response):
             template = env.get_template("home.html")
             response = template.render(next_event=row, calendar={"html": html_cal})
 
-        elif environ['PATH_INFO'] == '/private-events':
-            template = env.get_template("private-events.html")
-            response = template.render()
 
-        elif environ['PATH_INFO'] == '/about-contact':
-            template = env.get_template("about-contact.html")
-            response = template.render()
+        elif environ['PATH_INFO'] == '/admin/pages':
+
+            template = env.get_template("admin-pages.html")
+
+            if environ['QUERY_STRING']:
+                page_name = environ['QUERY_STRING'].split("=")[1]
+                try:
+                    page_content = read_file(f"data/{page_name}.html")
+                except:
+                    page_content = None
+                response = template.render(page_name=page_name, page_content=page_content)
+            else:
+                response = template.render(pages=pages)
+
+
+        elif environ['PATH_INFO'].lstrip('/') in pages:
+            page_name = environ['PATH_INFO'].lstrip('/')
+            try:
+                page_content = str(read_file(f"data/{page_name}.html"))
+                template = env.get_template("pages.html")
+                response = template.render(page={"name": page_name, "content": page_content})
+            except:
+                path_info = environ['PATH_INFO'].lstrip('/')
+                template = env.get_template("main.html")
+                response = template.render(path_info=f"{path_info} is 404")
+
 
         else:
+            path_info = environ['PATH_INFO'].lstrip('/')
             template = env.get_template("main.html")
-            response = template.render()
+            response = template.render(path_info=path_info)
 
     ####
     ####
@@ -329,6 +378,31 @@ def app(environ, start_response):
 
         template = env.get_template("about-contact.html")
         response = template.render(thanks=data_object[str(this_now)])
+
+
+    ####
+    ####
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/pages":
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+
+        post_input_array = post_input.split('------')
+
+        data_object = {}
+        for d in post_input_array:
+            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
+            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
+            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
+                data_object[post_data_key] = post_data_val
+
+        page_name = data_object['page_name']
+        page_content = data_object['page_content']
+
+        # Backup current version just in case cuz why not
+        os.rename(f"data/{page_name}.html", f"data/{page_name}.html.bak")
+
+        write_file(f"data/{page_name}.html", page_content)
+        response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages" />'
 
 
     ####

@@ -4,12 +4,16 @@
 {% block html_head %}
 <style>
 /* specific css */
+td a {
+  padding: 10px;
+  background-color: LightGray;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <table>
-<tr id="header_row">
+<tr class="p-3 mb-2 bg-dark text-white">
   <td><div id="add_new_link"><a href="/app/admin/events/add-edit">+</a></div></td>
   <td>Date / Time</td>
   <td>Title</td>

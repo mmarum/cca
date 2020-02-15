@@ -1,0 +1,49 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin pages{% endblock %}
+
+{% block html_head %}
+<style>
+/* specific css */
+textarea.form-control {
+  height: 300px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h1>Manage pages</h1>
+
+{% if pages %}
+
+  <ul>
+  {% for p in pages %}
+    <li><a href="/app/admin/pages?page={{ p }}">{{ p }}</a></li>
+  {% endfor %}
+  </ul>
+
+{% else %}
+
+  {% if page_name %}
+
+    <h2>{{ page_name }}</h2>
+
+    <form action="/app/admin/pages" method="POST" enctype="multipart/form-data" name="pages_form" id="pages_form">
+    <input type="hidden" name="page_name" value="{{ page_name }}" class="form-control"/>
+    <div class="form-group">
+    <textarea name="page_content" class="form-control">{% if page_content %}{{ page_content|safe }}{% endif %}</textarea>
+    </div>
+    <div class="form-group">
+    <input type="submit" name="submit" value="submit" class="form-control"/>
+    </div>
+    </form>
+
+  {% else %}
+
+    Error: page_name required
+
+  {% endif %}
+
+{% endif %}
+
+{% endblock %}
