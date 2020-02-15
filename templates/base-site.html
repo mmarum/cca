@@ -30,13 +30,13 @@
 <nav class="navbar navbar-expand-sm bg-light navbar-light">
   <ul class="navbar-nav">
   {% for i in ["calendar", "private-events", "about/contact", "commissioned-art", "after-school/summer-camp"] %}
-    <li class="nav-item"><a class="nav-link" href="#">{{ i }}</a></li>
+    <li class="nav-item"><a class="nav-link" href="/app/{{ i|replace('/', '-')|lower }}">{{ i }}</a></li>
   {% endfor%}
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop(); return false;" data-toggle="dropdown">crafts/services</a>
       <div class="dropdown-menu"  id="dropdown-menu">
       {% for i in ["acrylic painting", "watercolor painting", "PYOP", "Artist Guided Family Painting", "alcohol ink", "fluid art", "handbuilt pottery", "paint your own pottery", "fused glass", "leathercraft", "resin crafts", "water marbling", "specialty classes", "custom built tables, counter tops, art panels"] %}
-        <a class="dropdown-item" href="{{ i|replace(' ', '-')|replace(',', '')|lower }}">{{ i }}</a>
+        <a class="dropdown-item" href="/app/{{ i|replace(' ', '-')|replace(',', '')|lower }}">{{ i }}</a>
       {% endfor %}
       </div>
     </li>

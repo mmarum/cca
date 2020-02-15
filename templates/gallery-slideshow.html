@@ -4,14 +4,19 @@
 {% block html_head %}
 <style>
 /* specific css */
+.gallery_image {
+  max-width: 220px;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <center>{{ gallery.name }}</center>
 <p>{{ gallery.comment }}</p>
+<center>
 {% for i in images %}
   <img class="gallery_image" src="/gallery/{{ i[5]|replace('./', '') }}"/>
 {% endfor %}
+</center>
 {% endblock %}
 

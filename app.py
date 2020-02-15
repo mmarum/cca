@@ -5,6 +5,7 @@ import json
 import re
 import base64
 import calendar
+import datetime
 
 # https://jinja.palletsprojects.com/en/2.10.x/api/
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -80,6 +81,8 @@ def make_cal(db, month=2, year=2020):
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
 
+    this_now = datetime.datetime.now()
+
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
 
     ####
@@ -123,7 +126,7 @@ def app(environ, start_response):
                 response = ""
 
 
-        elif environ['PATH_INFO'] == '/list/events':
+        elif environ['PATH_INFO'] == '/list/events' or environ['PATH_INFO'] == '/calendar':
 
             db.query("SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime")
             r = db.store_result()
@@ -236,6 +239,14 @@ def app(environ, start_response):
             template = env.get_template("home.html")
             response = template.render(next_event=row, calendar={"html": html_cal})
 
+        elif environ['PATH_INFO'] == '/private-events':
+            template = env.get_template("private-events.html")
+            response = template.render()
+
+        elif environ['PATH_INFO'] == '/about-contact':
+            template = env.get_template("about-contact.html")
+            response = template.render()
+
         else:
             template = env.get_template("main.html")
             response = template.render()
@@ -293,6 +304,31 @@ def app(environ, start_response):
             c.close()
 
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
+
+
+    ####
+    ####
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/contact":
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+
+        data_object = json.loads(read_file("data/contactus.json"))
+
+        post_input_array = post_input.split('------')
+
+        message_object = {}
+        for d in post_input_array:
+            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
+            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
+            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
+                message_object[post_data_key] = post_data_val
+
+            data_object[str(this_now)] = message_object
+
+        write_file(f"data/contactus.json", json.dumps(data_object, indent=4))
+
+        template = env.get_template("about-contact.html")
+        response = template.render(thanks=data_object[str(this_now)])
 
 
     ####

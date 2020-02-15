@@ -16,6 +16,9 @@ td {
 table {
   width: 100%;
 }
+.logo {
+  max-width: 100%;
+}
 </style>
 {% endblock %}
 
@@ -24,7 +27,7 @@ table {
 <div class="row">
   <div class="col my-3 py-3">
     <a href="/app/book/event?eid={{ next_event.eid }}" class="event_link">
-      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}"/>
+      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="logo"/>
     </a>
   </div>
   <div class="col my-3 py-3">
