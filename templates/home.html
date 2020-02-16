@@ -4,7 +4,13 @@
 {% block html_head %}
 <style>
 /* specific css */
-#month3, #month4 {
+#month1, #month2, #month3, #month4, #month5, #month6 {
+  display: none;
+}
+#next_link {
+  display: inline;
+}
+#prev_link {
   display: none;
 }
 td {
@@ -47,6 +53,7 @@ table {
     <div>{{ next_event.description }}</div>
   </div>
   <div class="col my-3 py-3">
+    <div id="paper_calendar"></div>
     {{ calendar.html|safe }}
   </div>
 </div>
@@ -57,11 +64,21 @@ table {
 </div>
 
 <script>
-function nextMonth(next_month) {
-  var this_month = next_month - 1;
-  var next_month_html = document.getElementById("month"+next_month).innerHTML;
-  document.getElementById("month2").innerHTML = next_month_html;
+var d = new Date();
+var this_month = d.getMonth()+1;
+console.log("this_month: "+this_month);
+function showMonth(show_month) {
+  console.log("show_month: "+show_month);
+  var show_month_html = document.getElementById("month"+show_month).innerHTML;
+  document.getElementById("paper_calendar").innerHTML = show_month_html;
+  if (show_month != this_month) {
+    document.getElementById("prev_link").style.display = "inline";
+  }
+  if (show_month == this_month+3) {
+    document.getElementById("next_link").style.display = "none";
+  }
 }
+showMonth(2);
 </script>
 
 {% endblock %}

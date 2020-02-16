@@ -52,30 +52,25 @@ dbuser = "jedmarum_cca"
 passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
 
-def make_cal(db, month=2, year=2020):
-
+def make_cal(db, month, year):
     this_calendar = calendar.HTMLCalendar(calendar.SUNDAY)
-
-    # TODO: Identify current year and month
-    # to replace hard-coded values
-    this_year = year #2020
-    this_month = month #2
-    html_cal = this_calendar.formatmonth(this_year, this_month)
-    html_cal = html_cal.replace("&nbsp;"," ")
-    next_link = f"<div><a href='#' onclick='nextMonth({month+1}); return false;'>Next</a></div>\n"
-    html_cal = f"<div id='month{month}'>\n{html_cal}\n{next_link}\n</div>\n"
-
-    c = db.cursor()
-    c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {this_month} AND YEAR(edatetime) = {this_year}")
-    allrows = c.fetchall()
-    c.close()
-
-    for d in allrows:
-        day = str(d[0])
-        day = day.split(' ')[0].split('-')[2].lstrip('0')
-        html_cal = html_cal.replace(f'">{day}<', f' event"><a href="#" >{day}</a><')
-
-    return html_cal
+    combined_cals = ""
+    for m in range(month, month+4):
+        one_month_cal = this_calendar.formatmonth(year, m)
+        one_month_cal = one_month_cal.replace("&nbsp;"," ")
+        prev_link = f"<div id='prev_link'><a href='#' onclick='showMonth({m-1}); return false;'>&#171; Prev</a></div>\n"
+        next_link = f"<div id='next_link'><a href='#' onclick='showMonth({m+1}); return false;'>Next &#187;</a></div>\n"
+        one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
+        c = db.cursor()
+        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year}")
+        allrows = c.fetchall()
+        c.close()
+        for d in allrows:
+            day = str(d[0])
+            day = day.split(' ')[0].split('-')[2].lstrip('0')
+            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="#" >{day}</a><')
+        combined_cals += one_month_cal
+    return combined_cals
 
 
 def app(environ, start_response):
@@ -238,14 +233,9 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/home':
-            html_cal = ""
-            for n in range(2,5): # TODO: this is hard-coded for now
-                html_cal += make_cal(db, n, 2020)
-
-            #c = db.cursor()
-            #c.execute("SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
-            #allrows = c.fetchall()
-            #c.close()
+            month = 2
+            year = 2020
+            html_cal = make_cal(db, month, year)
 
             db.query(f"SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
             r = db.store_result()
