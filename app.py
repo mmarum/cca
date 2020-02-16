@@ -62,7 +62,7 @@ def make_cal(db, month=2, year=2020):
     this_month = month #2
     html_cal = this_calendar.formatmonth(this_year, this_month)
     html_cal = html_cal.replace("&nbsp;"," ")
-    next_link = f"<div><a onclick='nextMonth({month+1}); return false;'>Next</a></div>\n"
+    next_link = f"<div><a href='#' onclick='nextMonth({month+1}); return false;'>Next</a></div>\n"
     html_cal = f"<div id='month{month}'>\n{html_cal}\n{next_link}\n</div>\n"
 
     c = db.cursor()
@@ -83,8 +83,11 @@ def app(environ, start_response):
 
     this_now = datetime.datetime.now()
 
-    pages = ["private-events", "about-contact", "commissioned-art", "custom-built-tables-counter-tops-art-panels"]
-    galleries = ["acrylic-painting", "watercolor-painting", "artist-guided-family-painting", "alcohol-ink", "fluid-art", "handbuilt-pottery", "paint-your-own-pottery", "fused-glass", "leathercraft", "resin-crafts", "water-marbling", "specialty-classes"]
+    pages = ["private-events", "about-contact", "custom-built-tables-counter-tops-art-panels"]
+
+    galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "after-school-summer-camp": 7, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "paint-your-own-pottery": 12, "leathercraft": 13, "water-marbling": 14, "specialty-classes": 15}
+
+    galleries_list = list(galleries_dict.keys())
 
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
 
@@ -158,29 +161,13 @@ def app(environ, start_response):
             template = env.get_template("book-event.html")
             response = template.render(event_data=row)
 
-        elif environ['PATH_INFO'] == '/gallery/slideshow' or environ['PATH_INFO'].lstrip('/') in galleries:
+        elif environ['PATH_INFO'] == '/gallery/slideshow' or environ['PATH_INFO'].lstrip('/') in galleries_list:
 
             if environ['PATH_INFO'] == '/gallery/slideshow':
                 gid = int(environ['QUERY_STRING'].split("=")[1])
             else:
                 path_info = environ['PATH_INFO'].lstrip('/')
-                gallery_map = {
-                    "acrylic-painting": 1, 
-                    "watercolor-painting": 2, 
-                    "paint-your-pet": 3, 
-                    "fused-glass": 4, 
-                    "resin-crafts": 5, 
-                    "fluid-art": 6, 
-                    "after-school-summer-camp": 7,
-                    "artist-guided-family-painting": 8, 
-                    "alcohol-ink": 9, 
-                    "handbuilt-pottery": 10, 
-                    "paint-your-own-pottery": 11, 
-                    "leathercraft": 12, 
-                    "water-marbling": 13, 
-                    "specialty-classes": 14
-                }
-                gid = int(gallery_map[path_info])
+                gid = int(galleries_dict[path_info])
 
             try:
                 g = Gallery(gid)
