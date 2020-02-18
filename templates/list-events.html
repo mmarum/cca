@@ -11,7 +11,7 @@
 {% block content %}
 
 {% for event in events %}
-  <div class="row top-buffer">
+  <div class="row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
     <div class="col-sm-4">
       <a href="/app/book/event?eid={{ event.eid }}" class="event_link">
         <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
@@ -41,6 +41,10 @@ for (var key in orders_count) {
     console.log(key + " -> " + orders_count[key] + " old-val: " + sr.innerHTML + " new-val: " + new_value);
     sr.innerHTML = new_value;
   }
+}
+if(window.location.hash) {
+  var hash = window.location.hash.substr(1);
+  alert(hash);
 }
 </script>
 {% endblock %}

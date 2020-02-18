@@ -1,5 +1,5 @@
 {% extends "base-site.html" %}
-{% block title %}{{ page.name }}{% endblock %}
+{% block title %}{{ page_name }}{% endblock %}
 
 {% block html_head %}
 <style>
@@ -9,6 +9,18 @@
 
 {% block content %}
 
-{{ page.content|safe }}
+{% if email %}
+  <p class="alert alert-success top-buffer">Thank you {{ email }}.</p>
+{% endif %}
+
+{{ page_content|safe }}
+
+{% if page_name == "about-contact" %}
+  <form action="/app/contact" method="POST" enctype="multipart/form-data" name="contact_form" id="contact_form">
+  <p><input type="text" name="email" placeholder="Email"/></p>
+  <p><textarea name="message"></textarea></p>
+  <p><input type="submit" name="submit"/></p>
+  </form>
+{% endif %}
 
 {% endblock %}

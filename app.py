@@ -65,10 +65,12 @@ def make_cal(db, month, year):
         c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year}")
         allrows = c.fetchall()
         c.close()
+        zm = "0"+str(m) if len(str(m)) == 1 else m
         for d in allrows:
             day = str(d[0])
             day = day.split(' ')[0].split('-')[2].lstrip('0')
-            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="#" >{day}</a><')
+            zd = "0"+str(day) if len(str(day)) == 1 else day
+            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/app/calendar#{year}-{zm}-{zd}" >{day}</a><')
         combined_cals += one_month_cal
     return combined_cals
 
@@ -262,14 +264,14 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'].lstrip('/') in pages:
             page_name = environ['PATH_INFO'].lstrip('/')
-            try:
-                page_content = str(read_file(f"data/{page_name}.html"))
-                template = env.get_template("pages.html")
-                response = template.render(page={"name": page_name, "content": page_content})
-            except:
-                path_info = environ['PATH_INFO'].lstrip('/')
-                template = env.get_template("main.html")
-                response = template.render(path_info=f"{path_info} is 404")
+            #try:
+            page_content = str(read_file(f"data/{page_name}.html"))
+            template = env.get_template("pages.html")
+            response = template.render(page_name=page_name, page_content=page_content)
+            #except:
+            #    path_info = environ['PATH_INFO'].lstrip('/')
+            #    template = env.get_template("main.html")
+            #    response = template.render(path_info=f"{path_info} is 404")
 
 
         else:
@@ -307,6 +309,11 @@ def app(environ, start_response):
         # NOTICE BYTES STRING below FOR IMAGES
         image_eid = post_input.split(b'------')[1]
         eid = re.sub(b'^.*name="eid"(.*)$', r"\1", image_eid, flags=re.DOTALL).strip()
+
+        with open("stderr.log", "a") as logfile:
+            logfile.write(str(eid))
+
+
         eid = int(eid.decode('UTF-8'))
 
         image_data = post_input.split(b'------')[2]
@@ -351,10 +358,17 @@ def app(environ, start_response):
 
             data_object[str(this_now)] = message_object
 
+        email = data_object[str(this_now)]["email"]
+
         write_file(f"data/contactus.json", json.dumps(data_object, indent=4))
 
-        template = env.get_template("about-contact.html")
-        response = template.render(thanks=data_object[str(this_now)])
+        #template = env.get_template("about-contact.html")
+        #response = template.render(thanks=data_object[str(this_now)])
+
+        page_content = str(read_file(f"data/about-contact.html"))
+        template = env.get_template("pages.html")
+        page_name = "about-contact"
+        response = template.render(page_name=page_name, page_content=page_content, email=email)
 
 
     ####
@@ -379,7 +393,7 @@ def app(environ, start_response):
         os.rename(f"data/{page_name}.html", f"data/{page_name}.html.bak")
 
         write_file(f"data/{page_name}.html", page_content)
-        response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages" />'
+        response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages"/>'
 
 
     ####
@@ -396,7 +410,7 @@ def app(environ, start_response):
         for d in post_input_array:
             post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
             post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
+            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and not post_data_val.startswith('-----'):
                 data_object[post_data_key] = post_data_val
                 data_array.append(post_data_val)
 
@@ -435,6 +449,11 @@ def app(environ, start_response):
             fields = "edatetime, title, duration, price, elimit, location, image, description"
             vals = str(data_array).lstrip('[').rstrip(']')
             sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
+
+
+        with open("stderr.log", "a") as logfile:
+            logfile.write(sql)
+
 
         c = db.cursor()
         c.execute(sql)
