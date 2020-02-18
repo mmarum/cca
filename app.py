@@ -307,16 +307,17 @@ def app(environ, start_response):
         post_input = environ['wsgi.input'].read(length)
 
         # NOTICE BYTES STRING below FOR IMAGES
-        image_eid = post_input.split(b'------')[1]
-        eid = re.sub(b'^.*name="eid"(.*)$', r"\1", image_eid, flags=re.DOTALL).strip()
+        #image_eid = post_input.split(b'------')[1]
+        image_eid = post_input.split(b'Content-Disposition: form-data')[1]
+        eid = re.sub(b'^.*name="eid"(.*?)------.*$', r"\1", image_eid, flags=re.DOTALL).strip()
 
-        with open("stderr.log", "a") as logfile:
-            logfile.write(str(eid))
-
+        #with open("stderr.log", "a") as logfile:
+        #    logfile.write(str(f"post_input: {post_input}++++\nimage_eid: {image_eid}++++\neid: {eid}++++\n"))
 
         eid = int(eid.decode('UTF-8'))
 
-        image_data = post_input.split(b'------')[2]
+        #image_data = post_input.split(b'------')[2]
+        image_data = post_input.split(b'Content-Disposition: form-data')[2]
         image_filename = re.sub(b'^.*filename="(.*?)".*$', r"\1", image_data, flags=re.DOTALL).strip()
         image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
 
@@ -407,6 +408,11 @@ def app(environ, start_response):
 
         post_input_array = post_input.split('------')
 
+
+        #with open("stderr.log", "a") as logfile:
+        #    logfile.write(str(f"++++{post_input}++++"))
+
+
         for d in post_input_array:
             post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
             post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
@@ -451,8 +457,8 @@ def app(environ, start_response):
             sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
 
 
-        with open("stderr.log", "a") as logfile:
-            logfile.write(sql)
+        #with open("stderr.log", "a") as logfile:
+        #    logfile.write(f"{sql}____")
 
 
         c = db.cursor()
