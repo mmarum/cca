@@ -5,15 +5,14 @@
 <style>
 /* specific css */
 td a {
-  padding: 10px;
-  background-color: LightGray;
+  padding: 15px;
 }
 </style>
 {% endblock %}
 
 {% block content %}
 <table>
-<tr class="p-3 mb-2 bg-dark text-white">
+<tr class="p-3 mb-2 bg-light text-dark">
   <td><div id="add_new_link"><a href="/app/admin/events/add-edit">+</a></div></td>
   <td>Date / Time</td>
   <td>Title</td>
@@ -29,7 +28,7 @@ td a {
   <tr>
   {% for item in row %}
     {% if loop.index == 1 %}
-      <td><a href="/app/admin/events/add-edit?eid={{ item }}">{{ item }}</a></td>
+      <td align="right"><a class="bg-light" href="/app/admin/events/add-edit?eid={{ item }}">{{ item }}</a></td>
     {% else %}
       <td{% if loop.index > 3 %} class='extra_column'{% endif %}>{{ item }}</td>
     {% endif %}

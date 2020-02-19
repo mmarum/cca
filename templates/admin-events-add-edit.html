@@ -4,6 +4,9 @@
 {% block html_head %}
 <style>
 /* specific css */
+input, textarea, label {
+  margin: 10px;
+}
 </style>
 <!-- https://jqueryui.com/datepicker/ -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -23,23 +26,40 @@ function appendTime() {
 {% endblock %}
 
 {% block content %}
+
 <form action="/app/" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
-  {% if field.name != "eid" and field.name != "submit" %}
-    {{ field.label }}
+  {% if field.name != "eid" and field.name != "submit" and field.name != "image" %}
+    {% if form.eid.data %}
+      {{ field.label(class="form-text text-muted") }}
+    {% endif %}
   {% endif %}
   {% if field.name == "edatetime" %}
-    <div class="field">{{ field(autocomplete="off") }}</div>
-    <div class="field">
-      <input id="append_time" name="append_time" type="text" value="00:00:00" onblur="appendTime()">
-    </div>
+    {{ field(autocomplete="off", class="form-control") }}
+    {% if form.eid.data %}
+      <label class="form-text text-muted" for="time">Time</label>
+    {% endif %}
+    <input id="append_time" name="append_time" type="text" placeholder="00:00:00" onblur="appendTime()" class="form-control"/>
   {% else %}
-    <div class="field">{{ field(autocomplete="off") }}</div>
+    {{ field(autocomplete="off", class="form-control") }}
   {% endif %}
 {% endfor %}
-<div><a href="/app/admin/events/list" onclick="hideAddNewEvent(); return false;">Cancel</a></div>
-{% if form.eid.data %}
-  <div><a href="/app/admin/events/delete?eid={{ form.eid.data }}" onclick="return confirm('Are you sure?');">Delete this event</a></div>
-{% endif %}
 </form>
+
+<button type="button" class="btn btn-warning" onClick="window.open('/app/admin/events/list');">Cancel</button>
+
+{% if form.eid.data %}
+  <button type="button" class="btn btn-danger">
+    <a href="/app/admin/events/delete?eid={{ form.eid.data }}" onclick="return confirm('Are you sure?');">Delete</a>
+  </button>
+{% endif %}
+
+{% if not form.eid.data %}
+  <script>
+  {% for field in form %}
+    document.getElementById("{{ field.name }}").placeholder = "{{ field.name }}";
+  {% endfor %}
+{% endif %}
+</script>
+
 {% endblock %}
