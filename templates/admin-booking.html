@@ -9,8 +9,8 @@
 
 {% block content %}
 <h1>Summary of Orders</h1>
-<table>
-<tr class="p-3 mb-2 bg-dark text-white">
+<table class="table table-striped">
+<tr class="p-3 mb-2 bg-light text-dark">
 {% for i in ["title", "event date", "limit", "id", 
   "order id", "event id", "create time", "email", 
   "first name", "last name", "quantity", "total", "paid"] %}
@@ -20,9 +20,13 @@
 {% for order in orders %}
   <tr>
     {% for o in order %}
+      {% if loop.index == 1 %}
+        {% set this_title = o %}
+      {% endif %}
       <td>{{ o }}</td>
     {% endfor %}
   </tr>
+  {% set prev_title = order[0] %}
 {% endfor %}
 </table>
 {% endblock %}

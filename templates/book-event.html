@@ -4,6 +4,9 @@
 {% block html_head %}
 <style>
 /* specific css */
+#paypal-button-container {
+  display: none;
+}
 </style>
 {% endblock %}
 
@@ -13,32 +16,34 @@
 // sandbox client ID
 </script>
 
-<div class="row">
-<div class="column">
+<div class="row top-buffer">
+
+<div class="col-sm-4">
   <img src="/img/small/{{ event_data.image }}" class="event_image">
 </div>
-<div class="column">
-  <div>{{ event_data.edatetime }} {{ event_data.duration }} hrs <span class="book">Book Now</span></div>
+
+<div class="col-sm-8">
+  {{ event_data.edatetime.strftime('%a %b %d at %I:%M %p') }} {{ event_data.duration }} hrs
   <h1>{{ event_data.title }}</h1>
-  <div>
-    ${{ event_data.price }} per person, 
-    Max: {{ event_data.elimit }} people, 
-    At: {{ event_data.location }} 
-    {{ event_data.description }}
-
-    <form>
-    <select name="quantity" id="quantity" onchange="quant();">
-    <option value="">Choose quantity</option>
-    {% set x=event_data.elimit|int %}
-    {% for n in range(1, x+1) %}
-      <option value="{{ n }}">{{ n }}</option>
-    {% endfor %}
-    </select>
-    <form>
-
-  </div>
+  <div>${{ event_data.price }} per person</div>
+  <div>Max: {{ event_data.elimit }} people</div>
+  <div>At: {{ event_data.location }}</div>
+  <div>{{ event_data.description }}</div>
+  <form>
+  <select name="quantity" id="quantity" onchange="quant();">
+  <option value="">Quantity</option>
+  {% set x=event_data.elimit|int %}
+  {% for n in range(1, x+1) %}
+    <option value="{{ n }}">{{ n }}</option>
+  {% endfor %}
+  </select>
+  <form>
+  <div id="cost"></div>
 </div>
-</div>
+
+</div><!-- closes row -->
+
+<div id="paypal-button-container" class="text-center top-buffer"></div>
 
 {#
 TODO: instead of just plain range below do
@@ -47,31 +52,62 @@ ADD: JS to assure user chooses a quantity
 #}
 
 <script>
+var scarf_price = 43;
+var scarf_coupon = 15;
+
+function cost(quantity) {
+  var cost = 0;
+  cost = quantity * {{ event_data.price }};
+  // scarf_coupon: first scarf = $43, second = $28
+  if ({{ event_data.price }} == scarf_price) {
+    if ("{{ event_data.title }}".match(/scarf/gi)) {
+      if (quantity >= 2 ) {
+        if (quantity % 2) {
+          // Odd numbers
+          num = (quantity-1)/2;
+        } else {
+          // Even numbers
+          num = quantity/2;
+        }
+        total_coupon = scarf_coupon * num;
+        //console.log(total_coupon);
+        cost = cost - total_coupon;
+      }
+    }
+  }
+  //console.log(cost);
+  return cost;
+}
+
 function quant() {
-  document.getElementById("paypal-button-container").style.display = "block";
-  var quantity = 1; // default
+  var quantity = 1;
   var q = document.getElementById("quantity");
   quantity = q.options[q.selectedIndex].value;
-  console.log(quantity);
-  if (quantity == "") { alert("Please choose quantity"); }
+  //console.log(quantity);
+  document.getElementById("paypal-button-container").style.display = "block";
+  document.getElementById("cost").innerHTML = "$" + cost(quantity).toString();
+  if ("{{ event_data.title }}".match(/scarf/gi)) {
+    if (quantity >= 2) {
+      document.getElementById("cost").innerHTML += " ($15 coupon added for each 2nd scarf)";
+    }
+  }
+  if (quantity == "") { 
+    document.getElementById("paypal-button-container").style.display = "none";
+  }
   return quantity;
 }
-</script>
 
-<div id="paypal-button-container"></div>
-
-<script>
 // https://developer.paypal.com/docs/checkout/integrate/
 // View orders at PayPal here: https://developer.paypal.com/developer/dashboard/sandbox/
 // Verify the transaction
 // mmarum-buyer@gmail.com
+
   paypal.Buttons({
     createOrder: function(data, actions) {
       return actions.order.create({
         purchase_units: [{
           amount: {
-            //value: '0.01'
-            value: quant() * {{ event_data.price }}
+            value: cost(quant())
           }
         }]
       });
@@ -79,7 +115,7 @@ function quant() {
     onApprove: function(data, actions) {
       return actions.order.capture().then(function(details) {
         alert('Transaction completed by ' + details.payer.name.given_name);
-        console.log(details);
+        //console.log(details);
         // Call your server to save the transaction
         return fetch('/app/paypal-transaction-complete', {
           method: 'post',
@@ -96,6 +132,7 @@ function quant() {
       });
     }
   }).render('#paypal-button-container');
+
 // https://developer.paypal.com/docs/api/orders/v2/#orders_get
 </script>
 

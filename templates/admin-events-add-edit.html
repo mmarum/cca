@@ -46,7 +46,7 @@ function appendTime() {
 {% endfor %}
 </form>
 
-<button type="button" class="btn btn-warning" onClick="window.open('/app/admin/events/list');">Cancel</button>
+<button type="button" class="btn btn-warning" onClick="onclick=location.reload();location.href='/app/admin/events/list'">Cancel</button>
 
 {% if form.eid.data %}
   <button type="button" class="btn btn-danger">
