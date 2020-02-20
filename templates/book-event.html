@@ -4,7 +4,7 @@
 {% block html_head %}
 <style>
 /* specific css */
-#paypal-button-container {
+#paypal-button-container, #special {
   display: none;
 }
 </style>
@@ -31,7 +31,7 @@
   <div>{{ event_data.description }}</div>
   <form>
   <select name="quantity" id="quantity" onchange="quant();">
-  <option value="">Quantity</option>
+  <option value="">Number of guests</option>
   {% set x=event_data.elimit|int %}
   {% for n in range(1, x+1) %}
     <option value="{{ n }}">{{ n }}</option>
@@ -39,6 +39,7 @@
   </select>
   <form>
   <div id="cost"></div>
+  <button id="special" type="button" class="btn btn-info" onclick="onclick=scarf();">Add a 2nd scarf for $28</button>
 </div>
 
 </div><!-- closes row -->
@@ -52,48 +53,30 @@ ADD: JS to assure user chooses a quantity
 #}
 
 <script>
-var scarf_price = 43;
-var scarf_coupon = 15;
+function scarf() {
+  new_cost = cost(quant()) + 28;
+  document.getElementById("cost").innerHTML = "$" + new_cost.toString();
+  return new_cost;
+}
 
 function cost(quantity) {
-  var cost = 0;
-  cost = quantity * {{ event_data.price }};
-  // scarf_coupon: first scarf = $43, second = $28
-  if ({{ event_data.price }} == scarf_price) {
-    if ("{{ event_data.title }}".match(/scarf/gi)) {
-      if (quantity >= 2 ) {
-        if (quantity % 2) {
-          // Odd numbers
-          num = (quantity-1)/2;
-        } else {
-          // Even numbers
-          num = quantity/2;
-        }
-        total_coupon = scarf_coupon * num;
-        //console.log(total_coupon);
-        cost = cost - total_coupon;
-      }
-    }
-  }
-  //console.log(cost);
-  return cost;
+  c = quantity * {{ event_data.price }};
+  return c;
 }
 
 function quant() {
   var quantity = 1;
   var q = document.getElementById("quantity");
   quantity = q.options[q.selectedIndex].value;
-  //console.log(quantity);
+
   document.getElementById("paypal-button-container").style.display = "block";
+  document.getElementById("special").style.display = "block";
   document.getElementById("cost").innerHTML = "$" + cost(quantity).toString();
-  if ("{{ event_data.title }}".match(/scarf/gi)) {
-    if (quantity >= 2) {
-      document.getElementById("cost").innerHTML += " ($15 coupon added for each 2nd scarf)";
-    }
-  }
+
   if (quantity == "") { 
     document.getElementById("paypal-button-container").style.display = "none";
   }
+
   return quantity;
 }
 
