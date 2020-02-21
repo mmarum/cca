@@ -2,9 +2,18 @@
 {% block title %}Events list{% endblock %}
 
 {% block html_head %}
+<script>
+window.onhashchange = function() {
+  window.location.reload();
+}
+</script>
 <style>
-/* specific css */
-.event_image { width: 100%; }
+#paypal-button-container, .special, .check_time, .quantity_form {
+  display: none;
+}
+.event_image {
+  width: 100%;
+}
 </style>
 {% endblock %}
 
@@ -13,38 +22,220 @@
 {% for event in events %}
   <div class="row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
     <div class="col-sm-4">
-      <a href="/app/book/event?eid={{ event.eid }}" class="event_link">
+      <a href="/cca/calendar.html#{{ event.eid }}">
         <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
       </a>
     </div>
     <div class="col-sm-8">
       <span class="date">{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</span>
       Duration: {{ event.duration }} hrs
-      <a href="/app/book/event?eid={{ event.eid }}" class="event_link">
+      <a href="/cca/calendar.html#{{ event.eid }}">
         <h1>{{ event.title }}</h1>
       </a>
-      ${{ event.price }} per person,
-      <div><mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining.</mark></div>
+      <div>${{ event.price }} per person</div>
+      <div>Max: {{ event.elimit }} people. <mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining</mark></div>
       <div>Where: {{ event.location }}</div>
-      <div><a href="/app/book/event?eid={{ event.eid }}" class="event_link">Book Now</a></div>
+      <div id="book_now_{{ event.eid }}"><a href="/cca/calendar.html#{{ event.eid }}">Book Now</a></div>
       <div>{{ event.description }}</div>
+      <form class="quantity_form" id="quantity_form_{{ event.eid }}">
+      <div class="form-group">
+      <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
+      <option value="">Number of guests</option>
+      {% set x=event.elimit|int %}
+      {% for n in range(1, x+1) %}
+        <option value="{{ n }}">{{ n }}</option>
+      {% endfor %}
+      </select>
+      </div>
+      </form>
+      <div id="cost_{{ event.eid }}"></div>
+      <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scarf({{ event.eid }})">Add a 2nd scarf for $28</button>
+      <div id="check_time_{{ event.eid }}" class="check_time alert alert-danger"></div>
     </div>
   </div>
+
 {% endfor %}
 
+<form id="state_holder">
+<input type="hidden" id="state_eid"/>
+<input type="hidden" id="state_date"/>
+<input type="hidden" id="state_title"/>
+<input type="hidden" id="state_price"/>
+</form>
+
+<div id="paypal-button-container" class="text-center top-buffer"></div>
+
+<script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
+// sandbox client ID
+</script>
+
 <script>
+events_object = {{ events_object|safe }}
+
+function setEventMeta(eid) {
+  document.getElementById("state_eid").value = eid;
+  document.getElementById("state_date").value = events_object[eid]["date"];
+  document.getElementById("state_title").value = events_object[eid]["title"];
+  document.getElementById("state_price").value = events_object[eid]["price"];
+}
+
+function getEventMeta(field) {
+  //console.log(field+': '+document.getElementById("state_"+field).value);
+  return document.getElementById("state_"+field).value;
+}
+
+function hideRows() {
+  var x = document.getElementsByClassName("row");
+  for (var i = 0; i < x.length; i++) {
+    x[i].style.display = "none";
+  }
+}
+
+if (window.location.hash) {
+  var hash = window.location.hash.substr(1);
+  if (/^([0-9]{4}-[0-9]{2}-[0-9]{2})$/.test(hash)) {
+    hideRows();
+    var x = document.getElementsByClassName("date_"+hash);
+    for (var i = 0; i < x.length; i++) {
+      x[i].style.display = "flex";
+    }
+  } else if (/^([0-9]{1,9})$/.test(hash)) {
+    hideRows();
+    document.getElementById("eid_"+hash).style.display = "flex";
+    setEventMeta(hash);
+    document.getElementById("quantity_form_"+hash).style.display = "block";
+    checkTime(getEventMeta("date"));
+  }
+  document.getElementById("top").focus();
+}
+
 var orders_count = {{ orders_count }};
 for (var key in orders_count) {
   if (orders_count.hasOwnProperty(key)) {
     sr = document.getElementById("seats_remaining_"+key);
     new_value = sr.innerHTML-orders_count[key];
-    console.log(key + " -> " + orders_count[key] + " old-val: " + sr.innerHTML + " new-val: " + new_value);
+    //console.log(key + " -> " + orders_count[key] + " old-val: " + sr.innerHTML + " new-val: " + new_value);
     sr.innerHTML = new_value;
   }
 }
-if(window.location.hash) {
-  var hash = window.location.hash.substr(1);
-  alert(hash);
+
+function dhm(t){
+    var cd = 24 * 60 * 60 * 1000,
+        ch = 60 * 60 * 1000,
+        d = Math.floor(t / cd),
+        h = Math.floor( (t - d * cd) / ch),
+        m = Math.round( (t - d * cd - h * ch) / 60000),
+        pad = function(n){ return n < 10 ? '0' + n : n; };
+  if( m === 60 ){
+    h++;
+    m = 0;
+  }
+  if( h === 24 ){
+    d++;
+    h = 0;
+  }
+  return d + " days, " + h  + " hours, " + m + " minutes";
 }
+
+function checkTime(event_date_time) {
+  eid = getEventMeta("eid");
+  // milliseconds
+  var d = event_date_time * 1000;
+  var n = Date.now();
+  var dd = new Date(d);
+  var nn = new Date(n);
+  //console.log('d: ' + d + ' dd: ' + dd);
+  //console.log('n: ' + n + ' nn: ' + nn);
+  //console.log('time until event: ' + (d - n));
+  //console.log('time until event: ' + dhm(d - n));
+  if (d - n > 60*60*24*1000) {
+    //console.log("Not within 24h window. OK to book.");
+  } else {
+    //console.log("IS within 24h window. HIDE booking option.");
+    document.getElementById("quantity_form_"+eid).style.display = "none";
+    var check_time_msg = "Event occurs within 24 hours. Call to see if this event is still available.";
+    document.getElementById("check_time_"+eid).innerHTML = check_time_msg;
+    document.getElementById("check_time_"+eid).style.display = "block";
+    document.getElementById("book_now_"+eid).style.display = "none";
+  }
+}
+
+function getTotal(eid) {
+  var total = document.getElementById("cost_"+eid).innerHTML;
+  total = total.substring(1);
+  //console.log('getTotal: ' + total);
+  return total;
+}
+
+function scarf(eid) {
+  var price = getEventMeta("price");
+  var new_cost = subtotal(quant(eid), price) + 28;
+  document.getElementById("cost_"+eid).innerHTML = "$" + new_cost.toString();
+  //console.log('scarf: ' + new_cost);
+  return new_cost;
+}
+
+function subtotal(quantity, price) {
+  c = quantity * price;
+  //console.log('subtotal: ' + c);
+  return c;
+}
+
+function quant(eid) {
+  var quantity = 1;
+  var price = getEventMeta("price");
+  var q = document.getElementById("quantity_"+eid);
+  quantity = q.options[q.selectedIndex].value;
+  document.getElementById("paypal-button-container").style.display = "block";
+  if (getEventMeta("title").match(/scarf/gi)) {
+    document.getElementById("special_"+eid).style.display = "block";
+  }
+  document.getElementById("cost_"+eid).innerHTML = "$" + subtotal(quantity, price).toString();
+  if (quantity == "") { 
+    document.getElementById("paypal-button-container").style.display = "none";
+    document.getElementById("special_"+eid).style.display = "none";
+  }
+  //console.log('quant: ' + quantity);
+  return quantity;
+}
+
+// https://developer.paypal.com/docs/checkout/integrate/
+// View orders at PayPal here: https://developer.paypal.com/developer/dashboard/sandbox/
+// Verify the transaction
+// mmarum-buyer@gmail.com
+
+  paypal.Buttons({
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: getTotal(getEventMeta("eid"))
+          }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        alert('Transaction completed by ' + details.payer.name.given_name);
+        //console.log(details);
+        // Call your server to save the transaction
+        return fetch('/app/paypal-transaction-complete', {
+          method: 'post',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            orderID: data.orderID,
+            event_id: getEventMeta("eid"),
+            quantity: quant(price),
+            details: details
+          })
+        });
+      });
+    }
+  }).render('#paypal-button-container');
+
+// https://developer.paypal.com/docs/api/orders/v2/#orders_get
+
 </script>
 {% endblock %}

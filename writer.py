@@ -52,12 +52,19 @@ passw = json.loads(read_file("data/passwords.json"))[user]
 
 def get_page_contents(path):
     r = requests.get(f'http://www.jedmarum.com/app/{path}', auth=(f'{user}', f'{passw}'))
-    return r.text
+    if r.status_code == 200:
+        return r.text
 
 
 def scrape_and_write(scrape_path, write_path):
-    page_contents = get_page_contents(scrape_path)
-    write_file(f"../www/cca/{write_path}.html", page_contents)
+    try:
+        page_contents = get_page_contents(scrape_path)
+        if page_contents:
+            write_file(f"../www/cca/{write_path}.html", page_contents)
+        else:
+            print('____ page_contents failure')
+    except:
+        print('page_contents OR write_file failure')
 
 
 try:
@@ -73,7 +80,7 @@ try:
                 print('error-1')
                 pass
     else:
-        print('error-2')
+        print('Needs to be pages or galleries')
 except:
-    print('error-3')
+    print('error. probably no argument')
     #pass

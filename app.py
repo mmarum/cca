@@ -63,6 +63,9 @@ def make_cal(db, month, year):
         next_link = f"<div id='next_link'><a href='#' onclick='showMonth({m+1}); return false;'>Next &#187;</a></div>\n"
         one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
         c = db.cursor()
+
+        # TODO: In following query -- Return only events in future (per month)
+
         c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year}")
         allrows = c.fetchall()
         c.close()
@@ -71,7 +74,7 @@ def make_cal(db, month, year):
             day = str(d[0])
             day = day.split(' ')[0].split('-')[2].lstrip('0')
             zd = "0"+str(day) if len(str(day)) == 1 else day
-            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/app/calendar#{year}-{zm}-{zd}" >{day}</a><')
+            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/cca/calendar.html#{year}-{zm}-{zd}" >{day}</a><')
         combined_cals += one_month_cal
     return combined_cals
 
@@ -147,8 +150,20 @@ def app(environ, start_response):
 
                 orders_count_object[key] = val
 
+            events_object = {}
+            for row in allrows:
+                eid = row["eid"]
+                events_object[eid] = {}
+                events_object[eid]["date"] = int(row["edatetime"].timestamp())
+                events_object[eid]["title"] = row["title"]
+                events_object[eid]["price"] = row["price"]
+
+            events_object = json.dumps(events_object)
+
             template = env.get_template("list-events.html")
-            response = template.render(events=allrows, orders_count=orders_count_object)
+            response = template.render(events=allrows, 
+                orders_count=orders_count_object, events_object=events_object)
+
 
         elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
