@@ -30,6 +30,7 @@ from PIL import Image
 import MySQLdb
 
 from gallery import Gallery
+from writer import scrape_and_write
 
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -80,7 +81,7 @@ def app(environ, start_response):
 
     this_now = datetime.datetime.now()
 
-    pages = ["private-events", "about-contact", "custom-built-tables-counter-tops-art-panels"]
+    pages = ["private-events", "about-contact", "custom-built"]
 
     galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "after-school-summer-camp": 7, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "paint-your-own-pottery": 12, "leathercraft": 13, "water-marbling": 14, "specialty-classes": 15}
 
@@ -155,8 +156,12 @@ def app(environ, start_response):
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
 
+            db.query(f"SELECT count(id) as cnt FROM orders WHERE eid = {eid}")
+            o = db.store_result()
+            order_count = o.fetch_row(maxrows=1, how=1)[0]["cnt"]
+
             template = env.get_template("book-event.html")
-            response = template.render(event_data=row)
+            response = template.render(event_data=row, order_count=order_count)
 
         elif environ['PATH_INFO'] == '/gallery/slideshow' or environ['PATH_INFO'].lstrip('/') in galleries_list:
 
@@ -339,6 +344,9 @@ def app(environ, start_response):
 
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
+        scrape_and_write(f"calendar", "calendar")
+        scrape_and_write(f"home", "home")
+
 
     ####
     ####
@@ -395,6 +403,8 @@ def app(environ, start_response):
 
         write_file(f"data/{page_name}.html", page_content)
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages"/>'
+
+        scrape_and_write(page_name, page_name)
 
 
     ####
@@ -484,10 +494,13 @@ def app(environ, start_response):
         response = template.render(event_data=data_object, image_form=image_form,
             sql={"sql":sql}, eid={"eid":eid}, sql2={"sql2":sql2})
 
+        scrape_and_write("calendar", "calendar")
+        scrape_and_write("home", "home")
+
     ####
     ####
     else:
-        response = "barf"
+        response = "error"
 
     #response += f"<hr>{str(environ)}"
 

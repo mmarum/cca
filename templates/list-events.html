@@ -19,14 +19,14 @@
     </div>
     <div class="col-sm-8">
       <span class="date">{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</span>
-      {{ event.duration }} hrs
+      Duration: {{ event.duration }} hrs
       <a href="/app/book/event?eid={{ event.eid }}" class="event_link">
         <h1>{{ event.title }}</h1>
       </a>
       ${{ event.price }} per person,
-      <div><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining.</div>
-      <div>At: {{ event.location }}</div>
-      <div>Book Now</div>
+      <div><mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining.</mark></div>
+      <div>Where: {{ event.location }}</div>
+      <div><a href="/app/book/event?eid={{ event.eid }}" class="event_link">Book Now</a></div>
       <div>{{ event.description }}</div>
     </div>
   </div>

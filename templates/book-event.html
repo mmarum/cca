@@ -4,9 +4,10 @@
 {% block html_head %}
 <style>
 /* specific css */
-#paypal-button-container, #special {
+#paypal-button-container, #special, #check_time {
   display: none;
 }
+
 </style>
 {% endblock %}
 
@@ -23,23 +24,26 @@
 </div>
 
 <div class="col-sm-8">
-  {{ event_data.edatetime.strftime('%a %b %d at %I:%M %p') }} {{ event_data.duration }} hrs
+  {{ event_data.edatetime.strftime('%a %b %d at %I:%M %p') }} Duration: {{ event_data.duration }} hrs
   <h1>{{ event_data.title }}</h1>
   <div>${{ event_data.price }} per person</div>
-  <div>Max: {{ event_data.elimit }} people</div>
-  <div>At: {{ event_data.location }}</div>
-  <div>{{ event_data.description }}</div>
-  <form>
-  <select name="quantity" id="quantity" onchange="quant();">
+  <div>Max: {{ event_data.elimit }} people <mark><span id="seats_remaining">{{ event_data.elimit }}</span> seats remaining.</mark></div>
+  <div>Where: {{ event_data.location }}</div>
+  <p>{{ event_data.description }}</p>
+  <form id="quantity_form">
+  <div class="form-group">
+  <select name="quantity" id="quantity" onchange="quant();" class="form-control">
   <option value="">Number of guests</option>
   {% set x=event_data.elimit|int %}
   {% for n in range(1, x+1) %}
     <option value="{{ n }}">{{ n }}</option>
   {% endfor %}
   </select>
-  <form>
+  </div>
+  </form>
   <div id="cost"></div>
-  <button id="special" type="button" class="btn btn-info" onclick="onclick=scarf();">Add a 2nd scarf for $28</button>
+  <button id="special" type="button" class="btn btn-info" onclick="scarf()">Add a 2nd scarf for $28</button>
+  <div id="check_time" class="alert alert-danger"></div>
 </div>
 
 </div><!-- closes row -->
@@ -53,14 +57,71 @@ ADD: JS to assure user chooses a quantity
 #}
 
 <script>
+var order_count = {{ order_count }};
+sr = document.getElementById("seats_remaining");
+new_value = (Number(sr.innerHTML) - order_count);
+sr.innerHTML = new_value;
+
+function dhm(t){
+    var cd = 24 * 60 * 60 * 1000,
+        ch = 60 * 60 * 1000,
+        d = Math.floor(t / cd),
+        h = Math.floor( (t - d * cd) / ch),
+        m = Math.round( (t - d * cd - h * ch) / 60000),
+        pad = function(n){ return n < 10 ? '0' + n : n; };
+  if( m === 60 ){
+    h++;
+    m = 0;
+  }
+  if( h === 24 ){
+    d++;
+    h = 0;
+  }
+  return d + " days, " + h  + " hours, " + m + " minutes";
+}
+
+var test_event_date = {{ event_data.edatetime.timestamp()|int }};
+
+function checkTime(event_date_time) {
+  // milliseconds
+  var d = event_date_time * 1000;
+  var n = Date.now();
+  var dd = new Date(d);
+  var nn = new Date(n);
+  console.log('d: ' + d + ' dd: ' + dd);
+  console.log('n: ' + n + ' nn: ' + nn);
+  console.log('time until event: ' + (d - n));
+  console.log('time until event: ' + dhm(d - n));
+  if (d - n > 60*60*24*1000) {
+    console.log("Not within 24h window. OK to book." );
+  } else {
+    console.log("IS within 24h window. HIDE booking option.");
+    document.getElementById("quantity_form").style.display = "none";
+    var check_time_msg = "Event occurs within 24 hours. Call to see if this event is still available.";
+    document.getElementById("check_time").innerHTML = check_time_msg;
+    document.getElementById("check_time").style.display = "block";
+  }
+}
+
+checkTime({{ event_data.edatetime.timestamp()|int }});
+
+function getTotal() {
+  var total = document.getElementById("cost").innerHTML;
+  total = total.substring(1);
+  //console.log('getTotal: ' + total);
+  return total;
+}
+
 function scarf() {
-  new_cost = cost(quant()) + 28;
+  new_cost = subtotal(quant()) + 28;
   document.getElementById("cost").innerHTML = "$" + new_cost.toString();
+  //console.log('scarf: ' + new_cost);
   return new_cost;
 }
 
-function cost(quantity) {
+function subtotal(quantity) {
   c = quantity * {{ event_data.price }};
+  //console.log('subtotal: ' + c);
   return c;
 }
 
@@ -68,15 +129,16 @@ function quant() {
   var quantity = 1;
   var q = document.getElementById("quantity");
   quantity = q.options[q.selectedIndex].value;
-
   document.getElementById("paypal-button-container").style.display = "block";
-  document.getElementById("special").style.display = "block";
-  document.getElementById("cost").innerHTML = "$" + cost(quantity).toString();
-
+  {% if "scarf" in event_data.title|lower %}
+    document.getElementById("special").style.display = "block";
+  {% endif %}
+  document.getElementById("cost").innerHTML = "$" + subtotal(quantity).toString();
   if (quantity == "") { 
     document.getElementById("paypal-button-container").style.display = "none";
+    document.getElementById("special").style.display = "none";
   }
-
+  //console.log('quant: ' + quantity);
   return quantity;
 }
 
@@ -90,7 +152,7 @@ function quant() {
       return actions.order.create({
         purchase_units: [{
           amount: {
-            value: cost(quant())
+            value: getTotal()
           }
         }]
       });
