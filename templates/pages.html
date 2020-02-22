@@ -8,18 +8,25 @@
 
 {% block content %}
 
-{% if email %}
-  <p class="alert alert-success top-buffer">Thank you {{ email }}.</p>
-{% endif %}
+<div id="thanks_message"></div>
 
 {{ page_content|safe }}
 
 {% if page_name == "about-contact" %}
-  <form action="/app/contact" method="POST" enctype="multipart/form-data" name="contact_form" id="contact_form">
-  <p><input type="text" name="email" placeholder="Email"/></p>
-  <p><textarea name="message"></textarea></p>
-  <p><input type="submit" name="submit"/></p>
+  <form action="/contact/submit" method="POST" enctype="text/plain">
+  <p><input class="form-control" type="text" name="email" placeholder="Email"/></p>
+  <p><textarea class="form-control" name="message"></textarea></p>
+  <p><input class="form-control" type="submit" name="submit"/></p>
   </form>
+  <script>
+  if (window.location.hash) {
+    var hash = window.location.hash.substr(1);
+    if (/^(thanks)$/.test(hash)) {
+      var thanks_text = '<p class="alert alert-success top-buffer">Thank you for contacting us. We will try to get back to you soon.</p>'
+      document.getElementById("thanks_message").innerHTML = thanks_text;
+    }
+  }
+  </script>
 {% endif %}
 
 {% endblock %}
