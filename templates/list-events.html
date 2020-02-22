@@ -8,11 +8,23 @@ window.onhashchange = function() {
 }
 </script>
 <style>
-#paypal-button-container, .special, .check_time, .quantity_form {
+#paypal-button-container, .special, .check_time, .quantity_form, .cost {
   display: none;
 }
 .event_image {
   width: 100%;
+}
+select{
+  background: #ccff66 !important;
+  color:#FFF;
+  text-shadow:0 1px 0 rgba(0,0,0,0.4);
+}
+option:not(:checked) { 
+  background-color: white; 
+  color:#000;
+}
+.date {
+  font-size: 150%;
 }
 </style>
 {% endblock %}
@@ -28,7 +40,7 @@ window.onhashchange = function() {
     </div>
     <div class="col-sm-8">
       <span class="date">{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</span>
-      Duration: {{ event.duration }} hrs
+      Lasts: {{ event.duration }} hrs
       <a href="/cca/calendar.html#{{ event.eid }}">
         <h1>{{ event.title }}</h1>
       </a>
@@ -48,7 +60,7 @@ window.onhashchange = function() {
       </select>
       </div>
       </form>
-      <div id="cost_{{ event.eid }}"></div>
+      <div class="cost alert alert-warning" id="cost_{{ event.eid }}">Total: $0</div>
       <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scarf({{ event.eid }})">Add a 2nd scarf for $28</button>
       <div id="check_time_{{ event.eid }}" class="check_time alert alert-danger"></div>
     </div>
@@ -105,11 +117,12 @@ if (window.location.hash) {
     setEventMeta(hash);
     document.getElementById("quantity_form_"+hash).style.display = "block";
     checkTime(getEventMeta("date"));
+    document.getElementById("book_now_"+eid).style.display = "none";
   }
   document.getElementById("top").focus();
 }
 
-var orders_count = {{ orders_count }};
+var orders_count = {{ orders_count|safe }}
 for (var key in orders_count) {
   if (orders_count.hasOwnProperty(key)) {
     sr = document.getElementById("seats_remaining_"+key);
@@ -190,7 +203,9 @@ function quant(eid) {
   if (getEventMeta("title").match(/scarf/gi)) {
     document.getElementById("special_"+eid).style.display = "block";
   }
-  document.getElementById("cost_"+eid).innerHTML = "$" + subtotal(quantity, price).toString();
+  document.getElementById("cost_"+eid).innerHTML = "Total: $" + subtotal(quantity, price).toString();
+  document.getElementById("cost_"+eid).innerHTML += ". To complete order, click Paypal button below.";
+  document.getElementById("cost_"+eid).style.display = "block";
   if (quantity == "") { 
     document.getElementById("paypal-button-container").style.display = "none";
     document.getElementById("special_"+eid).style.display = "none";
@@ -227,7 +242,7 @@ function quant(eid) {
           body: JSON.stringify({
             orderID: data.orderID,
             event_id: getEventMeta("eid"),
-            quantity: quant(price),
+            quantity: quant(getEventMeta("eid")),
             details: details
           })
         });

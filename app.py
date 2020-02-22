@@ -64,9 +64,7 @@ def make_cal(db, month, year):
         one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
         c = db.cursor()
 
-        # TODO: In following query -- Return only events in future (per month)
-
-        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year}")
+        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime > CURDATE()")
         allrows = c.fetchall()
         c.close()
         zm = "0"+str(m) if len(str(m)) == 1 else m
@@ -137,7 +135,7 @@ def app(environ, start_response):
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
-            db.query("SELECT eid, count(eid) as count_eid FROM orders group by eid")
+            db.query("SELECT eid, SUM(quantity) as sum_quantity FROM orders GROUP BY eid")
             # TODO: May need to add join to events table above
             # so as to only pull future event dates
             r = db.store_result()
@@ -145,8 +143,8 @@ def app(environ, start_response):
 
             orders_count_object = {}
             for item in orders_count:
-                key = item['eid']
-                val = item['count_eid']
+                key = int(item['eid'])
+                val = int(item['sum_quantity'])
 
                 orders_count_object[key] = val
 
@@ -317,6 +315,8 @@ def app(environ, start_response):
         write_file(f"orders/{event_id}.json", json.dumps(orders, indent=4))
         response = "200"
 
+        scrape_and_write("calendar")
+
 
     ####
     ####
@@ -359,8 +359,8 @@ def app(environ, start_response):
 
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
-        scrape_and_write(f"calendar", "calendar")
-        scrape_and_write(f"home", "home")
+        scrape_and_write("calendar")
+        scrape_and_write("home")
 
 
     ####
@@ -419,7 +419,7 @@ def app(environ, start_response):
         write_file(f"data/{page_name}.html", page_content)
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages"/>'
 
-        scrape_and_write(page_name, page_name)
+        scrape_and_write(page_name)
 
 
     ####
@@ -509,8 +509,8 @@ def app(environ, start_response):
         response = template.render(event_data=data_object, image_form=image_form,
             sql={"sql":sql}, eid={"eid":eid}, sql2={"sql2":sql2})
 
-        scrape_and_write("calendar", "calendar")
-        scrape_and_write("home", "home")
+        scrape_and_write("calendar")
+        scrape_and_write("home")
 
     ####
     ####

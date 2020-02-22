@@ -3,6 +3,12 @@ import os
 import sys
 import json
 
+"""
+cron:
+source /home/jedmarum/virtualenv/app/3.6/bin/activate; cd /home/jedmarum/app; python writer.py pages
+source /home/jedmarum/virtualenv/app/3.6/bin/activate; cd /home/jedmarum/app; python writer.py galleries
+"""
+
 groups = {
 "pages": [
     "home",
@@ -56,11 +62,11 @@ def get_page_contents(path):
         return r.text
 
 
-def scrape_and_write(scrape_path, write_path):
+def scrape_and_write(path):
     try:
-        page_contents = get_page_contents(scrape_path)
+        page_contents = get_page_contents(path)
         if page_contents:
-            write_file(f"../www/cca/{write_path}.html", page_contents)
+            write_file(f"../www/cca/{path}.html", page_contents)
         else:
             print('____ page_contents failure')
     except:
@@ -69,18 +75,19 @@ def scrape_and_write(scrape_path, write_path):
 
 try:
     # "galleries" NEEDS TO BE CALLED VIA CRON
+    # "home" and "calendar" should also be on cron
     if sys.argv[1] in ["pages", "galleries"]:
         group = sys.argv[1]
         print(group)
         for item in groups[group]:
             try:
                 print(item)
-                scrape_and_write(item, item)
+                scrape_and_write(item)
             except:
-                print('error-1')
+                print('error. bad scrape')
                 pass
     else:
         print('Needs to be pages or galleries')
 except:
     print('error. probably no argument')
-    #pass
+
