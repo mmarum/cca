@@ -50,7 +50,8 @@ td {
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop(); return false;" data-toggle="dropdown">Crafts/Services</a>
       <div class="dropdown-menu"  id="dropdown-menu">
-      {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Paint your own pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling", "Specialty Classes", "Custom built tables, counter tops, art panels"] %}
+      {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling"] %}
+        {# "Paint your own pottery", "Specialty Classes", "Custom built" #}
         <a class="dropdown-item" href="/cca/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
       {% endfor %}
       </div>

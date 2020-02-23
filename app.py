@@ -82,9 +82,10 @@ def app(environ, start_response):
 
     this_now = datetime.datetime.now()
 
-    pages = ["private-events", "about-contact", "custom-built"]
+    pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp"]
 
-    galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "after-school-summer-camp": 7, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "paint-your-own-pottery": 12, "leathercraft": 13, "water-marbling": 14, "specialty-classes": 15}
+    galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13}
+    # "paint-your-own-pottery": 12, "specialty-classes": 14
 
     galleries_list = list(galleries_dict.keys())
 

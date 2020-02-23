@@ -9,7 +9,7 @@
 
 {% block content %}
 <h1 class="text-center">{{ gallery.name }}</h1>
-<p>{{ gallery.comment }}</p>
+<p>{{ gallery.comment|safe }}</p>
 <center>
 {% for i in images %}
   <img class="gallery_image" src="/gallery/{{ i[5]|replace('./', '') }}"/>

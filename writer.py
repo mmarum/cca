@@ -15,11 +15,11 @@ groups = {
     "calendar",
     "private-events", 
     "about-contact", 
-    "custom-built"
+    "custom-built",
+    "after-school-summer-camp"
 ],
 "galleries": [
     "commissioned-art",
-    "after-school-summer-camp",
     "acrylic-painting",
     "watercolor-painting",
     "paint-your-pet",
@@ -32,8 +32,7 @@ groups = {
     "leathercraft",
     "resin-crafts",
     "water-marbling",
-    "specialty-classes",
-    "custom-built"
+    "specialty-classes"
 ]
 }
 
@@ -85,9 +84,11 @@ try:
                 scrape_and_write(item)
             except:
                 print('error. bad scrape')
-                pass
+                #pass
     else:
         print('Needs to be pages or galleries')
+        #pass
 except:
     print('error. probably no argument')
+    #pass
 
