@@ -9,7 +9,7 @@
 {% block content %}
 <table class="table table-striped">
 <tr class="p-3 mb-2 bg-light text-dark">
-  <td><div id="add_new_link"><a href="/app/admin/events/add-edit">+</a></div></td>
+  <td><div id="add_new_link"><a href="/~catalystcreative/app/admin/events/add-edit">+</a></div></td>
   <td>Date</td>
   <td>Title</td>
   <td class='extra_column'>Duration</td>
@@ -24,7 +24,7 @@
   <tr>
   {% for item in row %}
     {% if loop.index == 1 %}
-      <td><a class="bg-light" href="/app/admin/events/add-edit?eid={{ item }}">{{ item }}</a></td>
+      <td><a class="bg-light" href="/~catalystcreative/app/admin/events/add-edit?eid={{ item }}">{{ item }}</a></td>
     {% elif loop.index == 2 %}
       <td>{{ item.strftime('%a %b %d %I:%M %p')|replace(' 0', ' ') }}</td>
     {% else %}

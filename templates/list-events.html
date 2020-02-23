@@ -34,20 +34,20 @@ option:not(:checked) {
 {% for event in events %}
   <div class="row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
     <div class="col-sm-4">
-      <a href="/cca/calendar.html#{{ event.eid }}">
-        <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
+      <a href="/~catalystcreative/calendar.html#{{ event.eid }}">
+        <img alt="{{ event.image }}" src="/~catalystcreative/img/small/{{ event.image }}" class="event_image"/>
       </a>
     </div>
     <div class="col-sm-8">
       <span class="date">{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</span>
       Lasts: {{ event.duration }} hrs
-      <a href="/cca/calendar.html#{{ event.eid }}">
+      <a href="/~catalystcreative/calendar.html#{{ event.eid }}">
         <h1>{{ event.title }}</h1>
       </a>
       <div>${{ event.price }} per person</div>
       <div>Max: {{ event.elimit }} people. <mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining</mark></div>
       <div>Where: {{ event.location }}</div>
-      <div id="book_now_{{ event.eid }}"><a href="/cca/calendar.html#{{ event.eid }}">Book Now</a></div>
+      <div id="book_now_{{ event.eid }}"><a href="/~catalystcreative/calendar.html#{{ event.eid }}">Book Now</a></div>
       <div>{{ event.description }}</div>
       <form class="quantity_form" id="quantity_form_{{ event.eid }}">
       <div class="form-group">

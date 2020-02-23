@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import MySQLdb
-# mysql -u jedmarum_cca jedmarum_piwi833 -p
+# mysql -u catalystcreative_cca catalystcreative_826 -p
 
 def read_file(file_name):
     f = open(file_name, "r")
@@ -18,9 +18,9 @@ class Gallery:
     def get_gallery(self):
 
         # DEDUPE THIS LATER !!!
-        dbuser = "jedmarum_cca"
+        dbuser = "catalystcreative_cca"
         passwd = json.loads(read_file("data/passwords.json"))[dbuser]
-        db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_piwi833")
+        db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_826")
 
         db.query(f"SELECT name, comment FROM piwigz_categories WHERE id = {self.category}")
         r = db.store_result()
@@ -31,9 +31,9 @@ class Gallery:
     def get_images(self):
 
         # DEDUPE THIS LATER !!!
-        dbuser = "jedmarum_cca"
+        dbuser = "catalystcreative_cca"
         passwd = json.loads(read_file("data/passwords.json"))[dbuser]
-        db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_piwi833")
+        db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_826")
 
         c = db.cursor()
         c.execute(f"SELECT i.id, i.file, i.name, i.width, i.height, i.path \

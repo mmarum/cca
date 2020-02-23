@@ -2,6 +2,6 @@
 
 # This script copies files into the git repo
 
-cp /home/jedmarum/app/*.* /home/jedmarum/app/cca/
-cp /home/jedmarum/app/templates/*.* /home/jedmarum/app/cca/templates/
-cp /home/jedmarum/contact/contact.py /home/jedmarum/app/cca/contact.py
+cp /home/catalystcreative/app/*.* /home/catalystcreative/app/cca/
+cp /home/catalystcreative/app/templates/*.* /home/catalystcreative/app/cca/templates/
+cp /home/catalystcreative/contact/contact.py /home/catalystcreative/app/cca/contact.py

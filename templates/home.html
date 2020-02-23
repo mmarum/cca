@@ -31,8 +31,8 @@ table {
 
 <div class="row">
   <div class="col my-3 py-3">
-    <a href="/cca/calendar.html#{{ next_event.eid }}" class="event_link">
-      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="logo"/>
+    <a href="/~catalystcreative/calendar.html#{{ next_event.eid }}" class="event_link">
+      <img alt="{{ next_event.image }}" src="/~catalystcreative/img/small/{{ next_event.image }}" class="logo"/>
     </a>
   </div>
   <div class="col my-3 py-3">
@@ -40,7 +40,7 @@ table {
       {{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}
       <!-- {{ next_event.duration }} hrs -->
     </div>
-    <a href="/cca/calendar.html#{{ next_event.eid }}" class="event_link">
+    <a href="/~catalystcreative/calendar.html#{{ next_event.eid }}" class="event_link">
       <h1>{{ next_event.title }}</h1>
     </a>
     <div>

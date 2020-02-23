@@ -5,8 +5,8 @@ import json
 
 """
 cron:
-source /home/jedmarum/virtualenv/app/3.6/bin/activate; cd /home/jedmarum/app; python writer.py pages
-source /home/jedmarum/virtualenv/app/3.6/bin/activate; cd /home/jedmarum/app; python writer.py galleries
+source /home/catalystcreative/virtualenv/app/3.6/bin/activate; cd /home/catalystcreative/app; python writer.py pages
+source /home/catalystcreative/virtualenv/app/3.6/bin/activate; cd /home/catalystcreative/app; python writer.py galleries
 """
 
 groups = {
@@ -51,13 +51,16 @@ def write_file(file_name, content):
     return True
 
 
-user = "jedmarum"
+user = "catalystcreative"
 passw = json.loads(read_file("data/passwords.json"))[user]
 
 
 def get_page_contents(path):
-    r = requests.get(f'http://www.jedmarum.com/app/{path}', auth=(f'{user}', f'{passw}'))
+    #r = requests.get(f'http://www.catalystcreative.com/~catalystcreative/app/{path}', auth=(f'{user}', f'{passw}'))
+    r = requests.get(f'http://96.31.72.56/~catalystcreative/app/{path}')
+    print(r.url)
     if r.status_code == 200:
+        print(r.status_code)
         return r.text
 
 
@@ -65,7 +68,7 @@ def scrape_and_write(path):
     try:
         page_contents = get_page_contents(path)
         if page_contents:
-            write_file(f"../www/cca/{path}.html", page_contents)
+            write_file(f"../www/{path}.html", page_contents)
         else:
             print('____ page_contents failure')
     except:

@@ -6,7 +6,6 @@
 </style>
 <!-- https://jqueryui.com/datepicker/ -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="/resources/demos/style.css">
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
@@ -22,7 +21,7 @@ $( function() {
     <div>{{ k }}: {{ v }}</div>
   {% endfor %}
 {% endif %}
-<form action="/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+<form action="/~catalystcreative/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in image_form %}
   {% if field.name != "eid" and field.name != "submit" %}
     {{ field.label }}

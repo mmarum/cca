@@ -48,8 +48,8 @@ def write_file(file_name, content):
     return True
 
 
-# mysql -u jedmarum_cca jedmarum_events -p
-dbuser = "jedmarum_cca"
+# mysql -u catalystcreative_cca catalystcreative_arts -p
+dbuser = "catalystcreative_cca"
 passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
 
@@ -72,7 +72,7 @@ def make_cal(db, month, year):
             day = str(d[0])
             day = day.split(' ')[0].split('-')[2].lstrip('0')
             zd = "0"+str(day) if len(str(day)) == 1 else day
-            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/cca/calendar.html#{year}-{zm}-{zd}" >{day}</a><')
+            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/~catalystcreative/calendar.html#{year}-{zm}-{zd}" >{day}</a><')
         combined_cals += one_month_cal
     return combined_cals
 
@@ -89,7 +89,7 @@ def app(environ, start_response):
 
     galleries_list = list(galleries_dict.keys())
 
-    db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="jedmarum_events")
+    db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
 
     ####
     ####
@@ -125,7 +125,7 @@ def app(environ, start_response):
                 c = db.cursor()
                 c.execute(sql)
                 c.close()
-                response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
+                response = '<meta http-equiv="refresh" content="0; url=/~catalystcreative/app/admin/events/list" />'
             else:
                 response = ""
 
@@ -358,7 +358,7 @@ def app(environ, start_response):
             c.execute(sql)
             c.close()
 
-        response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
+        response = '<meta http-equiv="refresh" content="0; url=/~catalystcreative/app/admin/events/list" />'
 
         scrape_and_write("calendar")
         scrape_and_write("home")
@@ -418,7 +418,7 @@ def app(environ, start_response):
         os.rename(f"data/{page_name}.html", f"data/{page_name}.html.bak")
 
         write_file(f"data/{page_name}.html", page_content)
-        response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages"/>'
+        response = '<meta http-equiv="refresh" content="0; url=/~catalystcreative/app/admin/pages"/>'
 
         scrape_and_write(page_name)
 
@@ -518,7 +518,7 @@ def app(environ, start_response):
     else:
         response = "error"
 
-    #response += f"<hr>{str(environ)}"
+    response += f"<hr>{str(environ)}"
 
     db.close()
 

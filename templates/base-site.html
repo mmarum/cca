@@ -40,19 +40,19 @@ td {
 <div class="container">
 
 <div class="topnav text-center">
-  <p><a href="/cca/home.html"><img src="/img/logo.png" class="img-fluid"/></a></p>
+  <p><a href="/~catalystcreative/home.html"><img src="/~catalystcreative/img/logo.png" class="img-fluid"/></a></p>
 
 <nav class="navbar navbar-expand-sm bg-light navbar-light d-flex">
   <ul class="navbar-nav list-inline mx-auto justify-content-center">
   {% for i in ["Calendar", "Private-Events", "About/Contact", "Commissioned-Art", "After-School/Summer-Camp"] %}
-    <li class="nav-item"><a class="nav-link" href="/cca/{{ i|replace('/', '-')|lower }}.html">{{ i }}</a></li>
+    <li class="nav-item"><a class="nav-link" href="/~catalystcreative/{{ i|replace('/', '-')|lower }}.html">{{ i }}</a></li>
   {% endfor%}
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop(); return false;" data-toggle="dropdown">Crafts/Services</a>
       <div class="dropdown-menu"  id="dropdown-menu">
       {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling"] %}
         {# "Paint your own pottery", "Specialty Classes", "Custom built" #}
-        <a class="dropdown-item" href="/cca/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
+        <a class="dropdown-item" href="/~catalystcreative/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
       {% endfor %}
       </div>
     </li>
