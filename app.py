@@ -518,7 +518,7 @@ def app(environ, start_response):
     else:
         response = "error"
 
-    response += f"<hr>{str(environ)}"
+    #response += f"<hr>{str(environ)}"
 
     db.close()
 
