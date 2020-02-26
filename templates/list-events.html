@@ -48,7 +48,18 @@ option:not(:checked) {
       <div>Max: {{ event.elimit }} people. <mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining</mark></div>
       <div>Where: {{ event.location }}</div>
       <div id="book_now_{{ event.eid }}"><a href="/~catalystcreative/calendar.html#{{ event.eid }}">Book Now</a></div>
-      <div>{{ event.description }}</div>
+
+      <div>
+      {% set event_desc = event.description.split('\n') %}
+      {% for e in event_desc %}
+        {% if e.startswith("http") %}
+          <a href="{{ e }}">LINK</a>
+        {% else %}
+          {{ e }}
+        {% endif %}
+      {% endfor %}
+      </div>
+
       <form class="quantity_form" id="quantity_form_{{ event.eid }}">
       <div class="form-group">
       <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">

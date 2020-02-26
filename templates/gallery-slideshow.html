@@ -3,17 +3,24 @@
 
 {% block html_head %}
 <style>
-.gallery_image { max-width: 220px; }
+.gallery_image {
+  max-width: 210px;
+}
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- {{ images|safe }} -->
 <h1 class="text-center">{{ gallery.name }}</h1>
 <p>{{ gallery.comment|safe }}</p>
 <center>
+<div class="row">
 {% for i in images %}
-  <img class="gallery_image" src="/~catalystcreative/gallery/{{ i[5]|replace('./', '') }}"/>
+  <div class="col-sm">
+  <img class="gallery_image" src="/~catalystcreative/gallery/{{ i[5]|replace('./', '')|replace('.jpg', '_small.jpg')|replace('.png', '_small.png') }}"/><br/>{{ i[2] }}
+  </div>
 {% endfor %}
+</div>
 </center>
 {% endblock %}
 
