@@ -12,7 +12,7 @@ window.onhashchange = function() {
   display: none;
 }
 .event_image {
-  width: 100%;
+  max-width: 100%;
 }
 select{
   background: #ccff66 !important;
@@ -26,26 +26,44 @@ option:not(:checked) {
 .date {
   font-size: 150%;
 }
+h1 {
+  border-bottom: 1px dashed LightGray;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 
+<form id="state_holder">
+<input type="hidden" id="state_eid"/>
+<input type="hidden" id="state_date"/>
+<input type="hidden" id="state_title"/>
+<input type="hidden" id="state_price"/>
+<input type="hidden" id="state_outside_payment" value="False"/>
+</form>
+
+<center>
+<h1>Upcoming Events</h1>
+</center>
+
 {% for event in events %}
   <div class="row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
-    <div class="col-sm-4">
+
+    <div class="col-sm-1">
+    </div>
+
+    <div class="col-md-2">
       <a href="/~catalystcreative/calendar.html#{{ event.eid }}">
         <img alt="{{ event.image }}" src="/~catalystcreative/img/small/{{ event.image }}" class="event_image"/>
       </a>
     </div>
-    <div class="col-sm-8">
-      <span class="date">{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</span>
-      Lasts: {{ event.duration }} hrs
+    <div class="col-lg-8">
+      <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} ({{ event.duration }} hrs)</h4>
       <a href="/~catalystcreative/calendar.html#{{ event.eid }}">
-        <h1>{{ event.title }}</h1>
+        <h3>{{ event.title }}</h3>
       </a>
       <div>${{ event.price }} per person</div>
-      <div>Max: {{ event.elimit }} people. <mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining</mark></div>
+      <!-- <div>Max: {{ event.elimit }} people. <mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining</mark></div> -->
       <div>Where: {{ event.location }}</div>
       <div id="book_now_{{ event.eid }}"><a href="/~catalystcreative/calendar.html#{{ event.eid }}">Book Now</a></div>
 
@@ -53,7 +71,15 @@ option:not(:checked) {
       {% set event_desc = event.description.split('\n') %}
       {% for e in event_desc %}
         {% if e.startswith("http") %}
-          <a href="{{ e }}">LINK</a>
+          <a href="{{ e }}">Buy tickets</a>
+          <script>
+          if (window.location.hash) {
+            var hash = window.location.hash.substr(1);
+            if ((/^([0-9]{1,9})$/.test(hash)) && (hash == {{ event.eid }})) {
+              document.getElementById("state_outside_payment").value = "True";
+            }
+          }
+          </script>
         {% else %}
           {{ e }}
         {% endif %}
@@ -61,30 +87,29 @@ option:not(:checked) {
       </div>
 
       <form class="quantity_form" id="quantity_form_{{ event.eid }}">
+      <p>Book now. Select number of guests:</p>
       <div class="form-group">
       <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
       <option value="">Number of guests</option>
       {% set x=event.elimit|int %}
-      {% for n in range(1, x+1) %}
+      {% for n in range(1, x+1) -%}
         <option value="{{ n }}">{{ n }}</option>
-      {% endfor %}
+      {%- endfor %}
       </select>
       </div>
       </form>
       <div class="cost alert alert-warning" id="cost_{{ event.eid }}">Total: $0</div>
       <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scarf({{ event.eid }})">Add a 2nd scarf for $28</button>
       <div id="check_time_{{ event.eid }}" class="check_time alert alert-danger"></div>
+
     </div>
+
+    <div class="col-sm-1">
+    </div>
+
   </div>
 
 {% endfor %}
-
-<form id="state_holder">
-<input type="hidden" id="state_eid"/>
-<input type="hidden" id="state_date"/>
-<input type="hidden" id="state_title"/>
-<input type="hidden" id="state_price"/>
-</form>
 
 <div id="paypal-button-container" class="text-center top-buffer"></div>
 
@@ -126,13 +151,18 @@ if (window.location.hash) {
     hideRows();
     document.getElementById("eid_"+hash).style.display = "flex";
     setEventMeta(hash);
-    document.getElementById("quantity_form_"+hash).style.display = "block";
+
+    if (document.getElementById("state_outside_payment").value == "False") {
+      document.getElementById("quantity_form_"+hash).style.display = "block";
+    }
+
     checkTime(getEventMeta("date"));
     document.getElementById("book_now_"+eid).style.display = "none";
   }
   document.getElementById("top").focus();
 }
 
+/*
 var orders_count = {{ orders_count|safe }}
 for (var key in orders_count) {
   if (orders_count.hasOwnProperty(key)) {
@@ -142,6 +172,7 @@ for (var key in orders_count) {
     sr.innerHTML = new_value;
   }
 }
+*/
 
 function dhm(t){
     var cd = 24 * 60 * 60 * 1000,

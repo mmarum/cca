@@ -26,7 +26,7 @@
   {{ event_data.edatetime.strftime('%a %b %d at %I:%M %p') }} Duration: {{ event_data.duration }} hrs
   <h1>{{ event_data.title }}</h1>
   <div>${{ event_data.price }} per person</div>
-  <div>Max: {{ event_data.elimit }} people <mark><span id="seats_remaining">{{ event_data.elimit }}</span> seats remaining.</mark></div>
+  <!-- <div>Max: {{ event_data.elimit }} people <mark><span id="seats_remaining">{{ event_data.elimit }}</span> seats remaining.</mark></div> -->
   <div>Where: {{ event_data.location }}</div>
   <p>{{ event_data.description }}</p>
   <form id="quantity_form">
@@ -56,10 +56,12 @@ ADD: JS to assure user chooses a quantity
 #}
 
 <script>
+/*
 var order_count = {{ order_count }};
 sr = document.getElementById("seats_remaining");
 new_value = (Number(sr.innerHTML) - order_count);
 sr.innerHTML = new_value;
+*/
 
 function dhm(t){
     var cd = 24 * 60 * 60 * 1000,

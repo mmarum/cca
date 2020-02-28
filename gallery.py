@@ -3,6 +3,7 @@ import sys
 import json
 import MySQLdb
 # mysql -u catalystcreative_cca catalystcreative_66 -p
+# update piwigz_categories set comment = '' where id = 13;
 
 def read_file(file_name):
     f = open(file_name, "r")

@@ -29,37 +29,54 @@ table {
 
 {% block content %}
 
-<div class="row">
-  <div class="col my-3 py-3">
+<div class="row top-buffer">
+
+  <div class="col-sm-1">
+  </div>
+
+  <div class="col-md-3">
     <a href="/~catalystcreative/calendar.html#{{ next_event.eid }}" class="event_link">
       <img alt="{{ next_event.image }}" src="/~catalystcreative/img/small/{{ next_event.image }}" class="logo"/>
     </a>
   </div>
-  <div class="col my-3 py-3">
-    <div>
-      {{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}
-      <!-- {{ next_event.duration }} hrs -->
-    </div>
+
+  <div class="col-md-4">
+    <h4>{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} <!-- ({{ next_event.duration }} hrs) --></h4>
     <a href="/~catalystcreative/calendar.html#{{ next_event.eid }}" class="event_link">
-      <h1>{{ next_event.title }}</h1>
+      <h3>{{ next_event.title }}</h3>
     </a>
     <div>
       ${{ next_event.price }} per person
-      <span id="seats_remaining_{{ next_event.eid }}">{{ next_event.elimit }}</span> seats remaining
+      <!-- <span id="seats_remaining_{{ next_event.eid }}">{{ next_event.elimit }}</span> seats remaining-->
     </div>
     <div>At: {{ next_event.location }}</div>
-    <div class="book_now">Book Now</div>
-    <div>{{ next_event.description }}</div>
+    <!-- <div class="book_now">Book Now</div> -->
+    <!-- <div>{{ next_event.description }}</div> -->
+
+    <div>
+    {% set event_desc = next_event.description.split(' ') %}
+    {% for e in event_desc %}
+      {% if loop.index < 30 %}
+        {{ e }}
+      {% endif %}
+    {% endfor %}
+    ... <a href="/~catalystcreative/calendar.html#{{ next_event.eid }}" class="event_link">Read More</a>
+    </div>
+
   </div>
-  <div class="col my-3 py-3">
+  <div class="col-md-3">
     <div id="paper_calendar"></div>
     {{ calendar.html|safe }}
   </div>
+
+  <div class="col-sm-1">
+  </div>
+
 </div>
 
 <div class="text-center">
-  <h5>Photos from recent events</h5>
-  <img src="/img/alc-ink-1.jpg" class="img-fluid"/>
+  <h3>Photos from recent events</h3>
+  <img src="/~catalystcreative/img/alc-ink-1.jpg" class="img-fluid"/>
 </div>
 
 <script>

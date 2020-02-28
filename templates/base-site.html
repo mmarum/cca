@@ -17,8 +17,8 @@
 
 <style>
 .top-buffer { 
-  /* padding: 10px 0 10px 0; */
-  margin-top: 10px;
+  padding: 10px 0 10px 0;
+  margin: 10px 0 10px 0;
   border-bottom: 1px dashed LightGray;
 }
 table { width: 100%; }
@@ -44,18 +44,21 @@ td {
 
 <nav class="navbar navbar-expand-sm bg-light navbar-light d-flex">
   <ul class="navbar-nav list-inline mx-auto justify-content-center">
-  {% for i in ["Calendar", "Private-Events", "About/Contact", "Commissioned-Art", "After-School/Summer-Camp"] %}
-    <li class="nav-item"><a class="nav-link" href="/~catalystcreative/{{ i|replace('/', '-')|lower }}.html">{{ i }}</a></li>
-  {% endfor%}
+  {% for i in ["Calendar", "Crafts/Services", "Private-Events", "About/Contact", "Commissioned-Art", "After-School/Summer-Camp"] -%}
+  {% if i == "Crafts/Services" %}
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop(); return false;" data-toggle="dropdown">Crafts/Services</a>
       <div class="dropdown-menu"  id="dropdown-menu">
-      {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling"] %}
+      {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling"] -%}
         {# "Paint your own pottery", "Specialty Classes", "Custom built" #}
         <a class="dropdown-item" href="/~catalystcreative/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
-      {% endfor %}
+      {%- endfor %}
       </div>
     </li>
+  {% else %}
+    <li class="nav-item"><a class="nav-link" href="/~catalystcreative/{{ i|replace('/', '-')|lower }}.html">{{ i }}</a></li>
+  {% endif %}
+  {%- endfor%}
   </ul>
 </nav>
 
