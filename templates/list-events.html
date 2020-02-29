@@ -8,7 +8,7 @@ window.onhashchange = function() {
 }
 </script>
 <style>
-#paypal-button-container, .special, .check_time, .quantity_form, .cost {
+#paypal-button-container, .special, .check_time, .quantity_form, .cost, .duration {
   display: none;
 }
 .event_image {
@@ -42,7 +42,7 @@ h1 {
 <input type="hidden" id="state_outside_payment" value="False"/>
 </form>
 
-<center>
+<center id="upcoming_events">
 <h1>Upcoming Events</h1>
 </center>
 
@@ -58,13 +58,13 @@ h1 {
       </a>
     </div>
     <div class="col-lg-8">
-      <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} ({{ event.duration }} hrs)</h4>
+      <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} <span class="duration">({{ event.duration }} hrs)</span></h4>
       <a href="/~catalystcreative/calendar.html#{{ event.eid }}">
         <h3>{{ event.title }}</h3>
       </a>
       <div>${{ event.price }} per person</div>
       <!-- <div>Max: {{ event.elimit }} people. <mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining</mark></div> -->
-      <div>Where: {{ event.location }}</div>
+      <div>{{ event.location }}</div>
       <div id="book_now_{{ event.eid }}"><a href="/~catalystcreative/calendar.html#{{ event.eid }}">Book Now</a></div>
 
       <div>
@@ -158,6 +158,7 @@ if (window.location.hash) {
 
     checkTime(getEventMeta("date"));
     document.getElementById("book_now_"+eid).style.display = "none";
+    document.getElementById("upcoming_events").style.display = "none";
   }
   document.getElementById("top").focus();
 }

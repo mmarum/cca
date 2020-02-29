@@ -15,6 +15,13 @@
 
 {% block html_head %}{% endblock %}
 
+<script>
+var browser_size = {
+  width: window.innerWidth || document.body.clientWidth,
+  height: window.innerHeight || document.body.clientHeight
+}
+</script>
+
 <style>
 .top-buffer { 
   padding: 10px 0 10px 0;
@@ -38,15 +45,40 @@ td {
     padding: 0px;
     margin: 0px;
   }
+  h1 {
+    font-size: 1.5rem;
+    padding: 10px;
+  }
+  h4 {
+    font-size: 1rem;
+    margin-top: 10px;
+  }
+  .logo {
+    padding: 10px 0 10px 0;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
 }
 @media only screen and (min-width: 600px) {
-  #expose_nav {
+  div#burger div {
     display: none;
   }
 }
 .logo {
   width: 100%;
   max-width: 915px;
+}
+div#burger div {
+  margin-top: 10px;
+  width: 35px;
+  height: 5px;
+  background-color: black;
+  margin: 6px 0;
+  
+}
+#buns {
+  
 }
 </style>
 
@@ -59,23 +91,26 @@ td {
 
 <div class="container">
 
-<div class="row">
-  <div class="col">
+<div class="row d-flex h-100">
+  <div class="col-2 justify-content-center align-self-center" id="burger" onclick="navbardrop('nav_container'); return false;">
+    <div id="buns">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+  <div class="col-10" id="logo_container">
     <center>
     <a href="/~catalystcreative/home.html"><img src="/~catalystcreative/img/logo.png" class="logo"/></a>
     </center>
   </div>
 </div>
 
-<div id="expose_nav">
-  <center>
-  <ul class="navbar-nav list-inline mx-auto justify-content-center">
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" onclick="navbardrop('nav_container'); return false;" data-toggle="dropdown">/ / /</a>
-    </li>
-  </ul>
-  </center>
-</div>
+<script>
+if (browser_size["width"] > 600) {
+  document.getElementById("logo_container").setAttribute("class", "col-12");
+}
+</script>
 
 <div class="row navbar_row">
   <div class="col">
