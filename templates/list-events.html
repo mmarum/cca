@@ -47,7 +47,7 @@ h1 {
 </center>
 
 {% for event in events %}
-  <div class="row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
+  <div class="row event_row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
 
     <div class="col-sm-1">
     </div>
@@ -133,7 +133,7 @@ function getEventMeta(field) {
 }
 
 function hideRows() {
-  var x = document.getElementsByClassName("row");
+  var x = document.getElementsByClassName("event_row");
   for (var i = 0; i < x.length; i++) {
     x[i].style.display = "none";
   }

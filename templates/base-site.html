@@ -21,12 +21,32 @@
   margin: 10px 0 10px 0;
   border-bottom: 1px dashed LightGray;
 }
-table { width: 100%; }
+table {
+  width: 100%;
+}
 td {
   border-bottom: 1px solid LightGray;
   border-right: 1px solid LightGray;
   padding: 5px;
   padding: 5px;
+}
+@media only screen and (max-width: 600px) {
+  #nav_container {
+    display: none;
+  }
+  .top-buffer {
+    padding: 0px;
+    margin: 0px;
+  }
+}
+@media only screen and (min-width: 600px) {
+  #expose_nav {
+    display: none;
+  }
+}
+.logo {
+  width: 100%;
+  max-width: 915px;
 }
 </style>
 
@@ -39,15 +59,35 @@ td {
 
 <div class="container">
 
-<div class="topnav text-center">
-  <p><a href="/~catalystcreative/home.html"><img src="/~catalystcreative/img/logo.png" class="img-fluid"/></a></p>
+<div class="row">
+  <div class="col">
+    <center>
+    <a href="/~catalystcreative/home.html"><img src="/~catalystcreative/img/logo.png" class="logo"/></a>
+    </center>
+  </div>
+</div>
+
+<div id="expose_nav">
+  <center>
+  <ul class="navbar-nav list-inline mx-auto justify-content-center">
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" onclick="navbardrop('nav_container'); return false;" data-toggle="dropdown">/ / /</a>
+    </li>
+  </ul>
+  </center>
+</div>
+
+<div class="row navbar_row">
+  <div class="col">
+
+<div id="nav_container">
 
 <nav class="navbar navbar-expand-sm bg-light navbar-light d-flex">
   <ul class="navbar-nav list-inline mx-auto justify-content-center">
   {% for i in ["Calendar", "Crafts/Services", "Private-Events", "About/Contact", "Commissioned-Art", "After-School/Summer-Camp"] -%}
   {% if i == "Crafts/Services" %}
     <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop(); return false;" data-toggle="dropdown">Crafts/Services</a>
+      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop('dropdown-menu'); return false;" data-toggle="dropdown">Crafts/Services</a>
       <div class="dropdown-menu"  id="dropdown-menu">
       {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling"] -%}
         {# "Paint your own pottery", "Specialty Classes", "Custom built" #}
@@ -62,7 +102,10 @@ td {
   </ul>
 </nav>
 
-</div><!-- close topnav -->
+</div>
+
+  </div><!-- close col -->
+</div><!-- close row -->
 
 {% block content %}{% endblock %}
 
@@ -81,15 +124,14 @@ td {
 </div><!-- close content -->
 
 <script>
-function navbardrop() {
-  var navbardrop_state = document.getElementById("dropdown-menu").style.display;
-  //alert(navbardrop_state);
+function navbardrop(div_id_name) {
+  var navbardrop_state = document.getElementById(div_id_name).style.display;
   if (navbardrop_state == "block") {
     navbardrop_state = "none";
   } else {
     navbardrop_state = "block";
   }
-  document.getElementById("dropdown-menu").style.display = navbardrop_state;
+  document.getElementById(div_id_name).style.display = navbardrop_state;
 }
 </script>
 

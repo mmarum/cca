@@ -8,6 +8,6 @@ def contact(environ, start_response):
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
         with open("contact.txt", "a") as myfile:
             myfile.write(post_input)
-        response = '<meta http-equiv="refresh" content="0; url=/cca/about-contact.html#thanks" />'
+        response = '<meta http-equiv="refresh" content="0; url=/~catalystcreative/about-contact.html#thanks" />'
     return [response.encode()]
 
