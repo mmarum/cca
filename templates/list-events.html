@@ -98,7 +98,7 @@ h1 {
       </select>
       </div>
       </form>
-      <div class="cost alert alert-warning" id="cost_{{ event.eid }}">Total: $0</div>
+      <div class="cost alert alert-warning" id="cost_{{ event.eid }}">0</div>
       <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scarf({{ event.eid }})">Add a 2nd scarf for $28</button>
       <div id="check_time_{{ event.eid }}" class="check_time alert alert-danger"></div>
 
@@ -111,11 +111,11 @@ h1 {
 
 {% endfor %}
 
-<div id="paypal-button-container" class="text-center top-buffer"></div>
-
-<script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
-// sandbox client ID
+<!-- <script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4"> -->
+<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
 </script>
+
+<div id="paypal-button-container" class="text-center top-buffer"></div>
 
 <script>
 events_object = {{ events_object|safe }}
@@ -218,22 +218,22 @@ function checkTime(event_date_time) {
 
 function getTotal(eid) {
   var total = document.getElementById("cost_"+eid).innerHTML;
-  total = total.substring(1);
-  //console.log('getTotal: ' + total);
+  //total = total.substring(1);
+  console.log('getTotal: ' + total);
   return total;
 }
 
 function scarf(eid) {
   var price = getEventMeta("price");
   var new_cost = subtotal(quant(eid), price) + 28;
-  document.getElementById("cost_"+eid).innerHTML = "$" + new_cost.toString();
-  //console.log('scarf: ' + new_cost);
+  document.getElementById("cost_"+eid).innerHTML = new_cost;
+  console.log('scarf: ' + new_cost);
   return new_cost;
 }
 
 function subtotal(quantity, price) {
   c = quantity * price;
-  //console.log('subtotal: ' + c);
+  console.log('subtotal: ' + c);
   return c;
 }
 
@@ -246,8 +246,8 @@ function quant(eid) {
   if (getEventMeta("title").match(/scarf/gi)) {
     document.getElementById("special_"+eid).style.display = "block";
   }
-  document.getElementById("cost_"+eid).innerHTML = "Total: $" + subtotal(quantity, price).toString();
-  document.getElementById("cost_"+eid).innerHTML += ". To complete order, click Paypal button below.";
+  document.getElementById("cost_"+eid).innerHTML = subtotal(quantity, price);
+  //document.getElementById("cost_"+eid).innerHTML += ". To complete order, click Paypal button below.";
   document.getElementById("cost_"+eid).style.display = "block";
   if (quantity == "") { 
     document.getElementById("paypal-button-container").style.display = "none";
@@ -256,11 +256,17 @@ function quant(eid) {
   //console.log('quant: ' + quantity);
   return quantity;
 }
+</script>
 
+<script>
 // https://developer.paypal.com/docs/checkout/integrate/
 // View orders at PayPal here: https://developer.paypal.com/developer/dashboard/sandbox/
 // Verify the transaction
 // mmarum-buyer@gmail.com
+
+console.log('total: ' + getTotal(getEventMeta("eid")));
+console.log('event_id: ' + getEventMeta("eid"));
+console.log('quantitiy: ' + quant(getEventMeta("eid")));
 
   paypal.Buttons({
     createOrder: function(data, actions) {
@@ -277,7 +283,7 @@ function quant(eid) {
         alert('Transaction completed by ' + details.payer.name.given_name);
         //console.log(details);
         // Call your server to save the transaction
-        return fetch('/app/paypal-transaction-complete', {
+        return fetch('/~catalystcreative/app/paypal-transaction-complete', {
           method: 'post',
           headers: {
             'content-type': 'application/json'
@@ -294,6 +300,5 @@ function quant(eid) {
   }).render('#paypal-button-container');
 
 // https://developer.paypal.com/docs/api/orders/v2/#orders_get
-
 </script>
 {% endblock %}
