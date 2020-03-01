@@ -64,7 +64,7 @@ def make_cal(db, month, year):
         one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
         c = db.cursor()
 
-        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime > CURDATE()")
+        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURDATE()")
         allrows = c.fetchall()
         c.close()
         zm = "0"+str(m) if len(str(m)) == 1 else m
@@ -97,7 +97,7 @@ def app(environ, start_response):
 
         if environ['PATH_INFO'] == '/admin/events/list':
             c = db.cursor()
-            c.execute("SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime")
+            c.execute("SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime")
             allrows = c.fetchall()
             c.close()
 
@@ -132,7 +132,7 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/list/events' or environ['PATH_INFO'] == '/calendar':
 
-            db.query("SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime")
+            db.query("SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
@@ -245,7 +245,7 @@ def app(environ, start_response):
 
             # PART-2: Select future-date orders from database for admin view
             c = db.cursor()
-            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime > CURDATE() ORDER BY o.eid")
+            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime >= CURDATE() ORDER BY o.eid")
             allrows = c.fetchall()
             c.close()
 
@@ -254,11 +254,11 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/home':
-            month = 2
+            month = 3 # TODO: MAKE THIS DYNAMIC NOT HARD-CODED
             year = 2020
             html_cal = make_cal(db, month, year)
 
-            db.query(f"SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
+            db.query(f"SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime limit 1")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
 

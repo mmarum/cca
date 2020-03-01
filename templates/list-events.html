@@ -59,7 +59,10 @@ h1 {
       </a>
     </div>
     <div class="col-lg-8">
-      <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} <span class="duration">({{ event.duration }} hrs)</span></h4>
+      <h4>
+        {{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} 
+        <span class="duration" id="duration_{{ event.eid }}">({{ event.duration }} hrs)</span>
+      </h4>
       <a href="/calendar.html#{{ event.eid }}">
         <h3>{{ event.title }}</h3>
       </a>
@@ -161,6 +164,7 @@ if (window.location.hash) {
     checkTime(getEventMeta("date"));
     document.getElementById("book_now_"+eid).style.display = "none";
     document.getElementById("upcoming_events").style.display = "none";
+    document.getElementById("duration_"+hash).style.display = "inline";
   }
   document.getElementById("top").focus();
 }
@@ -206,12 +210,12 @@ function checkTime(event_date_time) {
   //console.log('n: ' + n + ' nn: ' + nn);
   //console.log('time until event: ' + (d - n));
   //console.log('time until event: ' + dhm(d - n));
-  if (d - n > 60*60*24*1000) {
+  if (d - n > 60*60*6*1000) { // 60*60*24*1000
     //console.log("Not within 24h window. OK to book.");
   } else {
     //console.log("IS within 24h window. HIDE booking option.");
     document.getElementById("quantity_form_"+eid).style.display = "none";
-    var check_time_msg = "Event occurs within 24 hours. Call to see if this event is still available.";
+    var check_time_msg = "Event occurs within 6 hours. Call to see if this event is still available.";
     document.getElementById("check_time_"+eid).innerHTML = check_time_msg;
     document.getElementById("check_time_"+eid).style.display = "block";
     document.getElementById("book_now_"+eid).style.display = "none";

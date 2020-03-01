@@ -57,17 +57,18 @@ passw = json.loads(read_file("data/passwords.json"))[user]
 
 def get_page_contents(path):
     r = requests.get(f'http://www.catalystcreativearts.com/app/{path}', auth=(f'{user}', f'{passw}'))
-    #r = requests.get(f'http://www.catalystcreativearts.com/app/{path}')
     print(r.url)
     if r.status_code == 200:
         print(r.status_code)
         return r.text
+    else:
+        raise ValueError(f'get_page_contents fail: {path} {r.status_code}')
 
 
 def scrape_and_write(path):
     try:
         page_contents = get_page_contents(path)
-        if page_contents:
+        if len(page_contents) > 10:
             write_file(f"../www/{path}.html", page_contents)
         else:
             print(f'____ page_contents failure: {path}')
