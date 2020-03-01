@@ -21,7 +21,7 @@ $( function() {
     <div>{{ k }}: {{ v }}</div>
   {% endfor %}
 {% endif %}
-<form action="/~catalystcreative/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+<form action="/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in image_form %}
   {% if field.name != "eid" and field.name != "submit" %}
     {{ field.label }}

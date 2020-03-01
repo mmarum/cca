@@ -20,7 +20,7 @@
 {{ page_content|safe }}
 
 {% if page_name == "about-contact" %}
-  <form action="/~catalystcreative/contact/submit" method="POST" enctype="text/plain">
+  <form action="/contact/submit" method="POST" enctype="text/plain">
   <p><input class="form-control" type="text" name="email" placeholder="Email"/></p>
   <p><textarea class="form-control" name="message"></textarea></p>
   <p><input class="form-control" type="submit" name="submit"/></p>

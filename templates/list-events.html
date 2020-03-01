@@ -8,26 +8,27 @@ window.onhashchange = function() {
 }
 </script>
 <style>
-#paypal-button-container, .special, .check_time, .quantity_form, .cost, .duration {
+#paypal-button-container, .special, .check_time, .quantity_form, .cost, .cost_container, .duration {
   display: none;
 }
 .event_image {
   max-width: 100%;
 }
-select{
-  background: #ccff66 !important;
-  color:#FFF;
-  text-shadow:0 1px 0 rgba(0,0,0,0.4);
-}
-option:not(:checked) { 
-  background-color: white; 
-  color:#000;
+.quantity_form, .cost {
+  margin-top: 10px;
+  max-width: 350px;
 }
 .date {
   font-size: 150%;
 }
 h1 {
   border-bottom: 1px dashed LightGray;
+}
+.cost_container {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: LightGray;
+  border-radius: 5px;
 }
 </style>
 {% endblock %}
@@ -53,19 +54,19 @@ h1 {
     </div>
 
     <div class="col-md-2">
-      <a href="/~catalystcreative/calendar.html#{{ event.eid }}">
-        <img alt="{{ event.image }}" src="/~catalystcreative/img/small/{{ event.image }}" class="event_image"/>
+      <a href="/calendar.html#{{ event.eid }}">
+        <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
       </a>
     </div>
     <div class="col-lg-8">
       <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} <span class="duration">({{ event.duration }} hrs)</span></h4>
-      <a href="/~catalystcreative/calendar.html#{{ event.eid }}">
+      <a href="/calendar.html#{{ event.eid }}">
         <h3>{{ event.title }}</h3>
       </a>
       <div>${{ event.price }} per person</div>
       <!-- <div>Max: {{ event.elimit }} people. <mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining</mark></div> -->
       <div>{{ event.location }}</div>
-      <div id="book_now_{{ event.eid }}"><a href="/~catalystcreative/calendar.html#{{ event.eid }}">Book Now</a></div>
+      <div id="book_now_{{ event.eid }}"><a href="/calendar.html#{{ event.eid }}">Book Now</a></div>
 
       <div>
       {% set event_desc = event.description.split('\n') %}
@@ -87,10 +88,9 @@ h1 {
       </div>
 
       <form class="quantity_form" id="quantity_form_{{ event.eid }}">
-      <p>Book now. Select number of guests:</p>
       <div class="form-group">
       <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
-      <option value="">Number of guests</option>
+      <option value="">Select number of guests</option>
       {% set x=event.elimit|int %}
       {% for n in range(1, x+1) -%}
         <option value="{{ n }}">{{ n }}</option>
@@ -98,7 +98,9 @@ h1 {
       </select>
       </div>
       </form>
-      <div class="cost alert alert-warning" id="cost_{{ event.eid }}">0</div>
+      <div class="cost_container" id="cost_container_{{ event.eid }}">
+        Total: $<span class="cost" id="cost_{{ event.eid }}">0</span>. Click Paypal link below to complete process.
+      </div>
       <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scarf({{ event.eid }})">Add a 2nd scarf for $28</button>
       <div id="check_time_{{ event.eid }}" class="check_time alert alert-danger"></div>
 
@@ -248,7 +250,8 @@ function quant(eid) {
   }
   document.getElementById("cost_"+eid).innerHTML = subtotal(quantity, price);
   //document.getElementById("cost_"+eid).innerHTML += ". To complete order, click Paypal button below.";
-  document.getElementById("cost_"+eid).style.display = "block";
+  document.getElementById("cost_"+eid).style.display = "inline";
+  document.getElementById("cost_container_"+eid).style.display = "block";
   if (quantity == "") { 
     document.getElementById("paypal-button-container").style.display = "none";
     document.getElementById("special_"+eid).style.display = "none";
@@ -264,9 +267,9 @@ function quant(eid) {
 // Verify the transaction
 // mmarum-buyer@gmail.com
 
-console.log('total: ' + getTotal(getEventMeta("eid")));
-console.log('event_id: ' + getEventMeta("eid"));
-console.log('quantitiy: ' + quant(getEventMeta("eid")));
+//console.log('total: ' + getTotal(getEventMeta("eid")));
+//console.log('event_id: ' + getEventMeta("eid"));
+//console.log('quantitiy: ' + quant(getEventMeta("eid")));
 
   paypal.Buttons({
     createOrder: function(data, actions) {
@@ -283,7 +286,7 @@ console.log('quantitiy: ' + quant(getEventMeta("eid")));
         alert('Transaction completed by ' + details.payer.name.given_name);
         //console.log(details);
         // Call your server to save the transaction
-        return fetch('/~catalystcreative/app/paypal-transaction-complete', {
+        return fetch('/app/paypal-transaction-complete', {
           method: 'post',
           headers: {
             'content-type': 'application/json'

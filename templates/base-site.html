@@ -113,7 +113,7 @@ div#burger div {
   </div>
   <div class="col-10" id="logo_container">
     <center>
-    <a href="/~catalystcreative/home.html"><img src="/~catalystcreative/img/logo.png" class="logo"/></a>
+    <a href="/home.html"><img src="/img/logo.png" class="logo"/></a>
     </center>
   </div>
 </div>
@@ -138,12 +138,12 @@ if (browser_size["width"] > 600) {
       <div class="dropdown-menu"  id="dropdown-menu">
       {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling"] -%}
         {# "Paint your own pottery", "Specialty Classes", "Custom built" #}
-        <a class="dropdown-item" href="/~catalystcreative/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
+        <a class="dropdown-item" href="/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
       {%- endfor %}
       </div>
     </li>
   {% else %}
-    <li class="nav-item"><a class="nav-link" href="/~catalystcreative/{{ i|replace('/', '-')|lower }}.html">{{ i }}</a></li>
+    <li class="nav-item"><a class="nav-link" href="/{{ i|replace('/', '-')|lower }}.html">{{ i }}</a></li>
   {% endif %}
   {%- endfor%}
   </ul>

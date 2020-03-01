@@ -17,7 +17,7 @@ textarea.form-control {
 
   <ul>
   {% for p in pages %}
-    <li><a href="/~catalystcreative/app/admin/pages?page={{ p }}">{{ p }}</a></li>
+    <li><a href="/app/admin/pages?page={{ p }}">{{ p }}</a></li>
   {% endfor %}
   </ul>
 
@@ -27,7 +27,7 @@ textarea.form-control {
 
     <h2>{{ page_name }}</h2>
 
-    <form action="/~catalystcreative/app/admin/pages" method="POST" enctype="multipart/form-data" name="pages_form" id="pages_form">
+    <form action="/app/admin/pages" method="POST" enctype="multipart/form-data" name="pages_form" id="pages_form">
     <input type="hidden" name="page_name" value="{{ page_name }}" class="form-control"/>
     <div class="form-group">
     <textarea name="page_content" class="form-control">{% if page_content %}{{ page_content|safe }}{% endif %}</textarea>

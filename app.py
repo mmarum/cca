@@ -72,7 +72,7 @@ def make_cal(db, month, year):
             day = str(d[0])
             day = day.split(' ')[0].split('-')[2].lstrip('0')
             zd = "0"+str(day) if len(str(day)) == 1 else day
-            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/~catalystcreative/calendar.html#{year}-{zm}-{zd}" >{day}</a><')
+            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/calendar.html#{year}-{zm}-{zd}" >{day}</a><')
         combined_cals += one_month_cal
     return combined_cals
 
@@ -125,7 +125,7 @@ def app(environ, start_response):
                 c = db.cursor()
                 c.execute(sql)
                 c.close()
-                response = '<meta http-equiv="refresh" content="0; url=/~catalystcreative/app/admin/events/list" />'
+                response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
             else:
                 response = ""
 
@@ -358,7 +358,7 @@ def app(environ, start_response):
             c.execute(sql)
             c.close()
 
-        response = '<meta http-equiv="refresh" content="0; url=/~catalystcreative/app/admin/events/list" />'
+        response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
         scrape_and_write("calendar")
         scrape_and_write("home")
@@ -418,7 +418,7 @@ def app(environ, start_response):
         os.rename(f"data/{page_name}.html", f"data/{page_name}.html.bak")
 
         write_file(f"data/{page_name}.html", page_content)
-        response = '<meta http-equiv="refresh" content="0; url=/~catalystcreative/app/admin/pages"/>'
+        response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages"/>'
 
         scrape_and_write(page_name)
 

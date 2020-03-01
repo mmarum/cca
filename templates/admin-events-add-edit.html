@@ -25,7 +25,7 @@ function appendTime() {
 
 {% block content %}
 
-<form action="/~catalystcreative/app/" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+<form action="/app/" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
   {% if field.name != "eid" and field.name != "submit" and field.name != "image" %}
     {% if form.eid.data %}
@@ -44,11 +44,11 @@ function appendTime() {
 {% endfor %}
 </form>
 
-<button type="button" class="btn btn-warning" onClick="onclick=location.reload();location.href='/~catalystcreative/app/admin/events/list'">Cancel</button>
+<button type="button" class="btn btn-warning" onClick="onclick=location.reload();location.href='/app/admin/events/list'">Cancel</button>
 
 {% if form.eid.data %}
   <button type="button" class="btn btn-danger">
-    <a href="/~catalystcreative/app/admin/events/delete?eid={{ form.eid.data }}" onclick="return confirm('Are you sure?');">Delete</a>
+    <a href="/app/admin/events/delete?eid={{ form.eid.data }}" onclick="return confirm('Are you sure?');">Delete</a>
   </button>
 {% endif %}
 
