@@ -1,5 +1,5 @@
 {% extends "base-site.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Catalyst Creative Arts Home{% endblock %}
 
 {% block html_head %}
 <style>
@@ -55,11 +55,7 @@ table {
 
     <div>
     {% set event_desc = next_event.description.split(' ') %}
-    {% for e in event_desc %}
-      {% if loop.index < 30 %}
-        {{ e }}
-      {% endif %}
-    {% endfor %}
+    {% for e in event_desc -%}{% if loop.index < 30 %}{{ e }} {% endif %}{%- endfor %}
     ... <a href="/calendar.html#{{ next_event.eid }}" class="event_link">Read More</a>
     </div>
 
@@ -74,16 +70,34 @@ table {
 
 </div>
 
-<div class="text-center">
-  <h3>Photos from recent events</h3>
-  <img src="/img/alc-ink-1.jpg" class="img-fluid"/>
+<div class="row top-buffer">
+  <div class="col-sm-1">
+    <a href="#" onclick="that_way(); return false;" style="font-size: 200%">«</a>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_0" src="/img/small/artist-guided-1.jpg" class="img-fluid"/>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_1" src="/img/small/artist-guided-2.jpg" class="img-fluid"/>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_2" src="/img/small/artist-guided-3.jpg" class="img-fluid"/>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_3" src="/img/small/artist-guided-4.jpg" class="img-fluid"/>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_4" src="/img/small/artist-guided-5.jpg" class="img-fluid"/>
+  </div>
+  <div class="col-sm-1">
+    <a href="#" onclick="this_way(); return false;" style="font-size: 200%">»</a>
+  </div>
 </div>
 
+<!--
 <div class="row top-buffer">
-
   <div class="col-sm-2">
   </div>
-
   <div class="col-sm-8 text-center">
     <div style="float: left">
       <a href="" style="font-size: 200%">«</a>
@@ -92,12 +106,31 @@ table {
       <a href="" style="font-size: 200%">»</a>
     </div>
   </div>
-
   <div class="col-sm-2">
   </div>
 </div>
+-->
 
 <script>
+var slide_two = [
+  "/gallery/upload/2020/02/15/20200215203413-373c8fd7_small.jpg",
+  "/gallery/upload/2020/02/15/20200215203415-61551fd7_small.jpg",
+  "/gallery/upload/2020/02/15/20200215203415-102aea40_small.jpg",
+  "/gallery/upload/2020/02/15/20200215203416-11d835c0_small.jpg",
+  "/gallery/upload/2020/02/15/20200215203422-a147658f_small.jpg"
+]
+function that_way() {
+  this_way();
+}
+
+function this_way() {
+  for (var i = 0; i < 5; i++) {
+    console.log("slide_"+i);
+    console.log(slide_two[i]);
+    document.getElementById("slide_"+i).src = slide_two[i];
+  }
+}
+
 var d = new Date();
 var this_month = d.getMonth()+1;
 console.log("this_month: "+this_month);

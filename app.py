@@ -258,7 +258,7 @@ def app(environ, start_response):
             year = 2020
             html_cal = make_cal(db, month, year)
 
-            db.query(f"SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime limit 1")
+            db.query(f"SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
 
