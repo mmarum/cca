@@ -39,7 +39,8 @@ class Gallery:
         c = db.cursor()
         c.execute(f"SELECT i.id, i.file, i.name, i.width, i.height, i.path \
             FROM piwigz_images i, piwigz_image_category c \
-            WHERE c.image_id = i.id AND c.category_id = {self.category}")
+            WHERE c.image_id = i.id AND c.category_id = {self.category} \
+            ORDER BY c.rank")
         # Learn how to use cursor to retrieve a few at a time
         allrows = c.fetchall()
         c.close()

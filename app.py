@@ -31,6 +31,7 @@ import MySQLdb
 
 from gallery import Gallery
 from writer import scrape_and_write
+import time
 
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -82,7 +83,7 @@ def app(environ, start_response):
 
     this_now = datetime.datetime.now()
 
-    pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp"]
+    pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp", "summer-camp-registration"]
 
     galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13}
     # "paint-your-own-pottery": 12, "specialty-classes": 14
@@ -215,8 +216,8 @@ def app(environ, start_response):
                     eid = f.replace(".json", "").strip()
                     event_orders_data = json.loads(read_file(f"orders/{f}"))
 
-                    data_array = []
                     for order in event_orders_data:
+                        data_array = []
                         # We don't necessarily want all data from orders/event_eid_value.json
                         # So let's pick and choose what data we want to keep:
                         data_array.append(order['orderID'])
@@ -361,7 +362,8 @@ def app(environ, start_response):
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
         scrape_and_write("calendar")
-        scrape_and_write("home")
+        #time.sleep(2)
+        #scrape_and_write("home")
 
 
     ####
@@ -511,7 +513,8 @@ def app(environ, start_response):
             sql={"sql":sql}, eid={"eid":eid}, sql2={"sql2":sql2})
 
         scrape_and_write("calendar")
-        scrape_and_write("home")
+        #time.sleep(2)
+        #scrape_and_write("home")
 
     ####
     ####

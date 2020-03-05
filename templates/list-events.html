@@ -8,7 +8,7 @@ window.onhashchange = function() {
 }
 </script>
 <style>
-#paypal-button-container, .special, .check_time, .quantity_form, .cost, .cost_container, .duration {
+#paypal-button-container, .special, .special2, .check_time, .quantity_form, .cost, .cost_container, .duration {
   display: none;
 }
 .event_image {
@@ -105,6 +105,7 @@ h1 {
         Total: $<span class="cost" id="cost_{{ event.eid }}">0</span>. Click Paypal link below to complete process.
       </div>
       <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scarf({{ event.eid }})">Add a 2nd scarf for $28</button>
+      <button class="special2" id="special2_{{ event.eid }}" type="button" class="btn btn-info" onclick="camp({{ event.eid }})">Add a 2nd guest for $165</button>
       <div id="check_time_{{ event.eid }}" class="check_time alert alert-danger"></div>
 
     </div>
@@ -290,8 +291,9 @@ function quant(eid) {
         alert('Transaction completed by ' + details.payer.name.given_name);
         //console.log(details);
         // Call your server to save the transaction
-        return fetch('/app/paypal-transaction-complete', {
-          method: 'post',
+        //return fetch('/app/paypal-transaction-complete', {
+        return fetch('/order/submit', {
+          method: 'POST',
           headers: {
             'content-type': 'application/json'
           },

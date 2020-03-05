@@ -10,22 +10,23 @@
 <h1>Summary of Orders</h1>
 <table class="table table-striped">
 <tr class="p-3 mb-2 bg-light text-dark">
-{% for i in ["title", "event date", "limit", "id", 
+{% for i in ["title", "event date", 
   "order id", "event id", "create time", "email", 
   "first name", "last name", "quantity", "total", "paid"] %}
+
+  {# "limit", "id", #}
+
   <td>{{ i }}</td>
 {% endfor %}
 </tr>
 {% for order in orders %}
   <tr>
     {% for o in order %}
-      {% if loop.index == 1 %}
-        {% set this_title = o %}
+      {% if loop.index not in [3, 4] %}
+        <td>{{ o }}</td>
       {% endif %}
-      <td>{{ o }}</td>
     {% endfor %}
   </tr>
-  {% set prev_title = order[0] %}
 {% endfor %}
 </table>
 {% endblock %}
