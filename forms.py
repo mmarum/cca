@@ -24,9 +24,9 @@ class ImageForm(Form):
 class RegistrationForm(Form):
     rid = HiddenField("rid", description="rid")
     order_id = HiddenField("Order ID", description="Order ID")
-    camper1_name = StringField("Camper 1 Name", description="Camper 1 Name")
-    camper1_age = StringField("Camper 1 Age", description="Camper 1 Age")
-    camper1_grade = StringField("Camper 1 Grade", description="Camper 1 Grade")
+    camper1_name = StringField("Camper Name", description="Camper Name")
+    camper1_age = StringField("Camper Age", description="Camper Age")
+    camper1_grade = StringField("Camper Grade", description="Camper Grade")
     camper2_name = StringField("Camper 2 Name", description="Camper 2 Name")
     camper2_age = StringField("Camper 2 Age", description="Camper 2 Age")
     camper2_grade = StringField("Camper 2 Grade", description="Camper 2 Grade")
@@ -42,6 +42,10 @@ class RegistrationForm(Form):
     parent_phone = StringField("Phone", description="Phone")
     parent_em_name = StringField("Emergency Contact Person", description="Emergency Contact Person")
     parent_em_phone = StringField("Emergency Phone", description="Emergency Phone")
+    pickup1_name = StringField("Name", description="Name")
+    pickup1_phone = StringField("Phone", description="Phone")
+    pickup2_name = StringField("Name 2", description="Name 2")
+    pickup2_phone = StringField("Phone 2", description="Phone 2")
     treatment_permission = StringField("Emergency Treatment Permission", description="Phone")
     photo_release = StringField("Photo/Social Media Release", description="Phone")
 

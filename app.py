@@ -16,7 +16,7 @@ env = Environment(
 )
 
 # https://wtforms.readthedocs.io/en/stable/index.html
-from forms import EventsForm, ImageForm
+from forms import EventsForm, ImageForm, RegistrationForm
 
 from os import listdir
 from os.path import isfile, join
@@ -83,7 +83,7 @@ def app(environ, start_response):
 
     this_now = datetime.datetime.now()
 
-    pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp", "summer-camp-registration"]
+    pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp"]
 
     galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13}
     # "paint-your-own-pottery": 12, "specialty-classes": 14
@@ -282,16 +282,17 @@ def app(environ, start_response):
                 response = template.render(pages=pages)
 
 
+        elif environ['PATH_INFO'] == '/summer-camp-registration':
+            template = env.get_template("summer-camp-registration.html")
+            form = RegistrationForm()
+            response = template.render(form=form)
+
+
         elif environ['PATH_INFO'].lstrip('/') in pages:
             page_name = environ['PATH_INFO'].lstrip('/')
-            #try:
             page_content = str(read_file(f"data/{page_name}.html"))
             template = env.get_template("pages.html")
             response = template.render(page_name=page_name, page_content=page_content)
-            #except:
-            #    path_info = environ['PATH_INFO'].lstrip('/')
-            #    template = env.get_template("main.html")
-            #    response = template.render(path_info=f"{path_info} is 404")
 
 
         else:
