@@ -3,11 +3,10 @@
 
 {% block html_head %}
 <style>
-#camper2__name, #camper2__age, #camper2__grade,
-#camper2_name, #camper2_age, #camper2_grade,
-#camper3__name, #camper3__age, #camper3__grade,
-#camper3_name, #camper3_age, #camper3_grade,
-#add_third_camper  {
+h5 {
+  padding-top: 20px;
+}
+#camper2_group, #camper3_group, #paypal-button-container {
   display: none;
 }
 </style>
@@ -20,52 +19,315 @@
 <h3>Registration & Release Form</h3>
 </center>
 
-<form action="/contact/registration/" method="POST" enctype="multipart/form-data">
-<h5>CAMPER(S) INFORMATION</h5>
-{% for field in form %}
-  {% if field.name == "rid" or field.name == "order_id" %}
-    {{ field }}
-  {% else %}
-    {% if field.name == "camper2_name" %}
-      <p><a href="#" onclick="showMore(2); return false;">Add a second camper</a></p>
-    {% elif field.name == "camper3_name" %}
-      <p id="add_third_camper"><a href="#" onclick="showMore(3); return false;">Add a third camper</a></p>
+<form action="/contact/registration/" method="POST" enctype="multipart/form-data" name="registration_form" id="registration_form">
+<input id="rid" name="rid" type="hidden" value="">
+<input id="order_id" name="order_id" type="hidden" value="">
+
+<div class="row">
+  <div class="col-sm-12">
+    <h5>CAMPER(S) INFORMATION</h5>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="camper1_name">Camper Name</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.camper1_name }}
+    {% else %}
+      <input class="form-control" id="camper1_name" name="camper1_name" type="text" value="" required>
     {% endif %}
-    {% if field.name == "parent_name" %}
-      <h5>PARENT/GUARDIAN INFORMATION</h5>
-    {% elif field.name == "pickup1_name" %}
-      <h5>PERSON(S) AUTHORIZED TO PICK UP CAMPER</h5>
+    <p id="add_camper2"><a href="#" onclick="showMore(2); return false;">Add a second camper</a></p>
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="camper1_age">Camper Age</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.camper1_age }}
+    {% else %}
+      <input class="form-control" id="camper1_age" name="camper1_age" type="text" value="" required>
     {% endif %}
-    {{ field.label(class="form-text text-muted", id=field.name.replace('_', '__')) }}
-    {{ field(autocomplete="off", class="form-control") }}
-  {% endif %}
-{% endfor %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="camper1_grade">Camper Grade</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.camper1_grade }}
+    {% else %}
+      <input class="form-control" id="camper1_grade" name="camper1_grade" type="text" value="" required>
+    {% endif %}
+  </div>
+</div>
+
+<div id="camper2_group">
+<div class="row">
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="camper2_name">Camper 2 Name</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.camper2_name }}
+    {% else %}
+      <input class="form-control" id="camper2_name" name="camper2_name" type="text" value="">
+    {% endif %}
+    <p id="add_camper3"><a href="#" onclick="showMore(3); return false;">Add a third camper</a></p>
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="camper2_age">Camper 2 Age</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.camper2_age }}
+    {% else %}
+      <input class="form-control" id="camper2_age" name="camper2_age" type="text" value="">
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="camper2_grade">Camper 2 Grade</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.camper2_grade }}
+    {% else %}
+      <input class="form-control" id="camper2_grade" name="camper2_grade" type="text" value="">
+    {% endif %}
+  </div>
+</div>
+</div>
+
+<div id="camper3_group">
+<div class="row">
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="camper3_name">Camper 3 Name</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.camper3_name }}
+    {% else %}
+      <input class="form-control" id="camper3_name" name="camper3_name" type="text" value="">
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="camper3_age">Camper 3 Age</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.camper3_age }}
+    {% else %}
+      <input class="form-control" id="camper3_age" name="camper3_age" type="text" value="">
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="camper3_grade">Camper 3 Grade</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.camper3_grade }}
+    {% else %}
+      <input class="form-control" id="camper3_grade" name="camper3_grade" type="text" value="">
+    {% endif %}
+  </div>
+</div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <h5>PARENT/GUARDIAN INFORMATION</h5>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="parent_name">Name</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.parent_name }}
+    {% else %}
+      <input class="form-control" id="parent_name" name="parent_name" type="text" value="" required>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="parent_address">Address</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.parent_address }}
+    {% else %}
+      <input class="form-control" id="parent_address" name="parent_address" type="text" value="" required>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="parent_city">City</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.parent_city }}
+    {% else %}
+      <input class="form-control" id="parent_city" name="parent_city" type="text" value="" required>
+    {% endif %}
+  </div>
+</div>
+  
+<div class="row">
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="parent_state">State</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.parent_state }}
+    {% else %}
+      <input class="form-control" id="parent_state" name="parent_state" type="text" value="" required>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="parent_zip">Zip Code</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.parent_zip }}
+    {% else %}
+      <input class="form-control" id="parent_zip" name="parent_zip" type="text" value="" required>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="parent_email">Email</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.parent_email }}
+    {% else %}
+      <input class="form-control" id="parent_email" name="parent_email" type="text" value="" required>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="parent_phone">Phone</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.parent_phone }}
+    {% else %}
+      <input class="form-control" id="parent_phone" name="parent_phone" type="text" value="" required>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="parent_em_name">Emergency Contact Person</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.parent_em_name }}
+    {% else %}
+      <input class="form-control" id="parent_em_name" name="parent_em_name" type="text" value="" required>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    <label class="form-text text-muted" for="parent_em_phone">Emergency Phone</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.parent_em_phone }}
+    {% else %}
+      <input class="form-control" id="parent_em_phone" name="parent_em_phone" type="text" value="" required>
+    {% endif %}
+  </div>
+</div>
+  
+<div class="row">
+  <div class="col-sm-12">
+    <h5>PERSON(S) AUTHORIZED TO PICK UP CAMPER</h5>
+  </div>
+</div>
+    
+<div class="row">
+  <div class="col-sm-6">
+    <label class="form-text text-muted" for="pickup1_name">Name 1</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.pickup1_name }}
+    {% else %}
+      <input class="form-control" id="pickup1_name" name="pickup1_name" type="text" value="" required>
+    {% endif %}
+  </div>
+  <div class="col-sm-6">
+    <label class="form-text text-muted" for="pickup1_phone">Phone 1</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.pickup1_phone }}
+    {% else %}
+      <input class="form-control" id="pickup1_phone" name="pickup1_phone" type="text" value="" required>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-6">
+    <label class="form-text text-muted" for="pickup2_name">Name 2</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.pickup2_name }}
+    {% else %}
+      <input class="form-control" id="pickup2_name" name="pickup2_name" type="text" value="">
+    {% endif %}
+  </div>
+  <div class="col-sm-6">
+    <label class="form-text text-muted" for="pickup2_phone">Phone 2</label>
+    {% if form_data_submitted %}
+      {{ form_data_submitted.pickup2_phone }}
+    {% else %}
+      <input class="form-control" id="pickup2_phone" name="pickup2_phone" type="text" value="">
+    {% endif %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <h5>Check Sessions You Are Registering For</h5>
+  </div>
+</div>
+
+<p><input id="session1" name="session1" type="checkbox">
+<label for="session1">Week 1: June 22 - 26, 2020</label></p>
+    
+<p><input id="session2" name="session2" type="checkbox">
+<label for="session2">Week 2: July 13 - 17, 2020</label></p>
+
+<p><input id="treatment_permission" name="treatment_permission" type="checkbox" value="y" required>
+<label for="treatment_permission"><b>Emergency Treatment Permission</b></label><br/>
+<small>In case of emergency and in the event that none of the emergency contacts can be reached, CATALYST CREATIVE ARTS will need signed authorization (below) to seek medical assistance for your child. I give permission to the CATALYST CREATIVE ARTS, its employees and designated representatives, to use whatever emergency (e.g., first aid, disaster evacuation) measures are judged necessary by them for the care and protection of my child while under supervision of the CATALYST CREATIVE ARTS. In case of medical emergency, I understand that my child will be transported to appropriate medical facilities by a local emergency unit for treatment if the local emergency resource (police or paramedics) deems it necessary. It is understood that in some medical situations, the staff will need to contact the local emergency resource before the parent, child's physician and/ or other emergency contacts acting on the parents' behalf.</small>
+    
+<p><input id="photo_release" name="photo_release" type="checkbox" value="y" required>
+<label for="photo_release"><b>Photo/Social Media Release</b></label><br/>
+<small>I, the undersigned, grant Catalyst Creative, LLC d/b/a CATALYST CREATIVE ARTS, permission to use any pictures taken in public view of myself individually, my child (camper(s) listed above), or any in which I (or the camper(s)) appear in whole or in part during Summer Art Camp. I understand that these pictures may be reproduced in print and electronic media specifically to promote CATALYST CREATIVE ARTS. I waive any right to inspect or approve said pictures, or any captions or accompanying texts that may be used in connection with them, or to approve the use to which said materials may be applied.</small>
+
+<label class="form-text text-muted" for="signature" id="signature">Signature</label>
+<input class="form-control" id="signature" name="signature" type="text" value="" required>
+<p><small>Typing your name into the input field above serves as your signature.</small></p>
+<p><input class="form-control btn btn-success" id="submit" name="submit" type="submit" value="Submit" onClick="validate(); return false;"></p>
+
 </form>
 
-<h5>Check Sessions You Are Registering For</h5>
-WEEK 1: JUNE 22 - 26, 2020
-WEEK 2: JULY 13 - 17, 2020
+<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+</script>
 
-<p><b>EMERGENCY TREATMENT PERMISSION:</b> In case of emergency and in the event that none of the emergency contacts can be reached, CATALYST CREATIVE ARTS will need signed authorization (below) to seek medical assistance for your child. I give permission to the CATALYST CREATIVE ARTS, its employees and designated representatives, to use whatever emergency (e.g., first aid, disaster evacuation) measures are judged necessary by them for the care and protection of my child while under supervision of the CATALYST CREATIVE ARTS. In case of medical emergency, I understand that my child will be transported to appropriate medical facilities by a local emergency unit for treatment if the local emergency resource (police or paramedics) deems it necessary. It is understood that in some medical situations, the staff will need to contact the local emergency resource before the parent, child's physician and/ or other emergency contacts acting on the parents' behalf.</p>
-Yes
-No
-
-<p><b>PHOTO/SOCIAL MEDIA RELEASE:</b> I, the undersigned, grant Catalyst Creative, LLC d/b/a CATALYST CREATIVE ARTS, permission to use any pictures taken in public view of myself individually, my child (camper(s) listed above), or any in which I (or the camper(s)) appear in whole or in part during Summer Art Camp. I understand that these pictures may be reproduced in print and electronic media specifically to promote CATALYST CREATIVE ARTS. I waive any right to inspect or approve said pictures, or any captions or accompanying texts that may be used in connection with them, or to approve the use to which said materials may be applied.</p>
-ESIGNATURE
-NAME
+<div id="paypal-button-container" class="text-center top-buffer"></div>
 
 <script>
-function showMore(n) {
-  document.getElementById("camper"+n+"_name").style.display = "block";
-  document.getElementById("camper"+n+"_age").style.display = "block";
-  document.getElementById("camper"+n+"_grade").style.display = "block";
-  document.getElementById("camper"+n+"__name").style.display = "block";
-  document.getElementById("camper"+n+"__age").style.display = "block";
-  document.getElementById("camper"+n+"__grade").style.display = "block";
-  if (n == 2) {
-    document.getElementById("add_third_camper").style.display = "block";
+function validate() {
+  if ((document.getElementById("session1").checked === true)||(document.getElementById("session2").checked === true)) {
+    document.registration_form.submit();
+    return true;
+  } else {
+    alert('Please choose a session.');
+    return false;
   }
 }
+
+function showMore(n) {
+  document.getElementById("camper"+n+"_group").style.display = "block";
+  document.getElementById("add_camper"+n).style.display = "none";
+}
+
+// PAYPAL STUFF
+  paypal.Buttons({
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: getTotal(getEventMeta("eid"))
+          }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        alert('Transaction completed by ' + details.payer.name.given_name);
+        //console.log(details);
+        // Call your server to save the transaction
+        //return fetch('/app/paypal-transaction-complete', {
+        return fetch('/order/submit', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            orderID: data.orderID,
+            event_id: getEventMeta("eid"),
+            quantity: quant(getEventMeta("eid")),
+            details: details
+          })
+        });
+      });
+    }
+  }).render('#paypal-button-container');
+
 </script>
 
 {% endblock %}

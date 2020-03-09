@@ -46,6 +46,10 @@ class RegistrationForm(Form):
     pickup1_phone = StringField("Phone", description="Phone")
     pickup2_name = StringField("Name 2", description="Name 2")
     pickup2_phone = StringField("Phone 2", description="Phone 2")
-    treatment_permission = StringField("Emergency Treatment Permission", description="Phone")
-    photo_release = StringField("Photo/Social Media Release", description="Phone")
+    session1 = BooleanField("Week 1: June 22 - 26, 2020", description="session 1")
+    session2 = BooleanField("Week 2: July 13 - 17, 2020", description="session 2")
+    treatment_permission = BooleanField("Emergency Treatment Permission", description="")
+    photo_release = BooleanField("Photo/Social Media Release", description="")
+    signature = StringField("Signature", description="")
+    submit = SubmitField("Submit", description="Submit")
 

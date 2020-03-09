@@ -6,3 +6,4 @@ cp /home/catalystcreative/app/*.* /home/catalystcreative/app/cca/
 cp /home/catalystcreative/app/templates/*.* /home/catalystcreative/app/cca/templates/
 cp /home/catalystcreative/contact/contact.py /home/catalystcreative/app/cca/contact.py
 cp /home/catalystcreative/order/order.py /home/catalystcreative/app/cca/order.py
+cp /home/catalystcreative/registration/registration.py /home/catalystcreative/app/cca/registration.py
