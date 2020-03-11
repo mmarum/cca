@@ -38,6 +38,8 @@ function appendTime() {
       <label class="form-text text-muted" for="time">Time</label>
     {% endif %}
     <input id="append_time" name="append_time" type="text" placeholder="00:00:00" onblur="appendTime()" class="form-control"/>
+  {% elif field.name == "submit" %}
+    {{ field(autocomplete="off", class="form-control btn btn-success") }}
   {% else %}
     {{ field(autocomplete="off", class="form-control") }}
   {% endif %}

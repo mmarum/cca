@@ -15,6 +15,8 @@ env = Environment(
     autoescape=select_autoescape(['html'])
 )
 
+# TODO: Prevent SQL_injection
+
 # https://wtforms.readthedocs.io/en/stable/index.html
 from forms import EventsForm, ImageForm, RegistrationForm
 
@@ -233,11 +235,14 @@ def app(environ, start_response):
 
                         # Load database:
                         fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid"
-                        vals = str(data_array).lstrip('[').rstrip(']')
-                        sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
+                        #vals = str(data_array).lstrip('[').rstrip(']')
+                        vals = data_array
+                        #sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
+                        sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
                         c = db.cursor()
-                        c.execute(sql)
+                        #c.execute(sql)
+                        c.execute(sql, vals)
                         c.close()
 
                     # Now move the file to /orders/loaded/event_eid_value.json
@@ -476,30 +481,37 @@ def app(environ, start_response):
         if action == "Update":
             keys_vals = ""
             for k, v in data_object.items():
+                v = v.replace("'", "''")
                 keys_vals += str(f"{k}='{v}', ")
             keys_vals = keys_vals.rstrip(', ')
             sql = f"UPDATE events SET {keys_vals} WHERE eid = {eid}"
 
+            c = db.cursor()
+            c.execute(sql)
+            #c.execute(sql, vals)
+
+
         else:
             fields = "edatetime, title, duration, price, elimit, location, image, description"
-            vals = str(data_array).lstrip('[').rstrip(']')
-            sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
+            #vals = str(data_array).lstrip('[').rstrip(']')
+            vals = data_array
+            #sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
+            sql = f"INSERT INTO events ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+
+            c = db.cursor()
+            #c.execute(sql)
+            c.execute(sql, vals)
 
 
-        #with open("stderr.log", "a") as logfile:
-        #    logfile.write(f"{sql}____")
-
-
-        c = db.cursor()
-        c.execute(sql)
         c.close()
 
         # Next template needs to know the eid
         if action == "Insert":
             # Now retrieve the eid from the item we just added
             e = data_object['edatetime']
-            t = data_object['title']
+            t = data_object['title'].replace("'", "''")
             sql2 = f"SELECT eid FROM events WHERE edatetime = '{e}' AND title = '{t}'"
+            print(sql2)
             d = db.cursor()
             d.execute(sql2)
             eid = int(d.fetchone()[0])
