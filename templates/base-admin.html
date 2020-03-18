@@ -13,9 +13,18 @@
 
 <title>{% block title %}{% endblock %}</title>
 
+<script>
+if (location.protocol !== 'https:') {
+  location.replace(`https:${location.href.substring(location.protocol.length)}`);
+}
+</script>
+
 {% block html_head %}{% endblock %}
 
 <style>
+.form-control {
+  width: 90%;
+}
 </style>
 
 </head>

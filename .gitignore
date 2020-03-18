@@ -1,3 +1,4 @@
 *.log
 *.jpg
 passwords.json
+sendgrid.env

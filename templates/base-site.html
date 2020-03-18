@@ -27,6 +27,12 @@
 
 <title>{% block title %}{% endblock %}</title>
 
+<script>
+if (location.protocol !== 'https:') {
+  location.replace(`https:${location.href.substring(location.protocol.length)}`);
+}
+</script>
+
 {% block html_head %}{% endblock %}
 
 <script>
@@ -56,8 +62,12 @@ td {
     display: none;
   }
   .top-buffer {
-    padding: 0px;
-    margin: 0px;
+    padding: 15px 0 15px 0;
+    margin: 15px 0 15px 0;
+    border-bottom: 3px dashed Gray;
+  }
+  .event_image {
+    width: 100%;
   }
   h1 {
     font-size: 1.5rem;
@@ -74,7 +84,7 @@ td {
     font-size: 1.25rem;
   }
 }
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: 601px) {
   div#burger div {
     display: none;
   }
@@ -164,9 +174,9 @@ if (browser_size["width"] > 600) {
 {% block footer %}
 <div>400 E. Division St. Ste 100 Arlington, TX 76011 | (972) 446-0444</div>
 <div><a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a></div>
-<a href="https://www.facebook.com/PaintingWithInfluence" alt="Facebook">Facebook</a> | 
+<a href="https://www.facebook.com/catalystcreativeart/" alt="Facebook">Facebook</a> | 
 <a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a> | 
-<a href="hhtps://www.instagram.com/paintingwithinfluence" alt="Instagram">Instagram</a>
+<a href="https://www.instagram.com/catalystcreativearts/" alt="Instagram">Instagram</a>
 {% endblock %}
 </div>
 

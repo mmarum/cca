@@ -93,6 +93,6 @@ try:
         print('Needs to be pages or galleries')
         #pass
 except:
-    print('error. probably no argument')
-    #pass
+    #print('error. probably no argument')
+    pass
 

@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-#import urllib.parse
 import re
 import base64
 import calendar
@@ -162,9 +161,15 @@ def app(environ, start_response):
 
             events_object = json.dumps(events_object)
 
+            try:
+                test = environ['QUERY_STRING'].split("=")[1]
+            except:
+                test = ""
+
             template = env.get_template("list-events.html")
             response = template.render(events=allrows, 
-                orders_count=orders_count_object, events_object=events_object)
+                orders_count=orders_count_object, events_object=events_object, 
+                test=test)
 
 
         elif environ['PATH_INFO'] == '/book/event':

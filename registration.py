@@ -1,9 +1,17 @@
 import os
 import sys
 import json
+import requests
 import MySQLdb
 from reg_form import RegistrationForm
 from jinja2 import Environment, PackageLoader, select_autoescape
+
+#python3.6.8
+#requests
+#jinja2
+#mysql
+#mysqlclient
+
 
 def read_file(file_name):
     f = open(file_name, "r")
@@ -17,16 +25,18 @@ def write_file(file_name, content):
     f.close()
     return True
 
-dbuser = "catalystcreative_cca"
-passwd = json.loads(read_file("../app/data/passwords.json"))[dbuser]
-
 env = Environment(
     loader=PackageLoader('registration', ''), # blank for no templates dir
     autoescape=select_autoescape(['html'])
 )
 
 sys.path.insert(0, os.path.dirname(__file__))
+
 def registration(environ, start_response):
+
+    dbuser = "catalystcreative_cca"
+    passwd = json.loads(read_file("../app/data/passwords.json"))[dbuser]
+
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
     template = env.get_template("summer-camp.html")
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
@@ -157,6 +167,14 @@ def registration(environ, start_response):
             registrations = []
         registrations.append(form_registration)
         write_file(f"../app/registration/registrations.json", json.dumps(registrations, indent=4))
+
+        passwd = json.loads(read_file("../app/data/passwords.json"))["catalystemail"]
+        url = "https://www.catalystcreativearts.com/email/submit"
+        data = {"from_email": "TBD@TBD.com", "purpose": "registration"}
+        headers = {"Content-Type": "application/json"}
+        r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
+        print(r.status_code)
+
         response = "200"
 
     else:

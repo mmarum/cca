@@ -121,9 +121,16 @@ h1 {
 
 {% endfor %}
 
-<!-- <script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4"> -->
-<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+{% if test and test == "true" %}
+<h1>SANDBOX</h1>
+<script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
+// SANDBOX
 </script>
+{% else %}
+<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+// PRODUCTION
+</script>
+{% endif %}
 
 <div id="paypal-button-container" class="text-center top-buffer"></div>
 
@@ -293,7 +300,7 @@ function quant(eid) {
     onApprove: function(data, actions) {
       return actions.order.capture().then(function(details) {
         alert('Transaction completed by ' + details.payer.name.given_name);
-        //console.log(details);
+        console.log(details);
         // Call your server to save the transaction
         //return fetch('/app/paypal-transaction-complete', {
         return fetch('/order/submit', {

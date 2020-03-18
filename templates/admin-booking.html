@@ -23,7 +23,11 @@
   <tr>
     {% for o in order %}
       {% if loop.index not in [3, 4] %}
-        <td>{{ o }}</td>
+        {% if loop.index == 6 %}
+          <td>{{ o }}</td>
+        {% else %}
+          <td>{{ o }}</td>
+        {% endif %}
       {% endif %}
     {% endfor %}
   </tr>
