@@ -170,7 +170,7 @@ def registration(environ, start_response):
 
         passwd = json.loads(read_file("../app/data/passwords.json"))["catalystemail"]
         url = "https://www.catalystcreativearts.com/email/submit"
-        data = {"from_email": "TBD@TBD.com", "purpose": "registration"}
+        data = {"subject": "CCA Summer camp registration", "content": f"{json.dumps(registrations, indent=4)}"}
         headers = {"Content-Type": "application/json"}
         r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
         print(r.status_code)

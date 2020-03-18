@@ -20,7 +20,7 @@ def contact(environ, start_response):
             myfile.write(post_input)
         passwd = json.loads(read_file("../app/data/passwords.json"))["catalystemail"]
         url = "https://www.catalystcreativearts.com/email/submit"
-        data = {"from_email": "TBD@TBD.com", "purpose": "contact"}
+        data = {"subject": "CCA Contact form inquiry", "content": f"{post_input}"}
         headers = {"Content-Type": "application/json"}
         r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
         print(r.status_code)

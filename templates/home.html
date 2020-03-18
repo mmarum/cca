@@ -12,17 +12,39 @@
 #prev_link {
   display: none;
 }
+th {
+  border-bottom: 1px solid LightGray;
+  font-size: 85%;
+}
 td {
   border-bottom: 1px solid LightGray;
   border-right: 1px solid LightGray;
   padding: 5px;
   padding: 5px;
 }
+td:first-child {
+  border-left: 1px solid LightGray;
+}
 table {
   width: 100%;
 }
+th.month {
+  font-size: 150%;
+  padding: 10px 0 5px 0;
+}
 .logo {
   max-width: 100%;
+}
+.gift_cert {
+  width: 30px;
+}
+.dark_orange {
+  background-color: DarkOrange;
+  /* opacity: 0.5; */
+}
+.dark_orange a {
+  color: White;
+  font-size: 120%;
 }
 </style>
 {% endblock %}
@@ -35,6 +57,7 @@ table {
   </div>
 
   <div class="col-md-3">
+
     <a href="/calendar.html#{{ next_event.eid }}" class="event_link">
       <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="logo"/>
     </a>
@@ -61,6 +84,11 @@ table {
 
   </div>
   <div class="col-md-3">
+
+    <div class="text-center dark_orange">
+      <a href="/calendar.html#95">Gift Certificates <br/> Available for Purchase</a>
+    </div>
+
     <div id="paper_calendar"></div>
     {{ calendar.html|safe }}
   </div>

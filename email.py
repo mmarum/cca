@@ -30,12 +30,6 @@ def write_file(file_name, content):
     f.close()
     return True
 
-# TODO:
-# password protect /email dir
-# reqs to /email should include user/pass:
-# passwd = json.loads(read_file("../app/data/passwords.json"))["catalystemail"]
-# email.py should check for valid email pattern
-
 def email(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/plain')])
 
@@ -52,32 +46,17 @@ def email(environ, start_response):
         print str(form_data)
 
         # TODO: email pattern verification
-        from_email = str(form_data['from_email'])
-        print from_email
-        purpose = str(form_data['purpose'])
-        print purpose
 
-        if purpose == "order":
-            subject = "Someone has purchased an event"
-            html_content = "Details TBD"
-        elif purpose == "registration":
-            subject = "Someone has registered for summer camp"
-            html_content = "Details TBD"
-        elif purpose == "contact":
-            subject = "Someone has submitted an inquiry via contact form"
-            html_content = "Details TBD"
-        else:
-            subject = "ELSE"
-            html_content = "ELSE"
-
+        subject = str(form_data['subject'])
         print subject
-        print html_content
+        content = str(form_data['content'])
+        print content
 
         message = Mail(
-            from_email=from_email,
+            from_email="cca-robot@catalystcreativearts.com",
             to_emails="mmarum@gmail.com,info@catalystcreativearts.com",
             subject=subject,
-            html_content=html_content)
+            html_content=content)
 
         print message
 
@@ -98,8 +77,7 @@ def email(environ, start_response):
         except Exception as e:
             print e.message
 
-        # REWRITE RESPONSE:
-        response = str(from_email)+" "+str(purpose)+" "+str(subject)+" "+str(html_content)
+        response = "200"
 
     else:
         response = "200"

@@ -39,7 +39,7 @@ def order(environ, start_response):
 
         passwd = json.loads(read_file("../app/data/passwords.json"))["catalystemail"]
         url = "https://www.catalystcreativearts.com/email/submit"
-        data = {"from_email": "TBD@TBD.com", "purpose": "order"}
+        data = {"subject": "CCA Event purchase", "content": f"{json.dumps(orders, indent=4)}"}
         headers = {"Content-Type": "application/json"}
         r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
         print(r.status_code)

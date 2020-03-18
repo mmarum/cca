@@ -148,8 +148,7 @@ if (browser_size["width"] > 600) {
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop('dropdown-menu'); return false;" data-toggle="dropdown">Crafts/Services</a>
       <div class="dropdown-menu"  id="dropdown-menu">
-      {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling"] -%}
-        {# "Paint your own pottery", "Specialty Classes", "Custom built" #}
+      {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling", "Pottery Painting"] -%}
         <a class="dropdown-item" href="/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
       {%- endfor %}
       </div>

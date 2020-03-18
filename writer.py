@@ -9,6 +9,8 @@ source /home/catalystcreative/virtualenv/app/3.6/bin/activate; cd /home/catalyst
 source /home/catalystcreative/virtualenv/app/3.6/bin/activate; cd /home/catalystcreative/app; python writer.py galleries
 """
 
+# TODO: the lists below need to be de-duped or automated
+
 groups = {
 "pages": [
     "home",
@@ -32,7 +34,8 @@ groups = {
     "leathercraft",
     "resin-crafts",
     "water-marbling",
-    "specialty-classes"
+    "specialty-classes",
+    "pottery-painting"
 ]
 }
 
@@ -56,7 +59,7 @@ passw = json.loads(read_file("data/passwords.json"))[user]
 
 
 def get_page_contents(path):
-    r = requests.get(f'http://www.catalystcreativearts.com/app/{path}', auth=(f'{user}', f'{passw}'))
+    r = requests.get(f'https://www.catalystcreativearts.com/app/{path}', auth=(f'{user}', f'{passw}'))
     print(r.url)
     if r.status_code == 200:
         print(r.status_code)
