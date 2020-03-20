@@ -50,7 +50,11 @@ def email(environ, start_response):
         subject = str(form_data['subject'])
         print subject
         content = str(form_data['content'])
+        content = content.replace('%20', ' ')
         print content
+
+        if "Contact form inquiry" in subject and ("http" in content or ".com" in content):
+            raise ValueError('Link found in contact form submission. Stopping process.')
 
         message = Mail(
             from_email="cca-robot@catalystcreativearts.com",
