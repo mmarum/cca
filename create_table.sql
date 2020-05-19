@@ -55,3 +55,36 @@ treatment_permission TINYINT (1),
 photo_release TINYINT (1),
 signature VARCHAR (200)
 );
+
+CREATE TABLE products (
+pid INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+name VARCHAR (200) NOT NULL,
+description VARCHAR (2000) NOT NULL,
+image_path_array VARCHAR (1000) NOT NULL,
+inventory INT NOT NULL,
+active TINYINT (1),
+price VARCHAR (20) NOT NULL,
+keywords_array VARCHAR (500) NOT NULL
+);
+
+CREATE TABLE cart_products (
+cid INT NOT NULL,
+pid INT NOT NULL,
+quantity INT NOT NULL,
+price_override VARCHAR (20)
+);
+
+# CART ID (cid) should always be a 1-to-1 to user cookie session_id
+
+# This version is strictly a GUEST (no-login) shopping cart
+
+CREATE TABLE cart (
+cid INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+session_id VARCHAR (20),
+create_time VARCHAR (200) NOT NULL,
+payment_time VARCHAR (200) NOT NULL,
+order_id VARCHAR (20)
+);
+
+# payment_time represents time user session cookie is deleted because they paid.
+

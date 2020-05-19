@@ -41,6 +41,7 @@ th.month {
 .dark_orange {
   background-color: DarkOrange;
   /* opacity: 0.5; */
+  margin: 10px;
 }
 .dark_orange a {
   color: White;
@@ -56,6 +57,9 @@ mark {
 .honey_dew {
   background-color: HoneyDew;
 }
+.img250 {
+  width: 250px;
+}
 </style>
 {% endblock %}
 
@@ -68,7 +72,7 @@ mark {
 
   <div class="col-md-5 honey_dew">
 <h1 class="gold">Mini Private Events</h1>
-We are excited to announce a new offering of Mini Private Events. These events are for groups from 3 to 10 people. The studio will be <mark>cleaned, prepared and private to your group only</mark>. You may select from 4 time slots. Most of our activities to are designed to be 2 hours or less. You may choose a single instructor led activity or multiple DIY activities. You may <mark>schedule your event by calling the studio @ 972 446-0444</mark>. Please keep in mind some activities require 12 hours prep time. Remember, you are welcome to bring food and beverages to your event. (Time Slots: 10am, 1pm, 4pm, 7pm, daily)
+We are excited to announce a new offering of Mini Private Events. These events are for groups from 3 to 15 people. The studio will be <mark>cleaned, prepared and private to your group only</mark>. You may select from 4 time slots. Most of our activities to are designed to be 2 hours or less. You may choose a single instructor led activity or multiple DIY activities. You may <mark>schedule your event by calling the studio @ 972 446-0444</mark>. Please keep in mind some activities require 12 hours prep time. Remember, you are welcome to bring food and beverages to your event. (Time Slots: 10am, 1pm, 4pm, 7pm, daily)
   </div>
 
   <div class="col-md-5 honey_dew">
@@ -88,7 +92,31 @@ We are excited to announce a new offering of Mini Private Events. These events a
 </ul>
   </div>
 
+  <div class="col-sm-2">
+  </div>
+
+</div>
+
+<div class="row top-buffer">
+
   <div class="col-sm-1">
+  </div>
+
+  <div class="col-md-3">
+    <img src="/img/string-texas.jpg" class="img250"><br/>
+    <h5><a href="/string-art.html">Create and color an image with string art.</a></h5>
+  </div>
+
+  <div class="col-md-3">
+    <img src="/img/togokits.jpg" class="img250">
+  </div>
+
+  <div class="col-md-3">
+    <img src="/img/delivery.jpg" class="img250">
+    <h5>To-go art kits for pottery painting and string art. Delivery is available for $15 up to 20 mi.</h5>
+  </div>
+
+  <div class="col-sm-2">
   </div>
 
 </div>
@@ -132,7 +160,8 @@ We are excited to announce a new offering of Mini Private Events. These events a
     </div>
 
     <div id="paper_calendar"></div>
-    {{ calendar.html|safe }}
+    <img src="/img/cca-coffee.jpg" class="img250">
+    <!-- {{ calendar.html|safe }} -->
   </div>
 
   <div class="col-sm-1">

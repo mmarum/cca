@@ -17,7 +17,7 @@ env = Environment(
 # TODO: Prevent SQL_injection
 
 # https://wtforms.readthedocs.io/en/stable/index.html
-from forms import EventsForm, ImageForm, RegistrationForm
+from forms import ProductsForm, EventsForm, ImageForm, RegistrationForm
 
 from os import listdir
 from os.path import isfile, join
@@ -86,7 +86,7 @@ def app(environ, start_response):
 
     pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp"]
 
-    galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18}
+    galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18, "string-art": 19, "pottery-lessons": 20}
 
     galleries_list = list(galleries_dict.keys())
 
@@ -118,6 +118,7 @@ def app(environ, start_response):
 
             template = env.get_template("admin-events-add-edit.html")
             response = template.render(form=form)
+
 
         elif environ['PATH_INFO'] == "/admin/events/delete":
             eid = int(environ['QUERY_STRING'].split("=")[1])
@@ -171,6 +172,7 @@ def app(environ, start_response):
                 test=test)
 
 
+        #"""
         elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
             db.query(f"SELECT * FROM events WHERE eid = {eid}")
@@ -183,6 +185,8 @@ def app(environ, start_response):
 
             template = env.get_template("book-event.html")
             response = template.render(event_data=row, order_count=order_count)
+        #"""
+
 
         elif environ['PATH_INFO'] == '/gallery/slideshow' or environ['PATH_INFO'].lstrip('/') in galleries_list:
 
@@ -302,6 +306,23 @@ def app(environ, start_response):
             page_content = str(read_file(f"data/{page_name}.html"))
             template = env.get_template("pages.html")
             response = template.render(page_name=page_name, page_content=page_content)
+
+
+        elif environ['PATH_INFO'] == '/admin/products/list':
+            #c = db.cursor()
+            #c.execute("SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime")
+            #allrows = c.fetchall()
+            #c.close()
+
+            template = env.get_template("admin-products-list.html")
+            response = template.render()
+
+
+        elif environ['PATH_INFO'] == '/admin/products/add-edit':
+
+            form = ProductsForm()
+            template = env.get_template("admin-products-add-edit.html")
+            response = template.render(form=form)
 
 
         else:
@@ -434,6 +455,11 @@ def app(environ, start_response):
 
         scrape_and_write(page_name)
 
+
+    ####
+    ####
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/products/add-edit":
+        response = "ROOAAR"
 
     ####
     ####

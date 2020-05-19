@@ -53,3 +53,15 @@ class RegistrationForm(Form):
     signature = StringField("Signature", description="")
     submit = SubmitField("Submit", description="Submit")
 
+
+class ProductsForm (Form):
+    pid = HiddenField("pid", description="")
+    name = StringField("Name", description="")
+    description = StringField("Description", description="")
+    image_path_array = StringField("Image Path Array", description="Add one or multiple images")
+    inventory = StringField("Inventory", description="How many items remaining in stock")
+    active = StringField("Active", description="")
+    price = StringField("Price", description="Product price before discounts. This can be overridden")
+    keywords_array = StringField("Keywords Array", description="Comma-separated list of descriptive one-word keywords")
+    submit = SubmitField("Submit", description="")
+

@@ -1,0 +1,31 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin Products List{% endblock %}
+
+{% block html_head %}
+<style>
+img {
+  max-width: 100px;
+}
+@media only screen and (max-width: 600px) {
+  .extra_column {
+    display: none;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<table class="table table-striped">
+<tr class="p-3 mb-2 bg-light text-dark">
+  <td><div id="add_new_link"><a href="/app/admin/products/add-edit">+</a></div></td>
+  <td>Name</td>
+  <td class="extra_column">Description</td>
+  <td class="extra_column">Images</td>
+  <td class="extra_column">Inventory</td>
+  <td class="extra_column">Active</td>
+  <td class="extra_column">Price</td>
+  <td class="extra_column">Keywords</td>
+  <!-- <td class="extra_column">Description</td> -->
+</tr>
+</table>
+{% endblock %}

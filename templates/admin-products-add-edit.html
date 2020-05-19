@@ -1,0 +1,55 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin Add/Edit Products{% endblock %}
+
+{% block html_head %}
+<style>
+input, textarea, label, button {
+  margin: 10px;
+}
+textarea.form-control {
+  height: 100px;
+}
+span.help-block {
+  margin-left: 10px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<form action="/app/admin/products/add-edit" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+{% for field in form %}
+  {% if field.name == "submit" %}
+    {{ field(autocomplete="off", class="form-control btn btn-success") }}
+  {% elif field.name == "image_path_array" %}
+    <span class="help-block">{{ field.description }}</span>
+    <input type="file" name="image_path_array" id="image_path_array"/>
+  {% elif field.name == "active" %}
+    <div>
+      <label name="active"><input type="radio" name="active" id="active" value=1 checked="checked"/>Visible</label>
+      <label name="hideit"><input type="radio" name="active" id="hideit" value=0/>Hide it</label>
+    </div>
+  {% else %}
+    {{ field(autocomplete="off", class="form-control") }}
+  {% endif %}
+{% endfor %}
+</form>
+
+<button type="button" class="btn btn-warning" onClick="onclick=location.reload();location.href='/app/admin/products/list'">Cancel</button>
+
+{% if form.pid.data %}
+  <button type="button" class="btn btn-danger">
+    <a href="/app/admin/products/delete?pid={{ form.pid.data }}" onclick="return confirm('Are you sure?');">Delete</a>
+  </button>
+{% endif %}
+
+{% if not form.pid.data %}
+  <script>
+  {% for field in form %}
+    console.log("{{ field.name }}");
+    document.getElementById("{{ field.name }}").placeholder = "{{ field.name }}{% if field.description %}: {{ field.description|safe }}{% endif %}";
+  {% endfor %}
+  </script>
+{% endif %}
+
+{% endblock %}

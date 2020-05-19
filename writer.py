@@ -35,7 +35,9 @@ groups = {
     "resin-crafts",
     "water-marbling",
     "specialty-classes",
-    "pottery-painting"
+    "pottery-painting",
+    "string-art",
+    "pottery-lessons"
 ]
 }
 

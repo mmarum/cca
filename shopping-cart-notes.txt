@@ -1,0 +1,70 @@
+CREATE TABLE products (
+pid INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+name VARCHAR (200) NOT NULL,
+description VARCHAR (2000) NOT NULL,
+image_path_array VARCHAR (1000) NOT NULL,
+invetory INT NOT NULL,
+active TINYINT (1),
+price VARCHAR (20) NOT NULL,
+keywords_array VARCHAR (500) NOT NULL
+);
+
+
+CREATE TABLE cart_products (
+cid INT NOT NULL,
+pid INT NOT NULL,
+quantity INT NOT NULL,
+price_override VARCHAR (20)
+);
+
+
+# CART ID (cid) should always be a 1-to-1 to user cookie session_id
+
+# This version is strictly a GUEST (no-login) shopping cart
+
+CREATE TABLE cart (
+cid INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+session_id VARCHAR (20),
+create_time VARCHAR (200) NOT NULL,
+payment_time VARCHAR (200) NOT NULL,
+order_id VARCHAR (20)
+);
+
+
+# payment_time represents time user session cookie is deleted because they paid.
+
+
+----------
+user stuff 
+
+  paypal login aka "connect with paypal":
+  https://developer.paypal.com/docs/connect-with-paypal/reference/#
+  https://developer.paypal.com/docs/connect-with-paypal/reference/button-js-builder/?mark=connect%20with%20paypal
+  
+  For now I'll just do shopping cart as "Guest" with session-IDs: Logic:
+
+  On each request:
+  1) Check cookie for session_id
+  2) If session_id exists return shopping cart items (or at least show guest item count)
+
+  3) Only set new Guest session_id when user clicks on add-to-my-cart
+  4) Delete the session cookie after payment
+
+  Check and set use JS that hits backend API
+
+  Some JS:
+
+<script>
+//console.log("cookie-test");
+//SET:
+//document.cookie = "session_id=0123456789";
+
+//READ:
+//var session_id = document.cookie.split("=")[1];
+//console.log(session_id)
+
+//DELETE:
+//document.cookie = "session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+</script>
+
+

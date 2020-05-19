@@ -20,7 +20,9 @@
 {% block content %}
 <!-- {{ images|safe }} -->
 <h1 class="text-center">{{ gallery.name }}</h1>
-<p>{{ gallery.comment|safe }}</p>
+{% if gallery.comment|safe != "None" %}
+  <p>{{ gallery.comment|safe }}</p>
+{% endif %}
 <center>
 <div class="row">
 {% for i in images %}
