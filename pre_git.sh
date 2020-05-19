@@ -8,3 +8,4 @@ cp /home/catalystcreative/contact/contact.py /home/catalystcreative/app/cca/cont
 cp /home/catalystcreative/order/order.py /home/catalystcreative/app/cca/order.py
 cp /home/catalystcreative/registration/registration.py /home/catalystcreative/app/cca/registration.py
 cp /home/catalystcreative/email/email.py /home/catalystcreative/app/cca/email.py
+cp /home/catalystcreative/cart/cart.py /home/catalystcreative/app/cca/cart.py
