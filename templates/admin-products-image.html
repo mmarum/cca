@@ -1,0 +1,18 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin Add/Edit Image{% endblock %}
+
+{% block html_head %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<form action="/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+{% for field in image_form %}
+  {% if field.name != "eid" and field.name != "submit" %}
+    {{ field.label }}
+  {% endif %}
+  <div class="field">{{ field(class="image_upload") }}</div>
+{% endfor %}
+</form>
+{% endblock %}

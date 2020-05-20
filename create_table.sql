@@ -59,12 +59,12 @@ signature VARCHAR (200)
 CREATE TABLE products (
 pid INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 name VARCHAR (200) NOT NULL,
-description VARCHAR (2000) NOT NULL,
-image_path_array VARCHAR (1000) NOT NULL,
-inventory INT NOT NULL,
+description VARCHAR (2000),
+image_path_array VARCHAR (1000),
+inventory INT,
 active TINYINT (1),
-price VARCHAR (20) NOT NULL,
-keywords_array VARCHAR (500) NOT NULL
+price VARCHAR (20),
+keywords_array VARCHAR (500)
 );
 
 CREATE TABLE cart_products (

@@ -17,13 +17,11 @@ span.help-block {
 
 {% block content %}
 
-<form action="/app/admin/products/add-edit" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+<form action="/app/admin/products/{% if form.pid.data %}edit{% else %}add{% endif %}" 
+    method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
   {% if field.name == "submit" %}
     {{ field(autocomplete="off", class="form-control btn btn-success") }}
-  {% elif field.name == "image_path_array" %}
-    <span class="help-block">{{ field.description }}</span>
-    <input type="file" name="image_path_array" id="image_path_array"/>
   {% elif field.name == "active" %}
     <div>
       <label name="active"><input type="radio" name="active" id="active" value=1 checked="checked"/>Visible</label>

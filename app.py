@@ -271,19 +271,15 @@ def app(environ, start_response):
             month = 3 # TODO: MAKE THIS DYNAMIC NOT HARD-CODED
             year = 2020
             html_cal = make_cal(db, month, year)
-
             db.query(f"SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
-
             template = env.get_template("home.html")
             response = template.render(next_event=row, calendar={"html": html_cal})
 
 
         elif environ['PATH_INFO'] == '/admin/pages':
-
             template = env.get_template("admin-pages.html")
-
             if environ['QUERY_STRING']:
                 page_name = environ['QUERY_STRING'].split("=")[1]
                 try:
@@ -309,17 +305,15 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/products/list':
-            #c = db.cursor()
-            #c.execute("SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime")
-            #allrows = c.fetchall()
-            #c.close()
-
+            c = db.cursor()
+            c.execute("SELECT * FROM products")
+            allrows = c.fetchall()
+            c.close()
             template = env.get_template("admin-products-list.html")
-            response = template.render()
+            response = template.render(allrows=allrows)
 
 
         elif environ['PATH_INFO'] == '/admin/products/add-edit':
-
             form = ProductsForm()
             template = env.get_template("admin-products-add-edit.html")
             response = template.render(form=form)
@@ -459,7 +453,56 @@ def app(environ, start_response):
     ####
     ####
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/products/add-edit":
-        response = "ROOAAR"
+        c = db.cursor()
+        c.execute("SELECT * FROM products")
+        allrows = c.fetchall()
+        c.close()
+        template = env.get_template("admin-products-list.html")
+        response = template.render(allrows=allrows)
+
+
+    ####
+    ####
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/products/add":
+
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+
+        data_object = {}
+        data_array = []
+        post_input_array = post_input.split('------')
+
+        for d in post_input_array:
+            print(d)
+            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
+            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
+            print(post_data_key)
+            print(post_data_val)
+            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and not post_data_val.startswith('-----'):
+                data_object[post_data_key] = post_data_val
+                data_array.append(post_data_val)
+
+        print(data_object)
+        print(data_array)
+
+        # Cleanup: Remove "pid"
+        del data_object['pid']
+        del data_array[0]
+
+        fields = "name, description, image_path_array, inventory, price, keywords_array, active"
+        print(fields)
+        vals = data_array
+        print(vals)
+        sql = f"INSERT INTO products ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        print(sql)
+        c = db.cursor()
+        c.execute(sql, vals)
+
+        image_form = ImageForm()
+
+        template = env.get_template("admin-products-image.html")
+        response = template.render(image_form=image_form)
+
 
     ####
     ####

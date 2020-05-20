@@ -68,3 +68,5 @@ user stuff
 </script>
 
 
+insert into products (name, description, image_path_array, inventory, active, price, keywords_array) values ('Cool Thing', 'Very cool item', 'some_image_path, another_image_path', 5, 1, '10', 'keyword-1, keyword-2');
+
