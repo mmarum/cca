@@ -6,12 +6,27 @@
 .product_image {
   max-width: 100%;
 }
+#cart {
+  width: 50px;
+}
+#add_to_cart {
+  margin: 10px;
+  padding: 10px;
+  width: 200px;
+  border: 1px dashed LightGray;
+  border-radius: 15px;
+  background-color: HoneyDew;
+}
+#product_quantity_form {
+  margin-top: 10px;
+  max-width: 350px;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 
-<div class="row product_row top-buffer id="">
+<div class="row product_row top-buffer" id="">
 
   <div class="col-sm-1">
   </div>
@@ -22,17 +37,89 @@
   </div>
 
   <div class="col-lg-8">
-    <div>{{ row.name }}</div>
+    <h3>{{ row.name }}</h3>
     <div>{{ row.description }}</div>
-    <div>{{ row.image_path_array }}</div>
-    <div>{{ row.inventory }}</div>
-    <div>{{ row.price }}</div>
-    <div>{{ row.keywords_array }}</div>
+    <div>
+      <form action="" id="product_quantity_form">
+        <select name="quantity" id="product_quantity_select" class="form-control">
+          <option value=0>Select quantity</option>
+          <option value=1>1</option>
+          <option value=2>2</option>
+          <option value=3>3</option>
+          <option value=4>4</option>
+          <option value=5>5</option>
+          <option value=6>6</option>
+        </select>
+      </form>
+    </div>
+    <div id="add_to_cart">
+      <a href="" onclick="addToCart({{ row.pid }}); return false;">
+        <img src="/img/cart.png" id="cart">
+        Add to cart
+      </a>
+    </div>
+    <!-- <div>{{ row.inventory }}</div> -->
+    <div>Price: ${{ row.price }} per item</div>
+    <div>Keywords: {{ row.keywords_array }}</div>
+  </div>
+
+  <div class="col-sm-1">
+  </div>
+
+  <!-- NEW ROW BELOW -->
+
+  <div class="col-sm-1">
+  </div>
+
+  <div class="col-lg-10">
+    <div>
+      {% set image_array = row.image_path_array.split(',') %}
+      {% for i in image_array %}
+        {% if loop.index > 1 %}
+          <img src="/img/small/{{ i }}"/>
+        {% endif %}
+      {% endfor %}
+    </div>
   </div>
 
   <div class="col-sm-1">
   </div>
 
 </div>
+
+<script>
+function addToCart(pid) {
+  console.log(pid);
+  // GRAB THE QUANTITY FROM FORM
+  quantity = document.getElementById("product_quantity_select").value;
+  console.log(quantity);
+  if (quantity == 0) {
+    alert("Select quantity");
+  } else {
+    // FIRST CHECK IF USER HAS SESSION COOKIE
+    var session_id = document.cookie.split("=")[1];
+
+    if (session_id) {
+      console.log("Existing session_id. Let's use it");
+    } else {
+      console.log("No session_id yet. Let's set one");
+      // SET COOKIE
+      document.cookie = "session_id=0123456789; expires=Thu, 11 Jun 3020 12:00:00 UTC";
+      // READ COOKIE
+      session_id = document.cookie.split("=")[1];
+    }
+
+    if (session_id) {
+      console.log(session_id)
+      // MAKE A REQUEST TO THE NEW CART API
+      console.log("request to cart api");
+    } else {
+      console.log("Error. Still no session_id");
+    }
+
+  }
+  return false;
+}
+</script>
 
 {% endblock %}
