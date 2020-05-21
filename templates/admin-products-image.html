@@ -7,12 +7,28 @@
 {% endblock %}
 
 {% block content %}
+{% if product_data %}
+  {% for k, v in product_data.items() %}
+    <div>{{ k }}: {{ v }}</div>
+  {% endfor %}
+{% endif %}
 <form action="/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+
 {% for field in image_form %}
   {% if field.name != "eid" and field.name != "submit" %}
     {{ field.label }}
   {% endif %}
   <div class="field">{{ field(class="image_upload") }}</div>
 {% endfor %}
+
+<input class="image_upload" id="pid" name="pid" type="hidden" value="{{ pid.pid }}">
+
 </form>
+
+<button type="button" class="btn btn-warning" onClick="onclick=location.reload();location.href='/app/admin/products/list'">Skip</button>
+
+<script>
+document.getElementById("eid").value="0";
+</script>
+
 {% endblock %}

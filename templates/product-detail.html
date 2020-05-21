@@ -1,0 +1,38 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Product Details{% endblock %}
+
+{% block html_head %}
+<style>
+.product_image {
+  max-width: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row product_row top-buffer id="">
+
+  <div class="col-sm-1">
+  </div>
+
+  <div class="col-md-2">
+    {% set image_array = row.image_path_array.split(',') %}
+    <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/>
+  </div>
+
+  <div class="col-lg-8">
+    <div>{{ row.name }}</div>
+    <div>{{ row.description }}</div>
+    <div>{{ row.image_path_array }}</div>
+    <div>{{ row.inventory }}</div>
+    <div>{{ row.price }}</div>
+    <div>{{ row.keywords_array }}</div>
+  </div>
+
+  <div class="col-sm-1">
+  </div>
+
+</div>
+
+{% endblock %}

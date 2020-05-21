@@ -17,7 +17,7 @@ span.help-block {
 
 {% block content %}
 
-<form action="/app/admin/products/{% if form.pid.data %}edit{% else %}add{% endif %}" 
+<form action="/app/admin/products/add-edit" 
     method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
   {% if field.name == "submit" %}

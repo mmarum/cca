@@ -16,12 +16,14 @@ img {
 
 {% block content %}
 
+<p><a href="/app/products" target="_new">Temporary link to in-progress site products page</a></p>
+
 <table class="table table-striped">
 <tr class="p-3 mb-2 bg-light text-dark">
   <td><div id="add_new_link"><a href="/app/admin/products/add-edit">+</a></div></td>
   <td>Name</td>
   <td class="extra_column">Description</td>
-  <!-- <td class="extra_column">Images</td> -->
+  <td class="extra_column">Images</td>
   <td class="extra_column">Inventory</td>
   <td class="extra_column">Active</td>
   <td class="extra_column">Price</td>
@@ -36,12 +38,12 @@ img {
     {% if loop.index == 1 %}
       <td><a class="bg-light" href="/app/admin/products/add-edit?pid={{ item }}">{{ item }}</a></td>
     {% elif loop.index == 4 %}
-      <!-- <td class="extra_column"> -->
-        {# set image_array = item.split(',') #}
-        {# for i in image_array #}
-          <!-- {# i #} <br/> -->
-        {# endfor #}
-      <!-- </td> -->
+      <td class="extra_column">
+        {% set image_array = item.split(',') %}
+        {% for i in image_array %}
+          {{ i }} <br/>
+        {% endfor %}
+      </td>
     {% elif loop.index == 8 %}
       <td class="extra_column">
         {% set keyword_array = item.split(',') %}

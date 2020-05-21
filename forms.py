@@ -57,7 +57,7 @@ class RegistrationForm(Form):
 class ProductsForm (Form):
     pid = HiddenField("pid", description="")
     name = StringField("Name", description="")
-    description = StringField("Description", description="")
+    description = TextAreaField("Description", description="")
     image_path_array = HiddenField("Image Path Array", description="Add one or multiple images")
     inventory = StringField("Inventory", description="How many items remaining in stock. This value will change automatically as people buy")
     price = StringField("Price", description="Product price before discounts. This can be overridden")

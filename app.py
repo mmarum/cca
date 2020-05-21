@@ -172,6 +172,26 @@ def app(environ, start_response):
                 test=test)
 
 
+        elif environ['PATH_INFO'] == '/products':
+            db.query("SELECT * FROM products WHERE active = 1")
+            r = db.store_result()
+            allrows = r.fetch_row(maxrows=100, how=1)
+            template = env.get_template("list-products.html")
+            response = template.render(products=allrows)
+
+
+        elif re.match('/products/[a-z-]+/[0-9]+', environ['PATH_INFO']):
+            path_parts = environ['PATH_INFO'].split('/')
+            product_name = path_parts[2]
+            product_id = path_parts[3]
+            pid = int(product_id)
+            db.query(f"SELECT * FROM products WHERE pid = {pid}")
+            r = db.store_result()
+            row = r.fetch_row(maxrows=1, how=1)[0]
+            template = env.get_template("product-detail.html")
+            response = template.render(row=row)
+
+
         #"""
         elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
@@ -314,7 +334,14 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/products/add-edit':
-            form = ProductsForm()
+            if len(environ['QUERY_STRING']) > 1:
+                pid = environ['QUERY_STRING'].split("=")[1]
+                db.query(f"SELECT * FROM products WHERE pid = {pid}")
+                r = db.store_result()
+                row = r.fetch_row(maxrows=1, how=1)[0]
+                form = ProductsForm(**row)
+            else:
+                form = ProductsForm()
             template = env.get_template("admin-products-add-edit.html")
             response = template.render(form=form)
 
@@ -356,12 +383,29 @@ def app(environ, start_response):
         # NOTICE BYTES STRING below FOR IMAGES
         #image_eid = post_input.split(b'------')[1]
         image_eid = post_input.split(b'Content-Disposition: form-data')[1]
+
+        print(f"image_eid: {image_eid}")
+
         eid = re.sub(b'^.*name="eid"(.*?)------.*$', r"\1", image_eid, flags=re.DOTALL).strip()
+
+        print(f"eid: {eid}")
+
+        eid = int(eid.decode('UTF-8'))
+
+        print(f"eid: {eid}")
+
+        if eid == 0:
+            image_pid = post_input.split(b'Content-Disposition: form-data')[4]
+            if 'name="pid"' in image_pid.decode('UTF-8'):
+                pid = re.sub(b'^.*name="pid"(.*?)------.*$', r"\1", image_pid, flags=re.DOTALL).strip()
+                pid = int(pid.decode('UTF-8'))
+            else:
+                pid = 0
+        else:
+            pid = 0
 
         #with open("stderr.log", "a") as logfile:
         #    logfile.write(str(f"post_input: {post_input}++++\nimage_eid: {image_eid}++++\neid: {eid}++++\n"))
-
-        eid = int(eid.decode('UTF-8'))
 
         #image_data = post_input.split(b'------')[2]
         image_data = post_input.split(b'Content-Disposition: form-data')[2]
@@ -369,6 +413,8 @@ def app(environ, start_response):
         image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
 
         img_name = image_filename.decode('UTF-8')
+
+        print(f"img_name: {img_name}")
 
         if img_name and image_contents:
             open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
@@ -379,12 +425,23 @@ def app(environ, start_response):
             image.thumbnail(size)
             image.save(f"../www/img/small/{img_name}", 'JPEG')
 
-            sql = f"UPDATE events SET image = '{img_name}' WHERE eid = {eid}"
+            if pid > 0:
+                #sql = f"UPDATE products SET image_path_array = '{img_name}' WHERE eid = {eid}"
+                # Because image_path_array is a list containgin multiple values:
+                print(f"img_name: {img_name}")
+                print(f"pid: {pid}")
+                sql = f"UPDATE products SET image_path_array = concat(ifnull(image_path_array,''), ',{img_name}') WHERE pid = {pid}"
+                print(f"sql is: {sql}")
+                redirect_path = "products"
+            else:
+                sql = f"UPDATE events SET image = '{img_name}' WHERE eid = {eid}"
+                redirect_path = "events"
+
             c = db.cursor()
             c.execute(sql)
             c.close()
 
-        response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
+        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/{redirect_path}/list" />'
 
         scrape_and_write("calendar")
         #time.sleep(2)
@@ -453,55 +510,76 @@ def app(environ, start_response):
     ####
     ####
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/products/add-edit":
-        c = db.cursor()
-        c.execute("SELECT * FROM products")
-        allrows = c.fetchall()
-        c.close()
-        template = env.get_template("admin-products-list.html")
-        response = template.render(allrows=allrows)
-
-
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/products/add":
 
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
         data_object = {}
         data_array = []
+
         post_input_array = post_input.split('------')
 
         for d in post_input_array:
-            print(d)
             post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
             post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            print(post_data_key)
-            print(post_data_val)
             if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and not post_data_val.startswith('-----'):
                 data_object[post_data_key] = post_data_val
                 data_array.append(post_data_val)
 
-        print(data_object)
-        print(data_array)
+        try:
+            if int(data_object['pid']) > 0:
+                action = "Update"
+                pid = data_object['pid']
+            else:
+                action = "Insert"
+        except:
+            action = "Insert"
 
         # Cleanup: Remove "pid"
         del data_object['pid']
         del data_array[0]
 
-        fields = "name, description, image_path_array, inventory, price, keywords_array, active"
-        print(fields)
-        vals = data_array
-        print(vals)
-        sql = f"INSERT INTO products ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        print(sql)
-        c = db.cursor()
-        c.execute(sql, vals)
+        # Todo: More validation
+        products_form = ProductsForm(**data_object)
+
+        # Set query based on update vs insert
+        if action == "Update":
+            keys_vals = ""
+            for k, v in data_object.items():
+                v = v.replace("'", "''")
+                keys_vals += str(f"{k}='{v}', ")
+            keys_vals = keys_vals.rstrip(', ')
+            sql = f"UPDATE products SET {keys_vals} WHERE pid = {pid}"
+            #print(sql)
+            c = db.cursor()
+            c.execute(sql)
+        else:
+            fields = "name, description, image_path_array, inventory, price, keywords_array, active"
+            vals = data_array
+            sql = f"INSERT INTO products ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            c = db.cursor()
+            c.execute(sql, vals)
+        c.close()
+
+        # Next template needs to know the pid
+        if action == "Insert":
+            # Now retrieve the pid from the item we just added
+            n = data_object['name']
+            p = data_object['price']
+            sql2 = f"SELECT pid FROM products WHERE name = '{n}' AND price = '{p}'"
+            #print(sql2)
+            d = db.cursor()
+            d.execute(sql2)
+            pid = int(d.fetchone()[0])
+            d.close()
+        else:
+            sql2 = "just an update"
 
         image_form = ImageForm()
 
         template = env.get_template("admin-products-image.html")
-        response = template.render(image_form=image_form)
+        response = template.render(product_data=data_object, image_form=image_form,
+            sql={"sql":sql}, pid={"pid":pid}, sql2={"sql2":sql2})
 
 
     ####
@@ -584,7 +662,7 @@ def app(environ, start_response):
             e = data_object['edatetime']
             t = data_object['title'].replace("'", "''")
             sql2 = f"SELECT eid FROM events WHERE edatetime = '{e}' AND title = '{t}'"
-            print(sql2)
+            #print(sql2)
             d = db.cursor()
             d.execute(sql2)
             eid = int(d.fetchone()[0])
