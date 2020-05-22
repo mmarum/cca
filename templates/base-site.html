@@ -104,17 +104,15 @@ div#burger div {
 #buns {
   
 }
-#cart_top_right {
+#top_right_cart_container {
+  display: none;
   width: 50px;
   position: absolute;
   top: 20px;
   right: 20px;
 }
-#cart {
+.cart_icon {
   width: 50px;
-}
-#cart_total_items {
-  display: none;
 }
 </style>
 
@@ -125,12 +123,10 @@ div#burger div {
 
 <div id="content">
 
-<!--
-<div id="cart_top_right">
-  <img src="/img/cart.png" id="cart"/><br/>
-  <span id="cart_total_items"></span>
+<div id="top_right_cart_container">
+  <img src="/img/cart.png" class="cart_icon"/>
+  <div id="top_right_cart_total"></div>
 </div>
--->
 
 <div class="container">
 
@@ -210,6 +206,42 @@ function navbardrop(div_id_name) {
   }
   document.getElementById(div_id_name).style.display = navbardrop_state;
 }
+</script>
+
+<script>
+
+function make_request_get_total(session_id) {
+  fetch('/cart/total', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: session_id
+    })
+  })
+  .then(response=>response.json())
+  .then(data=>{
+    console.log(data); 
+    document.getElementById("top_right_cart_container").style.display = "block";
+    document.getElementById("top_right_cart_total").innerHTML = data;
+  })
+}
+
+function checkCartTotal() {
+  // FIRST CHECK IF USER HAS SESSION COOKIE
+  var session_id = document.cookie.split("=")[1];
+  if (session_id) {
+    console.log(session_id)
+    // MAKE A REQUEST TO THE NEW CART API
+    console.log("request to cart api");
+    make_request_get_total(session_id);
+  } else {
+    console.log("No session_id");
+  }
+}
+
+checkCartTotal();
 </script>
 
 </body>

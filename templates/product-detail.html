@@ -21,12 +21,16 @@
   margin-top: 10px;
   max-width: 350px;
 }
+img.check {
+  width: 35px;
+  padding-left: 10px;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 
-<div class="row product_row top-buffer" id="">
+<div class="row product_row top-buffer">
 
   <div class="col-sm-1">
   </div>
@@ -54,8 +58,9 @@
     </div>
     <div id="add_to_cart">
       <a href="" onclick="addToCart({{ row.pid }}); return false;">
-        <img src="/img/cart.png" id="cart">
+        <img src="/img/cart.png" class="cart_icon">
         Add to cart
+        <span id="check_container"></span>
       </a>
     </div>
     <!-- <div>{{ row.inventory }}</div> -->
@@ -93,7 +98,7 @@ function getRandom() {
 }
 
 function make_request(session_id, product_id, quantity) {
-  return fetch('/cart/add', {
+  const fetchPromise = fetch('/cart/add', {
     method: 'POST',
     headers: {
       'content-type': 'application/json'
@@ -103,6 +108,14 @@ function make_request(session_id, product_id, quantity) {
       product_id: product_id,
       quantity: quantity
     })
+  });
+  fetchPromise.then(response => {
+    var check_tag = '<img src="/img/check.png" class="check"/>';
+    document.getElementById("check_container").innerHTML = check_tag;
+    //document.getElementById("top_right_cart_container").style.display = "block";
+    make_request_get_total(session_id);
+    console.log("response from promise");
+    //console.log(response);
   });
 }
 
@@ -126,17 +139,14 @@ function addToCart(pid) {
       document.cookie = "session_id=" + random_number + "; expires=Tue, 11 Jun 2120 12:00:00 UTC; path=/";
       session_id = random_number
     }
-
     if (session_id) {
       console.log(session_id)
       // MAKE A REQUEST TO THE NEW CART API
       console.log("request to cart api");
-      response = make_request(session_id, {{ row.pid }}, quantity);
-      console.log(response);
+      make_request(session_id, {{ row.pid }}, quantity);
     } else {
       console.log("Error. Still no session_id");
     }
-
   }
   return false;
 }
