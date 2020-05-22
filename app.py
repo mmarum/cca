@@ -172,6 +172,11 @@ def app(environ, start_response):
                 test=test)
 
 
+        elif environ['PATH_INFO'] == '/cart':
+            template = env.get_template("cart-list.html")
+            response = template.render()
+
+
         elif environ['PATH_INFO'] == '/products':
             db.query("SELECT * FROM products WHERE active = 1")
             r = db.store_result()

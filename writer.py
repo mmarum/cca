@@ -18,7 +18,8 @@ groups = {
     "private-events", 
     "about-contact", 
     "custom-built",
-    "after-school-summer-camp"
+    "after-school-summer-camp",
+    "cart"
 ],
 "galleries": [
     "commissioned-art",
@@ -74,7 +75,10 @@ def scrape_and_write(path):
     try:
         page_contents = get_page_contents(path)
         if len(page_contents) > 10:
-            write_file(f"../www/{path}.html", page_contents)
+            if path in ["cart", "some-other"]:
+                write_file(f"../www/{path}/index.html", page_contents)
+            else:
+                write_file(f"../www/{path}.html", page_contents)
         else:
             print(f'____ page_contents failure: {path}')
     except:

@@ -1,0 +1,61 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Cart{% endblock %}
+
+{% block html_head %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+<div class="col-sm-1">
+</div>
+
+<div class="col-md-10">
+  <div id="cart_contents">
+  </div>
+</div>
+
+<div class="col-sm-1">
+</div>
+
+</div>
+
+<script>
+function make_request_get_list(session_id) {
+  fetch('/cart-api/list', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: session_id
+    })
+  })
+  .then(response=>response.json())
+  .then(data=>{
+    console.log(data); 
+    document.getElementById("cart_contents").innerHTML = data;
+  })
+}
+
+function getCartList() {
+  // FIRST CHECK IF USER HAS SESSION COOKIE
+  var session_id = document.cookie.split("=")[1];
+  if (session_id) {
+    console.log(session_id)
+    // MAKE A REQUEST TO THE NEW CART API
+    console.log("request to cart api");
+    make_request_get_list(session_id);
+  } else {
+    console.log("No session_id");
+  }
+}
+
+getCartList();
+</script>
+
+
+{% endblock %}

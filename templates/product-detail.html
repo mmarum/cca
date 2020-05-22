@@ -98,7 +98,7 @@ function getRandom() {
 }
 
 function make_request(session_id, product_id, quantity) {
-  const fetchPromise = fetch('/cart/add', {
+  const fetchPromise = fetch('/cart-api/add', {
     method: 'POST',
     headers: {
       'content-type': 'application/json'

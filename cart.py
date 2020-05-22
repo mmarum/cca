@@ -11,13 +11,13 @@ def read_file(file_name):
     f.close()
     return content
 
-# curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123", "product_id": 1, "quantity": 1}' https://www.catalystcreativearts.com/cart/add
+# curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123", "product_id": 1, "quantity": 1}' https://www.catalystcreativearts.com/cart-api/add
 # Sample response: {session_id: "123", product_id: 1, quantity: 1}
 # cart_products: cid pid quantity price_override
 # cart: cid session_id create_time payment_time order_id
 
 sys.path.insert(0, os.path.dirname(__file__))
-def cart(environ, start_response):
+def cart_api(environ, start_response):
     start_response('200 OK', [('Content-Type', 'application/json')])
 
     if environ['REQUEST_METHOD'] != "POST":
@@ -75,23 +75,27 @@ def cart(environ, start_response):
 
     ####
     elif environ['PATH_INFO'] == "/total":
-
-        #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart/total
-
+        #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/total
         try:
             sub_query = f"SELECT cid FROM cart WHERE session_id = '{session_id}'"
             db.query(f"SELECT SUM(quantity) AS sum FROM cart_products WHERE cid = ({sub_query})")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             sum = row["sum"]
-
         except:
             sum = 0
-
         response = str(sum)
  
+
+    ####
+    elif environ['PATH_INFO'] == "/list":
+        #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/list
+        response = str(session_id)
+
+
     else:
-        response = "200"
+        response = "Default error"
+
 
     return [response.encode()]
 
