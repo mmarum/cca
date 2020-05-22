@@ -68,6 +68,7 @@ keywords_array VARCHAR (500)
 );
 
 CREATE TABLE cart_products (
+id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 cid INT NOT NULL,
 pid INT NOT NULL,
 quantity INT NOT NULL,
@@ -80,9 +81,9 @@ price_override VARCHAR (20)
 
 CREATE TABLE cart (
 cid INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-session_id VARCHAR (20),
-create_time VARCHAR (200) NOT NULL,
-payment_time VARCHAR (200) NOT NULL,
+session_id VARCHAR (20) NOT NULL,
+create_time datetime,
+payment_time datetime,
 order_id VARCHAR (20)
 );
 

@@ -88,6 +88,24 @@
 </div>
 
 <script>
+function getRandom() {
+  return (Math.random() * 10000000000000000);
+}
+
+function make_request(session_id, product_id, quantity) {
+  return fetch('/cart/add', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: session_id,
+      product_id: product_id,
+      quantity: quantity
+    })
+  });
+}
+
 function addToCart(pid) {
   console.log(pid);
   // GRAB THE QUANTITY FROM FORM
@@ -104,15 +122,17 @@ function addToCart(pid) {
     } else {
       console.log("No session_id yet. Let's set one");
       // SET COOKIE
-      document.cookie = "session_id=0123456789; expires=Thu, 11 Jun 3020 12:00:00 UTC";
-      // READ COOKIE
-      session_id = document.cookie.split("=")[1];
+      var random_number = getRandom();
+      document.cookie = "session_id=" + random_number + "; expires=Tue, 11 Jun 2120 12:00:00 UTC; path=/";
+      session_id = random_number
     }
 
     if (session_id) {
       console.log(session_id)
       // MAKE A REQUEST TO THE NEW CART API
       console.log("request to cart api");
+      response = make_request(session_id, {{ row.pid }}, quantity);
+      console.log(response);
     } else {
       console.log("Error. Still no session_id");
     }
@@ -120,6 +140,7 @@ function addToCart(pid) {
   }
   return false;
 }
+
 </script>
 
 {% endblock %}
