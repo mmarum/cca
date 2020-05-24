@@ -36,8 +36,16 @@ function make_request_get_list(session_id) {
   })
   .then(response=>response.json())
   .then(data=>{
-    console.log(data); 
-    document.getElementById("cart_contents").innerHTML = data;
+    //console.log(data); 
+
+    var arrLen = data.length;
+    for (var i = 0; i < arrLen; i++) {
+      console.log(data[i]);
+      //x = data[i];
+      //console.log(x.name);
+    }
+
+    document.getElementById("cart_contents").innerHTML = data.session_id;
   })
 }
 

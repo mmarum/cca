@@ -66,12 +66,34 @@ def cart_api(environ, start_response):
         cid = row["cid"]
         fields = "cid, pid, quantity"
         vals = [cid, product_id, quantity]
-        # insert into cart_products (cid, pid, quantity) values (1, 1, 1);
-        sql = f"INSERT INTO cart_products ({fields}) VALUES (%s, %s, %s)"
-        c = db.cursor()
-        c.execute(sql, vals)
-        c.close()
+
+        try:
+            # CHECK to see if user already added this product
+            db.query(f"SELECT id, quantity FROM cart_products WHERE cid = {cid} AND pid = {product_id}")
+            r = db.store_result()
+            row = r.fetch_row(maxrows=1, how=1)[0]
+            cp_id = row["id"]
+            cp_quantity = row["quantity"]
+            # There should only ever be ONE row returned from above
+
+            new_quantity = quantity + cp_quantity
+
+            # IF pid already exists for this cid then UPDATE
+            sql = f"UPDATE cart_products SET quantity = {new_quantity} WHERE id = {cp_id}"
+            c = db.cursor()
+            c.execute(sql)
+            c.close()
+
+        except:
+            # IF pid does NOT yet exist for this cid then INSERT
+            # insert into cart_products (cid, pid, quantity) values (1, 1, 1);
+            sql = f"INSERT INTO cart_products ({fields}) VALUES (%s, %s, %s)"
+            c = db.cursor()
+            c.execute(sql, vals)
+            c.close()
+
         response = f"{cid} {session_id} {product_id} {quantity} {time_now}"
+
 
     ####
     elif environ['PATH_INFO'] == "/total":
@@ -90,7 +112,33 @@ def cart_api(environ, start_response):
     ####
     elif environ['PATH_INFO'] == "/list":
         #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/list
-        response = str(session_id)
+        try:
+            sub_query = f"SELECT cid FROM cart WHERE session_id = '{session_id}'"
+            #db.query(f"SELECT a.*, b.* FROM cart_products a, products b WHERE a.pid = b.pid AND a.cid = ({sub_query})")
+            db.query(f"select pid, quantity from cart_products where cid = ({sub_query})")
+            r = db.store_result()
+            rows = r.fetch_row(maxrows=100, how=1)
+            # ({'pid': 1, 'quantity': 6}, {'pid': 2, 'quantity': 4})
+        except:
+            rows = {}
+ 
+        pids = []
+        quantities = {}
+        for obj in rows:
+            p = obj['pid']
+            pids.append(p)
+            quantities[p] = obj['quantity']
+
+        pids = str(pids).strip('[').strip(']')
+
+        db.query(f"select * from products where pid in ({pids})")
+        r = db.store_result()
+        rows = r.fetch_row(maxrows=100, how=1)
+
+        y = json.dumps(rows)
+        response = str(y)
+
+        # Use valuesfrom keywords array to build a "related products" list
 
 
     else:
