@@ -16,6 +16,9 @@
 <div class="col-md-10">
   <div id="cart_contents">
   </div>
+  <div>
+  <a href="/app/products">More shopping</a>
+  </div>
 </div>
 
 <div class="col-sm-1">
@@ -41,11 +44,10 @@ function make_request_get_list(session_id) {
     var arrLen = data.length;
     for (var i = 0; i < arrLen; i++) {
       console.log(data[i]);
-      //x = data[i];
-      //console.log(x.name);
+      obj = data[i];
+      console.log(obj.name);
+      document.getElementById("cart_contents").innerHTML += obj.name + ' ' + obj.quantity + '<br/>';
     }
-
-    document.getElementById("cart_contents").innerHTML = data.session_id;
   })
 }
 
@@ -55,7 +57,7 @@ function getCartList() {
   if (session_id) {
     console.log(session_id)
     // MAKE A REQUEST TO THE NEW CART API
-    console.log("request to cart api");
+    console.log("request to cart api for list");
     make_request_get_list(session_id);
   } else {
     console.log("No session_id");

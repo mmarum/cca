@@ -121,21 +121,36 @@ def cart_api(environ, start_response):
             # ({'pid': 1, 'quantity': 6}, {'pid': 2, 'quantity': 4})
         except:
             rows = {}
+
+        #print(f'rows: {str(rows)}')
  
         pids = []
         quantities = {}
         for obj in rows:
             p = obj['pid']
+            #print(f"p: {p}")
             pids.append(p)
             quantities[p] = obj['quantity']
 
+        #print(f"quantities: {str(quantities)}")
+        #print(f'pids1: {str(pids)}')
+
         pids = str(pids).strip('[').strip(']')
+
+        #print(f'pids2: {pids}')
 
         db.query(f"select * from products where pid in ({pids})")
         r = db.store_result()
         rows = r.fetch_row(maxrows=100, how=1)
 
-        y = json.dumps(rows)
+        rows_copy = list(rows)
+        count = 0
+        for obj in rows:
+            p = obj['pid']
+            rows_copy[count]['quantity'] = quantities[p]
+            count += 1
+
+        y = json.dumps(rows_copy)
         response = str(y)
 
         # Use valuesfrom keywords array to build a "related products" list

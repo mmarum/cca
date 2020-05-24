@@ -239,7 +239,7 @@ function checkCartTotal() {
   if (session_id) {
     console.log(session_id)
     // MAKE A REQUEST TO THE NEW CART API
-    console.log("request to cart api");
+    console.log("request to cart api for total");
     make_request_get_total(session_id);
   } else {
     console.log("No session_id");
