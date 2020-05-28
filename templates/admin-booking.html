@@ -8,6 +8,7 @@
 
 {% block content %}
 <h1>Summary of Orders</h1>
+<p>(Where event dates are in the future) <a href="/app/admin/booking?view=past-events">Click here to see orders for events in the past</a></p>
 <table class="table table-striped">
 <tr class="p-3 mb-2 bg-light text-dark">
 {% for i in ["title", "event date", 

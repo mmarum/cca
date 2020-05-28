@@ -282,7 +282,7 @@ def app(environ, start_response):
                     # So that it doesn't get processed again
                     os.rename(f"orders/{f}", f"orders/loaded/{f}")
 
-            # PART-2: Select future-date orders from database for admin view
+            # PART-2: Select future-event-date orders from database for admin view
             c = db.cursor()
             c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime >= CURDATE() ORDER BY o.eid")
             allrows = c.fetchall()
