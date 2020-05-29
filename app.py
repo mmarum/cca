@@ -5,6 +5,7 @@ import re
 import base64
 import calendar
 import datetime
+import random
 
 # https://jinja.palletsprojects.com/en/2.10.x/api/
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -86,9 +87,34 @@ def app(environ, start_response):
 
     pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp"]
 
-    galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18, "string-art": 19, "pottery-lessons": 20}
+    #galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18, "string-art": 19, "pottery-lessons": 20}
+
+    #mysql -u catalystcreative_cca catalystcreative_66
+    #SELECT lower(name), id FROM piwigz_categories order by id asc;
+    galleries_dict = {
+    "acrylic-painting": 1,
+    "watercolor-painting": 2,
+    "paint-your-pet": 3,
+    "fused-glass": 4,
+    "resin-crafts": 5, # was "resin-art"
+    "fluid-art": 6,
+    "summer-art-camp": 7,
+    "commissioned-art": 8,
+    "alcohol-ink": 9,
+    "artist-guided-family-painting": 10,
+    "handbuilt-pottery": 11,
+    "leathercraft": 12,
+    "water-marbling": 13,
+    #"private-events": 14,
+    #"custom-counter-tops-tables": 15,
+    #"about-contact": 16,
+    "pottery-painting": 18,
+    "string-art": 19,
+    "pottery-lessons": 20
+    }
 
     galleries_list = list(galleries_dict.keys())
+    galleries_dict_vals = list(galleries_dict.values())
 
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
 
@@ -293,14 +319,22 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/home':
-            month = 3 # TODO: MAKE THIS DYNAMIC NOT HARD-CODED
+            month = 6 # TODO: MAKE THIS DYNAMIC NOT HARD-CODED
             year = 2020
             html_cal = make_cal(db, month, year)
             db.query(f"SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
+
+            #random_number = random.randint(1,len(galleries_dict))
+            random_number = random.choice(galleries_dict_vals)
+            g = Gallery(random_number)
+            gallery = g.get_gallery()
+            images = g.get_images()
+
             template = env.get_template("home.html")
-            response = template.render(next_event=row, calendar={"html": html_cal})
+            response = template.render(next_event=row, calendar={"html": html_cal}, 
+                gallery=gallery, images=images)
 
 
         elif environ['PATH_INFO'] == '/admin/pages':
