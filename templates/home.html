@@ -6,7 +6,13 @@
 .event_image {
   max-width: 100%;
 }
-#month1, #month2, #month3, #month4, #month5, #month6 {
+h1, h2 {
+  font-size: 20px;
+  padding 5px;
+  margin 5px;
+}
+#month1, #month2, #month3, #month4, #month5, #month6 ,
+#month7, #month8, #month9, #month10, #month11, #month12 {
   display: none;
 }
 #next_link {
@@ -42,13 +48,18 @@ th.month {
   width: 30px;
 }
 .dark_orange {
-  background-color: DarkOrange;
+  background-color: BurlyWood;
   /* opacity: 0.5; */
   margin: 10px;
+  padding: 5px 20px 5px 20px;
+  margin-bottom: .5rem;
+  font-weight: 500;
+  line-height: 1.2;
+  border-radius: 5px;
 }
 .dark_orange a {
   color: White;
-  font-size: 120%;
+  font-size: 20px;
 }
 mark {
   background-color: Yellow;
@@ -59,10 +70,25 @@ mark {
 }
 .honey_dew {
   background-color: HoneyDew;
+  padding: 10px;
 }
 @media only screen and (min-width: 601px) {
   .img250 {
     width: 250px;
+  }
+  .home-gallery {
+    max-width: 175px;
+  }
+}
+@media only screen and (max-width: 600px) {
+  .home-gallery {
+    padding-bottom: 10px;
+  }
+  .dark_orange {
+    padding: 0px;
+  }
+  .dark_orange a {
+    font-size: 16px;
   }
 }
 </style>
@@ -75,13 +101,34 @@ mark {
   <div class="col-sm-1">
   </div>
 
-  <div class="col-md-5 honey_dew">
-<h1>Art Studio Arlington TX</h1>
-<h2 class="gold">Mini Private Events</h2>
-We are excited to announce a new offering of Mini Private Events. These events are for groups from 3 to 15 people. The studio will be <mark>cleaned, prepared and private to your group only</mark>. You may select from 4 time slots. Most of our activities to are designed to be 2 hours or less. You may choose a single instructor led activity or multiple DIY activities. You may <mark>schedule your event by calling the studio @ 972 446-0444</mark>. Please keep in mind some activities require 12 hours prep time. Remember, you are welcome to bring food and beverages to your event. (Time Slots: 10am, 1pm, 4pm, 7pm, daily)
+  <div class="col-sm-5">
+    <h1>Art Studio Arlington Texas</h1>
   </div>
 
-  <div class="col-md-5 honey_dew">
+  <div class="col-sm-5">
+    <span class="dark_orange">
+      <a href="/calendar.html#95">Gift Certificates Available for Purchase</a>
+    </span>
+  </div>
+
+  <div class="col-sm-1">
+  </div>
+
+</div>
+
+
+<div class="row top-buffer">
+
+  <div class="col-sm-1">
+  </div>
+
+  <div class="col-md-3 honey_dew">
+    <h2>Mini Private Events</h2>
+We are excited to announce a new offering of <a href="/private-events.html">Mini Private Events</a>. These events are for groups from 3 to 15 people. The studio will be <mark>cleaned, prepared and private to your group only</mark>. You may select from 4 time slots. 
+
+Most of our activities to are designed to be 2 hours or less. You may choose a single instructor led activity or multiple DIY activities. You may <mark>schedule your event by calling the studio @ 972 446-0444</mark>. Please keep in mind some activities require 12 hours prep time. Remember, you are welcome to bring food and beverages to your event. (Time Slots: 10am, 1pm, 4pm, 7pm, daily)
+
+<!-- 
 <h3>Available activities:</h3>
 <ul>
 <li>Acrylic Painting 16 x 20 inch canvas - $25</li>
@@ -96,64 +143,39 @@ We are excited to announce a new offering of Mini Private Events. These events a
 <li>Rock Mandala Painting - $25</li>
 <li>Water Marbling on Silk Scarf - $43 (8 person minimum)</li>
 </ul>
+-->
+
   </div>
 
-  <div class="col-sm-2">
-  </div>
+  <div class="col-sm-4">
 
-</div>
-
-<div class="row top-buffer">
-
-  <div class="col-sm-1">
-  </div>
-
-  <div class="col-md-3">
-    <img src="/img/string-texas.jpg" class="img250"><br/>
-    <h5><a href="/string-art.html">Create and color an image with string art.</a></h5>
-  </div>
-
-  <div class="col-md-3">
-    <img src="/img/togokits.jpg" class="img250">
-  </div>
-
-  <div class="col-md-3">
-    <img src="/img/delivery.jpg" class="img250">
-    <h5>To-go art kits for pottery painting and string art. Delivery is available for $15 up to 20 mi.</h5>
-  </div>
-
-  <div class="col-sm-2">
-  </div>
-
-</div>
-
-
-<div class="row event_row top-buffer date_2020-06-22" id="eid_41">
-
-    <div class="col-sm-1">
-    </div>
-
-    <div class="col-md-2">
-      <a href="/calendar.html#41">
-        <img alt="facebook_1583975780068_3462882932646711.jpg" src="/img/small/facebook_1583975780068_3462882932646711.jpg" class="event_image">
-      </a>
-    </div>
-    <div class="col-lg-8">
-      <a href="/calendar.html#41">
-        <h2>Art Summer Camp Arlington Texas</h2>
-        <h3>Session 1 (June 22-26) or Session 2 (July 13-17)</h3>
-      </a>
+      <h2>Art Summer Camp Arlington Texas</h2>
+      <a href="/calendar.html#41">Session 1: June 22-26 or<br/>Session 2: July 13-17</a>
       <div>
         Each day campers will work on a daily project and a portion of their week-long project. We will work on 2 or more different art and craft projects daily, including: Watercolor Painting, Fluid Art, Handbuilt Pottery, Alcohol Ink, Cut-Out Collage - Large format, Water Marbling, Rock mandalas, String Art, Finger knitting, Paint Your Own Pottery, Printmaking and Acrylic Painting
         <a href="/registration/">Enroll / Buy tickets</a>
       </div>
-    </div>
+      <a href="/calendar.html#41">
+        <img src="/img/cca-building.png" class="event_image">
+      </a>
 
-    <div class="col-sm-1">
-    </div>
+  </div>
+
+  <div class="col-sm-3">
+
+    <h5>To-go art kits for pottery painting and string art.</h5>
+    <img src="/img/togokits.jpg" class="img250">
+    <h5><a href="/string-art.html">Create and color an image with string art.</a></h5>
+    <img src="/img/string-texas.jpg" class="img250"><br/>
+    <!-- <img src="/img/delivery.jpg" class="img250"> -->
+    <p>Delivery is available for $15 up to 20 mi.</p>
+
+  </div>
+
+  <div class="col-sm-1">
+  </div>
 
 </div>
-
 
 <div class="row top-buffer">
 
@@ -190,13 +212,9 @@ We are excited to announce a new offering of Mini Private Events. These events a
 
   <div class="col-md-3">
 
-    <div class="text-center dark_orange">
-      <a href="/calendar.html#95">Gift Certificates <br/> Available for Purchase</a>
-    </div>
-
     <div id="paper_calendar"></div>
-    <img src="/img/cca-coffee.jpg" class="img250">
-    <!-- {{ calendar.html|safe }} -->
+    <!-- <img src="/img/cca-coffee.jpg" class="img250"> -->
+    {{ calendar.html|safe }}
   </div>
 
   <div class="col-sm-1">
@@ -208,21 +226,30 @@ We are excited to announce a new offering of Mini Private Events. These events a
   <div class="col-sm-1">
     <a href="#" onclick="that_way(); return false;" style="font-size: 200%">«</a>
   </div>
+{% for i in images %}
+  {% if loop.index <= 5 %}
   <div class="col-sm-2">
-    <img id="slide_0" src="/img/small/artist-guided-1.jpg" class="img-fluid"/>
+  <img id="slide_{{ (loop.index)-1 }}" src="/gallery/{{ i[5]|replace('./', '')|replace('.jpg', '_small.jpg')|replace('.png', '_small.png') }}" class="home-gallery"/>
+  </div>
+  {% endif %}
+{% endfor %}
+  <!-- 
+  <div class="col-sm-2">
+    <img id="slide_0" src="/img/small/artist-guided-1.jpg" class="home-gallery"/>
   </div>
   <div class="col-sm-2">
-    <img id="slide_1" src="/img/small/artist-guided-2.jpg" class="img-fluid"/>
+    <img id="slide_1" src="/img/small/artist-guided-2.jpg" class="home-gallery"/>
   </div>
   <div class="col-sm-2">
-    <img id="slide_2" src="/img/small/artist-guided-3.jpg" class="img-fluid"/>
+    <img id="slide_2" src="/img/small/artist-guided-3.jpg" class="home-gallery"/>
   </div>
   <div class="col-sm-2">
-    <img id="slide_3" src="/img/small/artist-guided-4.jpg" class="img-fluid"/>
+    <img id="slide_3" src="/img/small/artist-guided-4.jpg" class="home-gallery"/>
   </div>
   <div class="col-sm-2">
-    <img id="slide_4" src="/img/small/artist-guided-5.jpg" class="img-fluid"/>
+    <img id="slide_4" src="/img/small/artist-guided-5.jpg" class="home-gallery"/>
   </div>
+  -->
   <div class="col-sm-1">
     <a href="#" onclick="this_way(); return false;" style="font-size: 200%">»</a>
   </div>
@@ -246,6 +273,7 @@ We are excited to announce a new offering of Mini Private Events. These events a
 -->
 
 <script>
+/*
 var slide_two = [
   "/gallery/upload/2020/02/15/20200215203413-373c8fd7_small.jpg",
   "/gallery/upload/2020/02/15/20200215203415-61551fd7_small.jpg",
@@ -253,6 +281,15 @@ var slide_two = [
   "/gallery/upload/2020/02/15/20200215203416-11d835c0_small.jpg",
   "/gallery/upload/2020/02/15/20200215203422-a147658f_small.jpg"
 ]
+*/
+var slide_two = [
+{% for i in images %}
+  {% if loop.index > 5 %}
+  "/gallery/{{ i[5]|replace('./', '')|replace('.jpg', '_small.jpg')|replace('.png', '_small.png') }}"{{ "," if not loop.last }}
+  {% endif %}
+{% endfor %}
+]
+
 function that_way() {
   this_way();
 }
@@ -279,15 +316,14 @@ function showMonth(show_month) {
     document.getElementById("next_link").style.display = "none";
   }
 }
-showMonth(3); // TODO: MAKE THIS DYNAMIC NOT HARD-CODED
+showMonth(5); // TODO: MAKE THIS DYNAMIC NOT HARD-CODED
 </script>
 
 <!--
-{{ gallery|safe }}
+{{ gallery.name|safe }}
 
-{% for i in images %}
-  /gallery/{{ i[5]|replace('./', '/')|replace('.jpg', '_small.jpg')|replace('.png', '_small.png') }}
-{% endfor %}
+{{ gallery.comment|safe }}
+
 -->
 
 {% endblock %}

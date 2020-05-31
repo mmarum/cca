@@ -319,7 +319,7 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/home':
-            month = 6 # TODO: MAKE THIS DYNAMIC NOT HARD-CODED
+            month = 5 # TODO: MAKE THIS DYNAMIC NOT HARD-CODED
             year = 2020
             html_cal = make_cal(db, month, year)
             db.query(f"SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
