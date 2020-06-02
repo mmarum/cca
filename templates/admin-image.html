@@ -3,6 +3,16 @@
 
 {% block html_head %}
 <style>
+.green {
+  color: Green;
+  background-color: #EEE;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+#submit{
+  margin-top: 10px;
+}
 </style>
 <!-- https://jqueryui.com/datepicker/ -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -16,11 +26,21 @@ $( function() {
 {% endblock %}
 
 {% block content %}
+<div class="green">Your data has been successfully added/updated</div>
 {% if event_data %}
   {% for k, v in event_data.items() %}
     <div>{{ k }}: {{ v }}</div>
   {% endfor %}
 {% endif %}
+
+<p style="padding-top: 10px;">
+<button type="button" class="btn btn-primary" onclick="javascript:location.href='/app/admin/events/list'">Finished adding/editing event. Go back to list</button>
+</p>
+
+<hr>
+
+<p>OR add/edit the event image here:</p>
+
 <form action="/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in image_form %}
   {% if field.name != "eid" and field.name != "submit" %}
