@@ -354,6 +354,15 @@ def app(environ, start_response):
                 response = template.render(pages=pages)
 
 
+        elif environ['PATH_INFO'] == '/admin/registration':
+            c = db.cursor()
+            c.execute("SELECT * FROM registration")
+            allrows = c.fetchall()
+            c.close()
+            template = env.get_template("admin-registration.html")
+            response = template.render(allrows=allrows)
+
+
         elif environ['PATH_INFO'] == '/summer-camp-registration':
             template = env.get_template("summer-camp-registration.html")
             form = RegistrationForm()

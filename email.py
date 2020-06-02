@@ -34,31 +34,32 @@ def email(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/plain')])
 
     SENDGRID_API_KEY = json.loads(read_file("../app/data/passwords.json"))["SENDGRID_API_KEY"]
-    print SENDGRID_API_KEY
+    #print SENDGRID_API_KEY
 
     if environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/submit":
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-        print('post_input')
-        print str(post_input)
+        #print('post_input')
+        #print str(post_input)
         form_data = json.loads(post_input)
-        print('form_data')
-        print str(form_data)
+        #print('form_data')
+        #print str(form_data)
 
         # TODO: email pattern verification
 
         subject = str(form_data['subject'])
-        print subject
+        #print subject
         content = str(form_data['content'])
         content = content.replace('%20', ' ')
-        print content
+        #print content
 
-        if "Contact form inquiry" in subject and ("http" in content or ".com" in content):
+        if "Contact form inquiry" in subject and ("http" in content or "www" in content):
             raise ValueError('Link found in contact form submission. Stopping process.')
 
         message = Mail(
             from_email="cca-robot@catalystcreativearts.com",
-            to_emails="mmarum@gmail.com,info@catalystcreativearts.com",
+            #to_emails="mmarum@gmail.com,info@catalystcreativearts.com",
+            to_emails="mmarum@gmail.com,j.marumusa@gmail.com",
             subject=subject,
             html_content=content)
 

@@ -27,7 +27,7 @@
 <div class="col-sm-8">
   {{ event_data.edatetime.strftime('%a %b %d at %I:%M %p') }} Duration: {{ event_data.duration }} hrs
   <h1>{{ event_data.title }}</h1>
-  <div>${{ event_data.price }} per person</div>
+  <div>${{ event_data.price }}</div>
   <!-- <div>Max: {{ event_data.elimit }} people <mark><span id="seats_remaining">{{ event_data.elimit }}</span> seats remaining.</mark></div> -->
   <div>Where: {{ event_data.location }}</div>
   <p>{{ event_data.description }}</p>

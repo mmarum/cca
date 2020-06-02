@@ -69,7 +69,7 @@ h1 {
 
       {% if event.price_text and "," in event.price_text %}
       {% else %}
-        <div>${{ event.price }} per person</div>
+        <div>${{ event.price }}</div>
       {% endif %}
 
       <!--
@@ -307,11 +307,12 @@ function quant(eid) {
   var q = document.getElementById("quantity_"+eid);
 
   // xxx
-  if (events_object[eid]["price_text"].match(/,/)) {
+  if ( (events_object[eid]["price_text"]) && (events_object[eid]["price_text"].match(/,/)) ) {
     quantity = q.value;
   } else {
     quantity = q.options[q.selectedIndex].value;
   }
+
   console.log('yo: '+quantity);
 
   document.getElementById("paypal-button-container").style.display = "block";
