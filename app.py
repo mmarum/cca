@@ -35,6 +35,7 @@ from gallery import Gallery
 from writer import scrape_and_write
 import time
 
+#from datetime import date
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -84,6 +85,8 @@ def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
 
     this_now = datetime.datetime.now()
+
+    #today = date.today() #today.year, today.month, today.day
 
     pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp"]
 
@@ -184,6 +187,7 @@ def app(environ, start_response):
                 events_object[eid]["date"] = int(row["edatetime"].timestamp())
                 events_object[eid]["title"] = row["title"]
                 events_object[eid]["price"] = row["price"]
+                events_object[eid]["price_text"] = row["price_text"]
 
             events_object = json.dumps(events_object)
 
@@ -319,8 +323,8 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/home':
-            month = 5 # TODO: MAKE THIS DYNAMIC NOT HARD-CODED
-            year = 2020
+            month = 6 #today.month
+            year = 2020 #today.year
             html_cal = make_cal(db, month, year)
             db.query(f"SELECT * FROM events WHERE edatetime > CURDATE() ORDER BY edatetime limit 1")
             r = db.store_result()
@@ -408,7 +412,7 @@ def app(environ, start_response):
         write_file(f"orders/{event_id}.json", json.dumps(orders, indent=4))
         response = "200"
 
-        scrape_and_write("calendar")
+        #scrape_and_write("calendar")
 
 
     ####
@@ -482,7 +486,7 @@ def app(environ, start_response):
 
         response = f'<meta http-equiv="refresh" content="0; url=/app/admin/{redirect_path}/list" />'
 
-        scrape_and_write("calendar")
+        #scrape_and_write("calendar")
         #time.sleep(2)
         #scrape_and_write("home")
 
@@ -715,7 +719,7 @@ def app(environ, start_response):
         response = template.render(event_data=data_object, image_form=image_form,
             sql={"sql":sql}, eid={"eid":eid}, sql2={"sql2":sql2})
 
-        scrape_and_write("calendar")
+        #scrape_and_write("calendar")
         #time.sleep(2)
         #scrape_and_write("home")
 

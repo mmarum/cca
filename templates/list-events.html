@@ -66,8 +66,23 @@ h1 {
       <a href="/calendar.html#{{ event.eid }}">
         <h3>{{ event.title }}</h3>
       </a>
-      <div>${{ event.price }} per person</div>
-      <!-- <div>Max: {{ event.elimit }} people. <mark><span id="seats_remaining_{{ event.eid }}">{{ event.elimit }}</span> seats remaining</mark></div> -->
+
+      {% if event.price_text and "," in event.price_text %}
+      {% else %}
+        <div>${{ event.price }} per person</div>
+      {% endif %}
+
+      <!--
+        <div>
+          Max: {{ event.elimit }} people.
+          <mark>
+            <span id="seats_remaining_{{ event.eid }}"> 
+              {{ event.elimit }}
+            </span> seats remaining
+          </mark>
+        </div>
+      -->
+
       <div>{{ event.location }}</div>
       <div id="book_now_{{ event.eid }}"><a href="/calendar.html#{{ event.eid }}">Book Now</a></div>
 
@@ -91,20 +106,43 @@ h1 {
       </div>
 
       <form class="quantity_form" id="quantity_form_{{ event.eid }}">
-      <div class="form-group">
-      <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
-      <option value="">Select number of guests</option>
-      {% if orders_count[event.eid] %}
-        {% set x=event.elimit|int - orders_count[event.eid] %}
-      {% else %}
-        {% set x=event.elimit|int %}
+
+      {% if event.price_text %}
+        {% if "," in event.price_text %}
+          <div class="form-group">
+          <select name="price_variation" id="event_variation" onchange="eventVariation({{ event.eid }}, this.options[this.selectedIndex].value);" class="form-control">
+          <option value="">Select options</option>
+          {% set prc = event.price_text.split(',') %}
+          {% for p in prc %}
+            {% set variation_name = p.split('@')[0] %}
+            {% set variation_price = p.split('@')[1] %}
+            <option value="{{ variation_price }}">{{ variation_name }} {{ variation_price }}</option>
+          {% endfor %}
+          </select>
+          </div>
+        {% endif %}
       {% endif %}
-      {% for n in range(1, x+1) -%}
-        <option value="{{ n }}">{{ n }}</option>
-      {%- endfor %}
-      </select>
-      </div>
+
+      {% if event.elimit and event.elimit > 1 %}
+        <div class="form-group">
+        <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
+        <option value="">Select number of guests</option>
+        {% if orders_count[event.eid] %}
+          {% set x=event.elimit|int - orders_count[event.eid] %}
+        {% else %}
+          {% set x=event.elimit|int %}
+        {% endif %}
+        {% for n in range(1, x+1) -%}
+          <option value="{{ n }}">{{ n }}</option>
+        {%- endfor %}
+        </select>
+        </div>
+      {% else %}
+        <input type="hidden" name="quantity" value="1" id="quantity_{{ event.eid }}"/>
+      {% endif %}
+
       </form>
+
       <div class="cost_container" id="cost_container_{{ event.eid }}">
         Total: $<span class="cost" id="cost_{{ event.eid }}">0</span>. Click Paypal link below to complete process.
       </div>
@@ -136,6 +174,13 @@ h1 {
 
 <script>
 events_object = {{ events_object|safe }}
+
+function eventVariation(eid, val) {
+  val = val.replace('\$', '');
+  document.getElementById("state_price").value = val;
+  console.log(eid + " " +  val);
+  quant(eid);
+}
 
 function setEventMeta(eid) {
   document.getElementById("state_eid").value = eid;
@@ -222,12 +267,13 @@ function checkTime(event_date_time) {
   //console.log('n: ' + n + ' nn: ' + nn);
   //console.log('time until event: ' + (d - n));
   //console.log('time until event: ' + dhm(d - n));
-  if (d - n > 60*60*6*1000) { // 60*60*24*1000
-    //console.log("Not within 24h window. OK to book.");
+  var event_start_padding = 4; // hours
+  if (d - n > 60*60* event_start_padding *1000) {
+    //console.log("Not within 4h window. OK to book.");
   } else {
-    //console.log("IS within 24h window. HIDE booking option.");
+    //console.log("IS within 4h window. HIDE booking option.");
     document.getElementById("quantity_form_"+eid).style.display = "none";
-    var check_time_msg = "Event occurs within 6 hours. Call to see if this event is still available.";
+    var check_time_msg = "Event occurs within 4 hours. Call to see if this event is still available.";
     document.getElementById("check_time_"+eid).innerHTML = check_time_msg;
     document.getElementById("check_time_"+eid).style.display = "block";
     document.getElementById("book_now_"+eid).style.display = "none";
@@ -259,7 +305,15 @@ function quant(eid) {
   var quantity = 1;
   var price = getEventMeta("price");
   var q = document.getElementById("quantity_"+eid);
-  quantity = q.options[q.selectedIndex].value;
+
+  // xxx
+  if (events_object[eid]["price_text"].match(/,/)) {
+    quantity = q.value;
+  } else {
+    quantity = q.options[q.selectedIndex].value;
+  }
+  console.log('yo: '+quantity);
+
   document.getElementById("paypal-button-container").style.display = "block";
   if (getEventMeta("title").match(/scarf/gi)) {
     document.getElementById("special_"+eid).style.display = "block";

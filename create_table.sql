@@ -7,7 +7,8 @@ price INT NOT NULL,
 elimit INT,
 location VARCHAR (200) NOT NULL,
 image VARCHAR (200),
-description VARCHAR (1000)
+description VARCHAR (1000),
+price_text VARCHAR (500)
 );
 
 CREATE TABLE orders (
@@ -21,6 +22,7 @@ last_name VARCHAR (200),
 quantity INT NOT NULL,
 cost VARCHAR (20) NOT NULL,
 paid VARCHAR (20) NOT NULL,
+guest_list VARCHAR(500),
 FOREIGN KEY (eid) REFERENCES events(eid)
 );
 

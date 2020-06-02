@@ -14,6 +14,7 @@ class EventsForm(Form):
     location = StringField("Location", description="Location")
     image = HiddenField("Image Path", description="Image Path")
     description = TextAreaField("Description", description="Description")
+    price_text = StringField("Price text", description="Price text")
     submit = SubmitField("Next", description="Next")
 
 class ImageForm(Form):

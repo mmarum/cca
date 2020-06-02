@@ -72,6 +72,13 @@ mark {
   background-color: HoneyDew;
   padding: 10px;
 }
+#home_gallery_backward {
+  display: none;
+  font-size: 200%;
+}
+#home_gallery_forward {
+  font-size: 200%;
+}
 @media only screen and (min-width: 601px) {
   .img250 {
     width: 250px;
@@ -223,84 +230,67 @@ Most of our activities to are designed to be 2 hours or less. You may choose a s
 </div>
 
 <div class="row top-buffer">
+  <div class="col-sm-1" style="text-align: right;">
+    <a href="#" onclick="slide_gallery('backward'); return false;" id="home_gallery_backward">«</a>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_0" src="" class="home-gallery"/>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_1" src="" class="home-gallery"/>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_2" src="" class="home-gallery"/>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_3" src="" class="home-gallery"/>
+  </div>
+  <div class="col-sm-2">
+    <img id="slide_4" src="" class="home-gallery"/>
+  </div>
   <div class="col-sm-1">
-    <a href="#" onclick="that_way(); return false;" style="font-size: 200%">«</a>
-  </div>
-{% for i in images %}
-  {% if loop.index <= 5 %}
-  <div class="col-sm-2">
-  <img id="slide_{{ (loop.index)-1 }}" src="/gallery/{{ i[5]|replace('./', '')|replace('.jpg', '_small.jpg')|replace('.png', '_small.png') }}" class="home-gallery"/>
-  </div>
-  {% endif %}
-{% endfor %}
-  <!-- 
-  <div class="col-sm-2">
-    <img id="slide_0" src="/img/small/artist-guided-1.jpg" class="home-gallery"/>
-  </div>
-  <div class="col-sm-2">
-    <img id="slide_1" src="/img/small/artist-guided-2.jpg" class="home-gallery"/>
-  </div>
-  <div class="col-sm-2">
-    <img id="slide_2" src="/img/small/artist-guided-3.jpg" class="home-gallery"/>
-  </div>
-  <div class="col-sm-2">
-    <img id="slide_3" src="/img/small/artist-guided-4.jpg" class="home-gallery"/>
-  </div>
-  <div class="col-sm-2">
-    <img id="slide_4" src="/img/small/artist-guided-5.jpg" class="home-gallery"/>
-  </div>
-  -->
-  <div class="col-sm-1">
-    <a href="#" onclick="this_way(); return false;" style="font-size: 200%">»</a>
+    <a href="#" onclick="slide_gallery('forward'); return false;" id="home_gallery_forward">»</a>
   </div>
 </div>
 
-<!--
-<div class="row top-buffer">
-  <div class="col-sm-2">
-  </div>
-  <div class="col-sm-8 text-center">
-    <div style="float: left">
-      <a href="" style="font-size: 200%">«</a>
-    </div>
-    <div style="float: right">
-      <a href="" style="font-size: 200%">»</a>
-    </div>
-  </div>
-  <div class="col-sm-2">
+<div class="row">
+  <div class="col-sm-12" style="text-align: center;">
+    Sample activity: <a href="/{{ gallery.name|replace(' ', '-')|lower }}.html">{{ gallery.name|safe }}</a>
+    <!-- {{ gallery.comment|safe }} -->
   </div>
 </div>
--->
 
 <script>
-/*
-var slide_two = [
-  "/gallery/upload/2020/02/15/20200215203413-373c8fd7_small.jpg",
-  "/gallery/upload/2020/02/15/20200215203415-61551fd7_small.jpg",
-  "/gallery/upload/2020/02/15/20200215203415-102aea40_small.jpg",
-  "/gallery/upload/2020/02/15/20200215203416-11d835c0_small.jpg",
-  "/gallery/upload/2020/02/15/20200215203422-a147658f_small.jpg"
-]
-*/
-var slide_two = [
+var home_gallery_image_list = [
 {% for i in images %}
-  {% if loop.index > 5 %}
   "/gallery/{{ i[5]|replace('./', '')|replace('.jpg', '_small.jpg')|replace('.png', '_small.png') }}"{{ "," if not loop.last }}
-  {% endif %}
 {% endfor %}
 ]
 
-function that_way() {
-  this_way();
-}
-
-function this_way() {
+function slide_gallery(direction) {
+  if (direction == "forward") {
+    page += 1;
+  } else if (direction == "backward") {
+    page -= 1;
+  } else {
+    page = 1;
+  }
+  console.log('page: '+page);
+  if (page == 1) {
+    backward_display = "none";
+  } else {
+    backward_display = "inline";
+  }
+  document.getElementById("home_gallery_backward").style.display = backward_display;
+  var start = (page - 1) * 5;
+  console.log('start: '+start);
+  var n = start;
   for (var i = 0; i < 5; i++) {
-    console.log("slide_"+i);
-    console.log(slide_two[i]);
-    document.getElementById("slide_"+i).src = slide_two[i];
+    document.getElementById("slide_"+i).src = home_gallery_image_list[n];
+    n++;
   }
 }
+slide_gallery('start');
 
 var d = new Date();
 var this_month = d.getMonth()+1;
@@ -316,14 +306,7 @@ function showMonth(show_month) {
     document.getElementById("next_link").style.display = "none";
   }
 }
-showMonth(5); // TODO: MAKE THIS DYNAMIC NOT HARD-CODED
+showMonth(this_month);
 </script>
-
-<!--
-{{ gallery.name|safe }}
-
-{{ gallery.comment|safe }}
-
--->
 
 {% endblock %}
