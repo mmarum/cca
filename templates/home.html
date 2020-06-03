@@ -79,6 +79,13 @@ mark {
 #home_gallery_forward {
   font-size: 200%;
 }
+.home_sample_activity {
+  text-align: center;
+  /*
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  */
+}
 @media only screen and (min-width: 601px) {
   .img250 {
     width: 250px;
@@ -254,7 +261,7 @@ Most of our activities to are designed to be 2 hours or less. You may choose a s
 </div>
 
 <div class="row">
-  <div class="col-sm-12" style="text-align: center;">
+  <div class="col-sm-12 home_sample_activity">
     Sample activity: <a href="/{{ gallery.name|replace(' ', '-')|lower }}.html">{{ gallery.name|safe }}</a>
     <!-- {{ gallery.comment|safe }} -->
   </div>

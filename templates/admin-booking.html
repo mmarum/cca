@@ -3,6 +3,11 @@
 
 {% block html_head %}
 <style>
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1350px;
+  }
+}
 </style>
 {% endblock %}
 
@@ -13,7 +18,7 @@
 <tr class="p-3 mb-2 bg-light text-dark">
 {% for i in ["title", "event date", 
   "order id", "event id", "create time", "email", 
-  "first name", "last name", "quantity", "total", "paid"] %}
+  "first name", "last name", "quantity", "total", "paid", "guest_list"] %}
 
   {# "limit", "id", #}
 

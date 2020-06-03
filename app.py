@@ -262,7 +262,18 @@ def app(environ, start_response):
                 template = env.get_template("main.html")
                 response = template.render(path_info=f"{path_info} gallery does not yet exist")
 
+
+        ####
         elif environ['PATH_INFO'] == '/admin/booking':
+
+            view = ""
+            gtlt = ">=" # default
+
+            if environ['QUERY_STRING'] and "view" in environ['QUERY_STRING']:
+                view = environ['QUERY_STRING'].split("=")[1]
+
+                if view == "past-events":
+                    gtlt = "<"
 
             # TODO: This first part should be call-able separately
             # And should be called about once per minute 
@@ -274,7 +285,7 @@ def app(environ, start_response):
             # List, sort, then read all files in the orders/ folder
             files = [f for f in listdir("orders/") if isfile(join("orders/", f))]
 
-            if len(files) > 0:
+            if len(files) > 0 and view != "past-events":
                 # PART-1: Load new orders into database:
                 # Reminder: Orders data files are saved as event_eid_value.json
                 for f in files:
@@ -314,7 +325,7 @@ def app(environ, start_response):
 
             # PART-2: Select future-event-date orders from database for admin view
             c = db.cursor()
-            c.execute("SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime >= CURDATE() ORDER BY o.eid")
+            c.execute(f"SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime {gtlt} CURDATE() ORDER BY e.edatetime")
             allrows = c.fetchall()
             c.close()
 
