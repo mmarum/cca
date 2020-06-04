@@ -11,6 +11,10 @@ h1, h2 {
   padding 5px;
   margin 5px;
 }
+.text_align_right {
+  text-align: right;
+  background-color: HoneyDew;
+}
 #month1, #month2, #month3, #month4, #month5, #month6 ,
 #month7, #month8, #month9, #month10, #month11, #month12 {
   display: none;
@@ -93,6 +97,11 @@ mark {
   .home-gallery {
     max-width: 175px;
   }
+  .vertical_text {
+    padding: 10px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
 }
 @media only screen and (max-width: 600px) {
   .home-gallery {
@@ -110,7 +119,7 @@ mark {
 
 {% block content %}
 
-<div class="row top-buffer">
+<div class="row" style="padding-top: 15px;">
 
   <div class="col-sm-1">
   </div>
@@ -191,7 +200,25 @@ Most of our activities to are designed to be 2 hours or less. You may choose a s
 
 </div>
 
+
+
 <div class="row top-buffer">
+
+  <div class="col-sm-1">
+  </div>
+
+  <div class="col-md-10">
+  UP NEXT
+  </div>
+
+  <div class="col-sm-1">
+  </div>
+
+</div>
+
+
+
+<div class="row">
 
   <div class="col-sm-1">
   </div>
@@ -225,9 +252,7 @@ Most of our activities to are designed to be 2 hours or less. You may choose a s
   </div>
 
   <div class="col-md-3">
-
     <div id="paper_calendar"></div>
-    <!-- <img src="/img/cca-coffee.jpg" class="img250"> -->
     {{ calendar.html|safe }}
   </div>
 
@@ -235,6 +260,52 @@ Most of our activities to are designed to be 2 hours or less. You may choose a s
   </div>
 
 </div>
+
+{% if pinned_events %}
+
+  {% for event in pinned_events %}
+
+  <div class="row top-buffer">
+
+  <div class="col-sm-1">
+  </div>
+
+  <div class="col-sm-1 text_align_right">
+  {% if loop.index == 1 %}
+    <span class="vertical_text">
+      FEATURED
+    </span>
+  {% endif %}
+  </div>
+
+  <div class="col-md-3">
+    <a href="/calendar.html#{{ event.eid }}" class="event_link">
+      <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="logo"/>
+    </a>
+  </div>
+
+  <div class="col-md-5">
+    {% if event.eid != 95 %}
+      <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h4>
+    {% endif %}
+    <a href="/calendar.html#{{ event.eid }}" class="event_link">
+      <h3>{{ event.title }}</h3>
+    </a>
+    <div>
+    {% set event_desc = event.description.split(' ') %}
+    {% for e in event_desc -%}{% if loop.index < 30 %}{{ e }} {% endif %}{%- endfor %}
+    ... <a href="/calendar.html#{{ event.eid }}" class="event_link">Read More</a>
+    </div>
+  </div>
+
+  <div class="col-sm-2">
+  </div>
+
+  </div>
+
+  {% endfor %}
+
+{% endif %}
 
 <div class="row top-buffer">
   <div class="col-sm-1" style="text-align: right;">

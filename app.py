@@ -68,7 +68,7 @@ def make_cal(db, month, year):
         one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
         c = db.cursor()
 
-        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME()")
+        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() and (pinned <> 'invisible' or pinned is null)")
         allrows = c.fetchall()
         c.close()
         zm = "0"+str(m) if len(str(m)) == 1 else m
@@ -163,7 +163,7 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/list/events' or environ['PATH_INFO'] == '/calendar':
 
-            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() ORDER BY edatetime")
+            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (pinned <> 'invisible' or pinned is null) ORDER BY edatetime")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
@@ -334,13 +334,20 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/home':
+            # UP-NEXT EVENT
             month = 6 #today.month
             year = 2020 #today.year
             html_cal = make_cal(db, month, year)
-            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() ORDER BY edatetime limit 1")
+            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and (pinned <> 'invisible' or pinned is null) ORDER BY edatetime limit 1")
             r = db.store_result()
-            row = r.fetch_row(maxrows=1, how=1)[0]
+            next_event = r.fetch_row(maxrows=1, how=1)[0]
 
+            # FEATURED / PINNED EVENTS
+            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and pinned = 'home' ORDER BY edatetime limit 10")
+            r = db.store_result()
+            pinned_events = r.fetch_row(maxrows=10, how=1)
+
+            # GALLERY / SLIDESHOW
             #random_number = random.randint(1,len(galleries_dict))
             random_number = random.choice(galleries_dict_vals)
             g = Gallery(random_number)
@@ -348,8 +355,8 @@ def app(environ, start_response):
             images = g.get_images()
 
             template = env.get_template("home.html")
-            response = template.render(next_event=row, calendar={"html": html_cal}, 
-                gallery=gallery, images=images)
+            response = template.render(next_event=next_event, calendar={"html": html_cal}, 
+                pinned_events=pinned_events, gallery=gallery, images=images)
 
 
         elif environ['PATH_INFO'] == '/admin/pages':

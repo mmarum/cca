@@ -8,7 +8,8 @@ elimit INT,
 location VARCHAR (200) NOT NULL,
 image VARCHAR (200),
 description VARCHAR (1000),
-price_text VARCHAR (500)
+price_text VARCHAR (500),
+pinned VARCHAR (200)
 );
 
 CREATE TABLE orders (

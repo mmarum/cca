@@ -28,9 +28,9 @@
 <title>{% block title %}{% endblock %}</title>
 
 <script>
-if (location.protocol !== 'https:') {
-  location.replace(`https:${location.href.substring(location.protocol.length)}`);
-}
+//if (location.protocol !== 'https:') {
+//  location.replace(`https:${location.href.substring(location.protocol.length)}`);
+//}
 </script>
 
 {% block html_head %}{% endblock %}
@@ -46,7 +46,7 @@ var browser_size = {
 .top-buffer { 
   padding: 10px 0 10px 0;
   margin: 10px 0 10px 0;
-  border-bottom: 1px dashed LightGray;
+  border-top: 1px dashed LightGray;
 }
 table {
   width: 100%;
@@ -148,7 +148,7 @@ div#burger div {
   </div>
   <div class="col-10" id="logo_container">
     <center>
-    <a href="/home.html"><img src="/img/logo.png" class="logo"/></a>
+    <a href="/"><img src="/img/logo.png" class="logo"/></a>
     </center>
   </div>
 </div>

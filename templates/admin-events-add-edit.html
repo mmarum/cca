@@ -61,7 +61,11 @@ function appendTime() {
 {% if not form.eid.data %}
   <script>
   {% for field in form %}
-    document.getElementById("{{ field.name }}").placeholder = "{{ field.name }}";
+    {% if field.name == "price_text" or field.name == "pinned" %}
+      document.getElementById("{{ field.name }}").placeholder = "{{ field.description }}";
+    {% else %}
+      document.getElementById("{{ field.name }}").placeholder = "{{ field.name }}";
+    {% endif %}
   {% endfor %}
 {% endif %}
 </script>
