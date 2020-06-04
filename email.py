@@ -7,6 +7,8 @@ import json
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
+#import urllib
+
 #python2.7.16
 #sendgrid
 #requests
@@ -50,7 +52,9 @@ def email(environ, start_response):
         subject = str(form_data['subject'])
         #print subject
         content = str(form_data['content'])
+
         content = content.replace('%20', ' ')
+        #content = urllib.unquote(content).decode('utf8')
         #print content
 
         if "Contact form inquiry" in subject and ("http" in content or "www" in content):
@@ -60,6 +64,7 @@ def email(environ, start_response):
             from_email="cca-robot@catalystcreativearts.com",
             #to_emails="mmarum@gmail.com,info@catalystcreativearts.com",
             to_emails="mmarum@gmail.com,j.marumusa@gmail.com",
+            #to_emails="mmarum@gmail.com",
             subject=subject,
             html_content=content)
 
