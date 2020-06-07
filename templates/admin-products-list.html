@@ -40,8 +40,10 @@ img {
     {% elif loop.index == 4 %}
       <td class="extra_column">
         {% set image_array = item.split(',') %}
+        <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/>
+        {% set image_array = item.split(',') %}
         {% for i in image_array %}
-          {{ i }} <br/>
+          <!-- {{ i }} -->
         {% endfor %}
       </td>
     {% elif loop.index == 8 %}

@@ -8,6 +8,7 @@ form, input {
 }
 .product_image {
   max-width: 100%;
+  padding: 5px;
 }
 #cart {
   width: 50px;
@@ -46,7 +47,7 @@ img.check {
 
 {% block content %}
 
-<div class="row product_row top-buffer">
+<div class="row product_row top-buffer-no-line">
 
   <div class="col-sm-1">
   </div>
@@ -54,17 +55,43 @@ img.check {
   <div class="col-md-2">
     {% set image_array = row.image_path_array.split(',') %}
     <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/>
+
+    {% set image_array = row.image_path_array.split(',') %}
+    {% for i in image_array %}
+      {% if loop.index > 2 %}
+         <img src="/img/small/{{ i }}" alt="" class="product_image"/>
+      {% endif %}
+    {% endfor %}
+
   </div>
 
-  <div class="col-lg-8">
+  <div class="col-lg-6">
     <h3>{{ row.name }}</h3>
+    <div>${{ row.price }}</div>
     <div>{{ row.description }}</div>
-    <div>
-      <a href="#" onclick="plusMinus(-1); return false;" class="plus_minus">-</a>
+  </div>
+
+  <div class="col-sm-3">
+
+    <div style="padding-left: 10px;">
+      <!-- <a href="#" onclick="plusMinus(-1); return false;" class="plus_minus">-</a> -->
       <form action="" id="product_quantity_form">
-        <input type="text" name="quantity" id="product_quantity_select" class="form-control" value="1"/>
+        <!-- <input type="text" name="quantity" id="product_quantity_select" class="form-control" value="1" onblur="newQuant(this.value);"/> -->
+        <select name="quantity" id="product_quantity_select" class="form-control">
+          <!-- <option value=0>Select quantity</option> -->
+          <option value=1>1</option>
+          <option value=2>2</option>
+          <option value=3>3</option>
+          <option value=4>4</option>
+          <option value=5>5</option>
+          <option value=6>6</option>
+          <option value=7>7</option>
+          <option value=8>8</option>
+          <option value=9>9</option>
+          <option value=10>10</option>
+        </select>
       </form>
-      <a href="#" onclick="plusMinus(1); return false;" class="plus_minus">+</a>
+      <!-- <a href="#" onclick="plusMinus(1); return false;" class="plus_minus">+</a> -->
     </div>
     <div id="add_to_cart">
       <a href="#" onclick="addToCart({{ row.pid }}); return false;">
@@ -74,41 +101,37 @@ img.check {
       </a>
     </div>
     <!-- <div>{{ row.inventory }}</div> -->
-    <div>Price: ${{ row.price }} per item</div>
-    <div>Keywords: {{ row.keywords_array }}</div>
-    <div>
-    <a href="/app/products">More shopping</a>
-    </div>
-  </div>
 
-  <div class="col-sm-1">
   </div>
 
   <!-- NEW ROW BELOW -->
 
-  <div class="col-sm-1">
+  <div class="col-sm-3">
   </div>
 
-  <div class="col-lg-10">
+  <div class="col-lg-6">
     <div>
-      {% set image_array = row.image_path_array.split(',') %}
-      {% for i in image_array %}
-        {% if loop.index > 1 %}
-          <img src="/img/small/{{ i }}"/>
-        {% endif %}
-      {% endfor %}
+      <div>Keywords (Related products) {{ row.keywords_array }}</div>
+      <div><a href="/app/products">More shopping</a></div>
+      <div><a href="/cart">Go to cart</a></div>
     </div>
   </div>
 
-  <div class="col-sm-1">
+  <div class="col-sm-3">
   </div>
 
 </div>
 
 <script>
+//function newQuant(val) {
+//  alert(val);
+//}
+
 function plusMinus(n) {
   v = document.getElementById("product_quantity_select").value;
+  //console.log(v);
   x = (Number(v) + Number(n));
+  console.log('new val: '+x);
   document.getElementById("product_quantity_select").value = x;
   return false;
 }

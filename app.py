@@ -374,7 +374,7 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/admin/registration':
             c = db.cursor()
-            c.execute("SELECT * FROM registration")
+            c.execute("SELECT * FROM registration ORDER BY rid desc")
             allrows = c.fetchall()
             c.close()
             template = env.get_template("admin-registration.html")
@@ -713,11 +713,11 @@ def app(environ, start_response):
 
 
         else:
-            fields = "edatetime, title, duration, price, elimit, location, image, description"
+            fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, pinned"
             #vals = str(data_array).lstrip('[').rstrip(']')
             vals = data_array
             #sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
-            sql = f"INSERT INTO events ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            sql = f"INSERT INTO events ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
             c = db.cursor()
             #c.execute(sql)

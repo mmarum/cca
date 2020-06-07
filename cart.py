@@ -96,6 +96,30 @@ def cart_api(environ, start_response):
 
 
     ####
+    if environ['PATH_INFO'] == "/update":
+
+        product_id = int(input_list["product_id"])
+        quantity = int(input_list["quantity"])
+
+        db.query(f"SELECT cid FROM cart WHERE session_id = '{session_id}'")
+        r = db.store_result()
+        row = r.fetch_row(maxrows=1, how=1)[0]
+        cid = row["cid"]
+
+        db.query(f"SELECT id FROM cart_products WHERE cid = {cid} AND pid = {product_id}")
+        r = db.store_result()
+        row = r.fetch_row(maxrows=1, how=1)[0]
+        cp_id = row["id"]
+
+        sql = f"UPDATE cart_products SET quantity = {quantity} WHERE id = {cp_id}"
+        c = db.cursor()
+        c.execute(sql)
+        c.close()
+
+        response = f"{cid} {session_id} {product_id} {quantity} {time_now}"
+
+
+    ####
     elif environ['PATH_INFO'] == "/total":
         #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/total
         try:

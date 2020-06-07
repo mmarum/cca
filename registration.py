@@ -126,6 +126,8 @@ def registration(environ, start_response):
 
         response = template.render(data=post_input_dict, rid=rid)
 
+
+    ####
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/edit":
 
         # DE-DUPE THESE NEXT 17 LINES:
@@ -157,6 +159,8 @@ def registration(environ, start_response):
         form = RegistrationForm(**row)
         response = template.render(form=form)
 
+
+    ####
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/complete":
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
@@ -174,6 +178,17 @@ def registration(environ, start_response):
         headers = {"Content-Type": "application/json"}
         r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
         print(r.status_code)
+
+        registration_id = int(form_registration["registration_id"])
+        order_id = form_registration["order_id"]
+        sql = f"UPDATE registration SET order_id = '{order_id}' WHERE rid = {registration_id}"
+
+        print(f"sql: {sql}")
+
+        c = db.cursor()
+        c.execute(sql)
+        c.close()
+
 
         response = "200"
 

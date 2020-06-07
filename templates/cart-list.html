@@ -4,8 +4,10 @@
 {% block html_head %}
 <style>
 .product_price, .product_total {
+  /*
   padding-left: 40px;
   padding-right: 40px;
+  */
 }
 form, input {
   display: inline;
@@ -48,7 +50,7 @@ img.check {
 .top-buffer {
   padding: 10px 0 10px 0;
   margin: 10px 0 10px 0;
-  border-bottom: 1px dashed LightGray;
+  /* border-bottom: 1px dashed LightGray; */
 }
 #cart_sum_top, #cart_sum_bottom {
   text-align: right;
@@ -102,9 +104,9 @@ function make_request_get_list(session_id) {
     var product_total_sum = 0;
     var lines = '';
     for (var i = 0; i < arrLen; i++) {
-      console.log(data[i]);
+      //console.log(data[i]);
       obj = data[i];
-      console.log(obj.name);
+      //console.log(obj.name);
       product_image = '<img src="/img/small/' + obj.image_path_array.split(',')[1] + '" class="product_image"/>';
       product_name = obj.name.toLowerCase().replace(' ', '-');
       product_total = obj.price * obj.quantity;
@@ -118,13 +120,27 @@ function make_request_get_list(session_id) {
 </div>
 <div class="col-lg-8">
 <a href="/app/products/${product_name}/${obj.pid}"><h3>${obj.name}</h3></a>
-<span class="product_price">$${obj.price}</span>
-<a href="#" onclick="plusMinus(-1); return false;" class="plus_minus">-</a>
+<div class="product_price">$${obj.price}</div>
+<div>
+
 <form action="" id="product_quantity_form">
-<input type="text" name="quantity" id="product_quantity_select" class="form-control" value="${obj.quantity}"/>
+<select name="quantity" id="product_quantity_select" class="form-control" onclick="updateQuantity(${obj.pid}, this.options[this.selectedIndex].value);">
+<option value=${obj.quantity}>${obj.quantity}</option>
+<option value=0>0</option>
+<option value=1>1</option>
+<option value=2>2</option>
+<option value=3>3</option>
+<option value=4>4</option>
+<option value=5>5</option>
+<option value=6>6</option>
+<option value=7>7</option>
+<option value=8>8</option>
+<option value=9>9</option>
+<option value=10>10</option>
+</select>
 </form>
-<a href="#" onclick="plusMinus(1); return false;" class="plus_minus">+</a>
-<span class="product_total">$${product_total}</span>
+
+</div>
 </div>
 <div class="col-sm-1"></div>
 </div>
@@ -158,6 +174,47 @@ function plusMinus(n) {
   v = document.getElementById("product_quantity_select").value;
   x = (Number(v) + Number(n));
   document.getElementById("product_quantity_select").value = x;
+  return false;
+}
+
+function make_request(session_id, product_id, quantity) {
+  const fetchPromise = fetch('/cart-api/update', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: session_id,
+      product_id: product_id,
+      quantity: quantity
+    })
+  });
+  fetchPromise.then(response => {
+    make_request_get_total(session_id);
+    console.log("response from promise");
+    //console.log(response);
+  });
+}
+
+function updateQuantity(pid, quantity) {
+  console.log(pid);
+  console.log(quantity);
+  // GRAB THE QUANTITY FROM FORM
+  //quantity = document.getElementById("product_quantity_select").value;
+  //console.log(quantity);
+  if (quantity == 0) {
+    // REMOVE ITEM FROM CART LIST
+  } else {
+    var session_id = document.cookie.split("=")[1];
+    if (session_id) {
+      console.log(session_id)
+      // MAKE A REQUEST TO CART API
+      console.log("request to cart api to update quantity");
+      make_request(session_id, pid, quantity);
+    } else {
+      console.log("Error. Still no session_id");
+    }
+  }
   return false;
 }
 
