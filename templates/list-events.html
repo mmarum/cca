@@ -141,6 +141,8 @@ h1 {
         <input type="hidden" name="quantity" value="1" id="quantity_{{ event.eid }}"/>
       {% endif %}
 
+        <!-- Optional: Guests: <input type="text" name="guest_list" id="guest_list" /> -->
+
       </form>
 
       <div class="cost_container" id="cost_container_{{ event.eid }}">
@@ -272,13 +274,13 @@ function checkTime(event_date_time) {
   //console.log('n: ' + n + ' nn: ' + nn);
   //console.log('time until event: ' + (d - n));
   //console.log('time until event: ' + dhm(d - n));
-  var event_start_padding = 4; // hours
+  var event_start_padding = 10; // hours
   if (d - n > 60*60* event_start_padding *1000) {
-    //console.log("Not within 4h window. OK to book.");
+    //console.log("Not within xh window. OK to book.");
   } else {
-    //console.log("IS within 4h window. HIDE booking option.");
+    //console.log("IS within xh window. HIDE booking option.");
     document.getElementById("quantity_form_"+eid).style.display = "none";
-    var check_time_msg = "Event occurs within 4 hours. Call to see if this event is still available.";
+    var check_time_msg = "Event occurs within " + event_start_padding + " hours. Call to see if this event is still available.";
     document.getElementById("check_time_"+eid).innerHTML = check_time_msg;
     document.getElementById("check_time_"+eid).style.display = "block";
     document.getElementById("book_now_"+eid).style.display = "none";

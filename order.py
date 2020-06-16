@@ -37,12 +37,30 @@ def order(environ, start_response):
 
         write_file(f"../app/orders/{event_id}.json", json.dumps(orders, indent=4))
 
+        ####
+        try:
+            payer_info = {
+                "order_id": form_orders['details']['payer']['name']['given_name'],
+                "payer_email": form_orders['details']['payer']['email_address'],
+                "payer_name": form_orders['details']['payer']['name']['given_name']
+            }
+        except:
+            payer_info = ''
+        ####
+
         passwd = json.loads(read_file("../app/data/passwords.json"))["catalystemail"]
         url = "https://www.catalystcreativearts.com/email/submit"
+
         data = {"subject": "CCA Event purchase", "content": f"{json.dumps(orders, indent=4)}"}
         headers = {"Content-Type": "application/json"}
         r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
         print(r.status_code)
+
+        if type(payer_info) == dict:
+            data = {"subject": "Thank you for your CCA Event purchase", "content": f"", "payer_info": payer_info}
+            headers = {"Content-Type": "text/html"}
+            r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
+            print(r.status_code)
 
         response = f"sendgrid response: {str(r.status_code)}"
 
