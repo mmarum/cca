@@ -125,7 +125,13 @@ h1 {
 
       {% if event.elimit and event.elimit > 1 %}
         <div class="form-group">
-        <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
+
+        {% if "scarf" in event.title.lower() %}
+          <select name="quantity" id="quantity_{{ event.eid }}" onchange="geust_change({{ event.eid }}, this.options[this.selectedIndex].value);" class="form-control">
+        {% else %}
+          <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
+        {% endif %}
+
         <option value="">Select number of guests</option>
         {% if orders_count[event.eid] %}
           {% set x=event.elimit|int - orders_count[event.eid] %}
@@ -153,7 +159,12 @@ h1 {
       <div id="transaction_complete_row">
       </div>
 
-      <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scarf({{ event.eid }})">Add a 2nd scarf for $28</button>
+      {% if "scarf" in event.title.lower() %}
+        <button class="special" id="subtract_scraf_{{ event.eid }}" type="button" class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'subtract')">Subtract scarf</button>
+        <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'add')">Add additional scarf for $28</button>
+      {% endif %}
+
+      <div id="scraf_detail_{{ event.eid }}"></div>
       <button class="special2" id="special2_{{ event.eid }}" type="button" class="btn btn-info" onclick="camp({{ event.eid }})">Add a 2nd guest for $165</button>
       <div id="check_time_{{ event.eid }}" class="check_time alert alert-danger"></div>
 
@@ -294,18 +305,73 @@ function getTotal(eid) {
   return total;
 }
 
+var scarf_count = 0;
+var scarf_total_price = 0;
 function scarf(eid) {
   var price = getEventMeta("price");
   var new_cost = subtotal(quant(eid), price) + 28;
   document.getElementById("cost_"+eid).innerHTML = new_cost;
-  console.log('scarf: ' + new_cost);
+  scarf_count += 1;
+  console.log('_scarf_count: ' + scarf_count);
+  scarf_total_price = scarf_count * 28;
+  console.log('_scarf_total_price: ' + scarf_total_price);
   return new_cost;
 }
 
+
+// START THINGS
+
+var scraf_cost = 28;
+var scraf_count = 0;
+var scraf_total = 0;
+function scraf_change(eid, operator) {
+  if (operator == "add") {
+    scraf_count += 1;
+  } else if (operator == "subtract") {
+    scraf_count -= 1;
+  }
+  scraf_total = scraf_count * scraf_cost;
+  do_things(eid);
+  if (scraf_count == 0) {
+    document.getElementById("subtract_scraf_"+eid).style.display = "none";
+  } else {
+    document.getElementById("subtract_scraf_"+eid).style.display = "inline";
+  }
+  return true;
+}
+
+var geust_cost = 43;
+var geust_count = 0;
+var geust_total = 0;
+function geust_change(eid, num) {
+  geust_count = num;
+  geust_total = geust_count * geust_cost;
+  do_things(eid);
+  return true;
+}
+
+function do_things(eid) {
+  geust_plus_scraf_total = geust_total + scraf_total;
+  var scraf_detail = '';
+  scraf_detail += ' guest count: ' + geust_count + '; guest total: ' + geust_total + '<br>\n';
+  scraf_detail += ' extra scarf count: ' + scraf_count + '; extra scarf total: ' + scraf_total + '<br>\n';
+  scraf_detail += ' guests plus extra scarf total: ' + geust_plus_scraf_total + '<br>\n';
+  document.getElementById("scraf_detail_"+eid).innerHTML = scraf_detail;
+  document.getElementById("cost_container_"+eid).style.display = "block";
+  document.getElementById("paypal-button-container").style.display = "block";
+  document.getElementById("special_"+eid).style.display = "inline";
+  document.getElementById("cost_"+eid).style.display = "inline";
+  document.getElementById("cost_"+eid).innerHTML = geust_plus_scraf_total;
+}
+
+// STOP THINGS
+
+
+var cost_subtotal = 0;
 function subtotal(quantity, price) {
-  c = quantity * price;
-  console.log('subtotal: ' + c);
-  return c;
+  cost_subtotal = quantity * price;
+  //console.log('cost_subtotal: ' + cost_subtotal);
+  return cost_subtotal;
 }
 
 function quant(eid) {
@@ -319,12 +385,20 @@ function quant(eid) {
     quantity = q.options[q.selectedIndex].value;
   }
 
-  console.log('yo: '+quantity);
+  console.log('guest_quantity: ' + quantity);
 
   document.getElementById("paypal-button-container").style.display = "block";
+
   if (getEventMeta("title").match(/scarf/gi)) {
     document.getElementById("special_"+eid).style.display = "block";
+
+    //console.log('price: ' + price);
+    console.log('scarf_total_price: ' + scarf_total_price);
+    var subtotal_plus_scarves = subtotal(quantity, price) + scarf_total_price;
+    console.log('subtotal plus scarf_total_price: ' + subtotal_plus_scarves);
+
   }
+
   document.getElementById("cost_"+eid).innerHTML = subtotal(quantity, price);
   //document.getElementById("cost_"+eid).innerHTML += ". To complete order, click Paypal button below.";
   document.getElementById("cost_"+eid).style.display = "inline";
@@ -334,6 +408,7 @@ function quant(eid) {
     document.getElementById("special_"+eid).style.display = "none";
   }
   //console.log('quant: ' + quantity);
+
   return quantity;
 }
 </script>
