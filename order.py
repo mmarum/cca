@@ -40,11 +40,15 @@ def order(environ, start_response):
         ####
         try:
             payer_info = {
-                "order_id": form_orders['details']['payer']['name']['given_name'],
+                "order_id": form_orders['orderID'],
+                "event_id": form_orders['event_id'],
                 "payer_email": form_orders['details']['payer']['email_address'],
-                "payer_name": form_orders['details']['payer']['name']['given_name']
+                "payer_name": form_orders['details']['payer']['name']['given_name'],
+                "amount": form_orders['details']['purchase_units'][0]['amount']['value']
             }
+            print(payer_info)
         except:
+            print('SOMETHING WENT WRONG WITH COLLECTING PAYER_INFO FROM FORM_ORDERS')
             payer_info = ''
         ####
 
@@ -57,10 +61,13 @@ def order(environ, start_response):
         print(r.status_code)
 
         if type(payer_info) == dict:
-            data = {"subject": "Thank you for your CCA Event purchase", "content": f"", "payer_info": payer_info}
+            print('attempt to send to payer')
+            data = {"subject": "Thank you for your CCA Event purchase", "content": f"_hey_ _content_", "payer_info": f"{json.dumps(payer_info, indent=4)}"}
             headers = {"Content-Type": "text/html"}
             r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
             print(r.status_code)
+        else:
+            print('NO LUCK-- payer_info type is not dict')
 
         response = f"sendgrid response: {str(r.status_code)}"
 

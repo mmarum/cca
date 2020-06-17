@@ -45,13 +45,14 @@ def email(environ, start_response):
         #print str(post_input)
         form_data = json.loads(post_input)
         #print('form_data')
-        #print str(form_data)
+        print 'form_data: ' + str(form_data)
 
         # TODO: email pattern verification
 
         subject = str(form_data['subject'])
-        #print subject
+        print 'subject: ' + subject
         content = str(form_data['content'])
+        print 'content: ' + content
 
         content = content.replace('%20', ' ')
         #content = urllib.unquote(content).decode('utf8')
@@ -60,14 +61,32 @@ def email(environ, start_response):
         if "Contact form inquiry" in subject and ("http" in content or "www" in content):
             raise ValueError('Link found in contact form submission. Stopping process.')
 
+        try:
+            payer_info = json.loads(form_data['payer_info'])
+            to_emails = payer_info['payer_email']
+
+            if to_emails == "mmarum-buyer@gmail.com":
+                to_emails = "mmarum@gmail.com"
+
+            content = str(payer_info["payer_name"]) + ",\n"
+            content += "Thank you for your event purchase at CCA.\n" 
+            content += "Order ID: " + str(payer_info["order_id"]) + ".\n"
+            content += "Event ID: " + str(payer_info["event_id"]) + ".\n"
+            content += "Amount: " + str(payer_info["amount"]) + ".\n"
+
+        except:
+            payer_info = ''
+            to_emails = "mmarum@gmail.com"
+
+        print 'to_emails: ' + to_emails
+
         message = Mail(
             from_email="cca-robot@catalystcreativearts.com",
-            #to_emails="mmarum@gmail.com,info@catalystcreativearts.com",
-            to_emails="mmarum@gmail.com,j.marumusa@gmail.com",
-            #to_emails="mmarum@gmail.com",
+            to_emails=to_emails,
             subject=subject,
             html_content=content)
 
+        print 'print message ____'
         print message
 
         try:
@@ -77,13 +96,12 @@ def email(environ, start_response):
 
             try:
                 response = sg.send(message)
+                print response.status_code
+                print response.body
+                print response.headers
             except:
-                response = "FAILED TO SEND"
                 print "FAILED TO SEND"
                 
-            print response.status_code
-            print response.body
-            print response.headers
         except Exception as e:
             print e.message
 
