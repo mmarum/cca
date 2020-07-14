@@ -45,14 +45,14 @@ def email(environ, start_response):
         #print str(post_input)
         form_data = json.loads(post_input)
         #print('form_data')
-        print 'form_data: ' + str(form_data)
+        #print 'form_data: ' + str(form_data)
 
         # TODO: email pattern verification
 
         subject = str(form_data['subject'])
-        print 'subject: ' + subject
+        #print 'subject: ' + subject
         content = str(form_data['content'])
-        print 'content: ' + content
+        #print 'content: ' + content
 
         content = content.replace('%20', ' ')
         #content = urllib.unquote(content).decode('utf8')
@@ -61,12 +61,39 @@ def email(environ, start_response):
         if "Contact form inquiry" in subject and ("http" in content or "www" in content):
             raise ValueError('Link found in contact form submission. Stopping process.')
 
+        # payer_info should look like this:
+        # {'order_id': '03466302SA486820S', 'event_id': '146', 'payer_email': 'mmarum@gmail.com', 'payer_name': 'Matthew', 'amount': '1.00'}
+
+        # form_data: {u'content': u'_hey_ _content_', u'payer_info': u'{\n    "order_id": "8AP73850LP3806125",\n    "event_id": "146",\n    "payer_email": "mmarum@gmail.com",\n    "payer_name": "Matthew",\n    "amount": "1.00"\n}', u'subject': u'Thank you for your CCA Event purchase'}
+
+        """
+form_data: {u'content': u'_hey_ _content_', u'payer_info': u'{\n    "order_id": "41T612531F6532025",\n    "event_id": "152",\n    "payer_email": "mmarum-buyer@gmail.com",\n    "payer_name": "test",\n    "amount": "38.00"\n}', u'subject': u'Thank you for your CCA Event purchase'}
+subject: Thank you for your CCA Event purchase
+content: _hey_ _content_
+____payer_info
+['order_id', 'event_id', 'amount', 'payer_name', 'payer_email']
+Traceback (most recent call last):
+  File "email.py", line 78, in email
+    to_emails = payer_info['payer_email']
+TypeError: list indices must be integers, not str
+        """
+
         try:
-            payer_info = json.loads(form_data['payer_info'])
+            payer_info_u = json.loads(form_data['payer_info'])
+            print(payer_info_u)
+
+            #payer_info = [x.encode('utf-8') for x in payer_info_u]
+            payer_info = payer_info_u
+            print(payer_info)
+
+            print('____payer_info')
+            print(payer_info)
+
             to_emails = payer_info['payer_email']
 
             if to_emails == "mmarum-buyer@gmail.com":
-                to_emails = "mmarum@gmail.com"
+                #to_emails = "mmarum@gmail.com"
+                to_emails = "mmarum@advance.net"
 
             content = str(payer_info["payer_name"]) + ",\n"
             content += "Thank you for your event purchase at CCA.\n" 
@@ -77,6 +104,8 @@ def email(environ, start_response):
         except:
             payer_info = ''
             to_emails = "mmarum@gmail.com"
+            #to_emails = "j.marumusa@gmail.com"
+            #to_emails = "mmarum@advance.net"
 
         print 'to_emails: ' + to_emails
 

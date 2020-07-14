@@ -8,7 +8,7 @@ window.onhashchange = function() {
 }
 </script>
 <style>
-#paypal-button-container, .special, .special2, .check_time, .quantity_form, .cost, .cost_container, .duration {
+#paypal-button-container, #pay-with, .special, .special2, .check_time, .quantity_form, .cost, .cost_container, .duration {
   display: none;
 }
 .event_image {
@@ -123,7 +123,7 @@ h1 {
         {% endif %}
       {% endif %}
 
-      {% if event.elimit and event.elimit > 1 %}
+      {% if event.elimit and event.elimit >= 1 %}
         <div class="form-group">
 
         {% if "scarf" in event.title.lower() %}
@@ -132,7 +132,7 @@ h1 {
           <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
         {% endif %}
 
-        <option value="">Select number of guests</option>
+        <option value="">Select number of {% if "splash box" in event.title.lower() %}canvases{% else %}guests{% endif %}</option>
         {% if orders_count[event.eid] %}
           {% set x=event.elimit|int - orders_count[event.eid] %}
         {% else %}
@@ -153,15 +153,15 @@ h1 {
 
       <div class="cost_container" id="cost_container_{{ event.eid }}">
         Total: $<span class="cost" id="cost_{{ event.eid }}">0</span>. 
-        <span id="cost_container_text">Click Paypal link below to complete process.</span>
-      </div>
-
-      <div id="transaction_complete_row">
+        <!-- <span id="cost_container_text">Click Paypal link below to complete process.</span> -->
       </div>
 
       {% if "scarf" in event.title.lower() %}
         <button class="special" id="subtract_scraf_{{ event.eid }}" type="button" class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'subtract')">Subtract scarf</button>
         <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'add')">Add additional scarf for $28</button>
+        <script>
+          var geust_cost = {{ event.price }};
+        </script>
       {% endif %}
 
       <div id="scraf_detail_{{ event.eid }}"></div>
@@ -188,15 +188,17 @@ h1 {
 </script>
 {% endif %}
 
-<div id="paypal-button-container" class="text-center top-buffer"></div>
+<div id="pay-with" class="text-center">Pay with:</div>
+<div id="paypal-button-container" class="text-center"></div>
 
 <script>
 events_object = {{ events_object|safe }}
 
 function eventVariation(eid, val) {
   val = val.replace('\$', '');
-  document.getElementById("state_price").value = val;
   console.log(eid + " " +  val);
+  document.getElementById("state_price").value = val;
+  console.log(document.getElementById("state_price").value);
   quant(eid);
 }
 
@@ -340,7 +342,7 @@ function scraf_change(eid, operator) {
   return true;
 }
 
-var geust_cost = 43;
+//var geust_cost = 43;
 var geust_count = 0;
 var geust_total = 0;
 function geust_change(eid, num) {
@@ -359,6 +361,7 @@ function do_things(eid) {
   document.getElementById("scraf_detail_"+eid).innerHTML = scraf_detail;
   document.getElementById("cost_container_"+eid).style.display = "block";
   document.getElementById("paypal-button-container").style.display = "block";
+  document.getElementById("pay-with").style.display = "block";
   document.getElementById("special_"+eid).style.display = "inline";
   document.getElementById("cost_"+eid).style.display = "inline";
   document.getElementById("cost_"+eid).innerHTML = geust_plus_scraf_total;
@@ -388,6 +391,7 @@ function quant(eid) {
   console.log('guest_quantity: ' + quantity);
 
   document.getElementById("paypal-button-container").style.display = "block";
+  document.getElementById("pay-with").style.display = "block";
 
   if (getEventMeta("title").match(/scarf/gi)) {
     document.getElementById("special_"+eid).style.display = "block";
@@ -405,6 +409,7 @@ function quant(eid) {
   document.getElementById("cost_container_"+eid).style.display = "block";
   if (quantity == "") { 
     document.getElementById("paypal-button-container").style.display = "none";
+    document.getElementById("pay-with").style.display = "none";
     document.getElementById("special_"+eid).style.display = "none";
   }
   //console.log('quant: ' + quantity);
@@ -437,18 +442,15 @@ function quant(eid) {
     },
     onApprove: function(data, actions) {
       return actions.order.capture().then(function(details) {
-        alert('Transaction completed by ' + details.payer.name.given_name);
-
-        //var transaction_completed_text = "Transaction complete. Thank you " + details.payer.name.given_name;
-        //transaction_completed_text += " Order ID: " + details.id;
-
-        //console.log('given_name: '+details.payer.name.given_name);
-        //console.log('details_id: '+details.id);
-
-        //document.getElementById("transaction_complete_row").innerHTML = transaction_completed_text;
-        //document.getElementById("transaction_complete_row").style.backgroundColor = "green";
-
-        //document.getElementById("paypal-button-container").style.display = 'none';
+        //alert('Transaction completed by ' + details.payer.name.given_name);
+        var transaction_completed_text = "Transaction complete. Thank you " + details.payer.name.given_name;
+        transaction_completed_text += " - Order ID: " + details.id;
+        console.log(transaction_completed_text);
+        document.getElementById("cost_container_"+getEventMeta("eid")).innerHTML += transaction_completed_text;
+        document.getElementById("cost_container_"+getEventMeta("eid")).style.backgroundColor = "#00C851";
+        //document.getElementById("cost_container_text").innerHTML = "";
+        document.getElementById("paypal-button-container").style.display = "none";
+        document.getElementById("pay-with").style.display = "none";
 
         console.log(details);
         // Call your server to save the transaction
