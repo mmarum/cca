@@ -43,6 +43,10 @@ h1 {
 <input type="hidden" id="state_outside_payment" value="False"/>
 </form>
 
+<script>
+geust_cost = {};
+</script>
+
 <center id="upcoming_events">
 <h1>Upcoming Events</h1>
 </center>
@@ -160,7 +164,7 @@ h1 {
         <button class="special" id="subtract_scraf_{{ event.eid }}" type="button" class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'subtract')">Subtract scarf</button>
         <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'add')">Add additional scarf for $28</button>
         <script>
-          var geust_cost = {{ event.price }};
+          geust_cost[{{ event.eid }}] = {{ event.price }};
         </script>
       {% endif %}
 
@@ -347,7 +351,7 @@ var geust_count = 0;
 var geust_total = 0;
 function geust_change(eid, num) {
   geust_count = num;
-  geust_total = geust_count * geust_cost;
+  geust_total = geust_count * geust_cost[eid];
   do_things(eid);
   return true;
 }
