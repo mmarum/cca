@@ -7,8 +7,6 @@ import calendar
 import datetime
 import random
 
-#from datetime import date
-
 # https://jinja.palletsprojects.com/en/2.10.x/api/
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -37,6 +35,7 @@ from gallery import Gallery
 from writer import scrape_and_write
 import time
 
+#from datetime import date
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -57,55 +56,20 @@ def write_file(file_name, content):
 dbuser = "catalystcreative_cca"
 passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
+
 def make_cal(db, month, year):
     this_calendar = calendar.HTMLCalendar(calendar.SUNDAY)
     combined_cals = ""
-
-
-    month_range = []
-    c = 0
-    m = month
-    for i in range(4):
-        if m+c > 12:
-            m = 1
-            c = 0
-        month_range.append(m+c)
-        c += 1
-
-
-    prev_month = 0
-
-
-    for m in month_range:
-
-        if prev_month == 12:
-            year += 1
-
-        if m == 12:
-            next_month = 1
-        else:
-            next_month = m + 1
-
-        if m == 1:
-            prev_month = 12
-        else:
-            prev_month = m - 1
-
-        #print(f"month: {m}")
-        #print(f"year: {year}")
-
+    for m in range(month, month+4):
         one_month_cal = this_calendar.formatmonth(year, m)
         one_month_cal = one_month_cal.replace("&nbsp;"," ")
-        prev_link = f"<div id='prev_link'><a href='#' onclick='showMonth({prev_month}); return false;'>&#171; Prev</a></div>\n"
-        next_link = f"<div id='next_link'><a href='#' onclick='showMonth({next_month}); return false;'>Next &#187;</a></div>\n"
+        prev_link = f"<div id='prev_link'><a href='#' onclick='showMonth({m-1}); return false;'>&#171; Prev</a></div>\n"
+        next_link = f"<div id='next_link'><a href='#' onclick='showMonth({m+1}); return false;'>Next &#187;</a></div>\n"
         one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
         c = db.cursor()
 
         c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() and (pinned <> 'invisible' or pinned is null)")
         allrows = c.fetchall()
-
-        #print(allrows)
-
         c.close()
         zm = "0"+str(m) if len(str(m)) == 1 else m
         for d in allrows:
@@ -114,12 +78,8 @@ def make_cal(db, month, year):
             zd = "0"+str(day) if len(str(day)) == 1 else day
             one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/calendar.html#{year}-{zm}-{zd}" >{day}</a><')
         combined_cals += one_month_cal
-
-        #print(combined_cals)
-
-        prev_month = m
-
     return combined_cals
+
 
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
@@ -375,17 +335,12 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/home':
             # UP-NEXT EVENT
-            month = int(this_now.strftime("%m"))
-            year = int(this_now.strftime("%Y"))
+            month = 11 #today.month
+            year = 2020 #today.year
             html_cal = make_cal(db, month, year)
-
-            #print(html_cal)
-
             db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and (pinned <> 'invisible' or pinned is null) ORDER BY edatetime limit 1")
             r = db.store_result()
             next_event = r.fetch_row(maxrows=1, how=1)[0]
-            #html_cal = ""
-            #next_event = ""
 
             # FEATURED / PINNED EVENTS
             db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and pinned = 'home' ORDER BY edatetime limit 10")

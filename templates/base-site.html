@@ -74,7 +74,7 @@ td {
     width: 100%;
   }
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.0rem;
     padding: 10px;
   }
   h4 {
@@ -91,9 +91,15 @@ td {
     width: 100%;
   }
 }
+#tagline {
+  font-size: 20px;
+}
 @media only screen and (min-width: 601px) {
   div#burger div {
     display: none;
+  }
+  #tagline {
+    font-size: 30px;
   }
 }
 .logo {
@@ -129,6 +135,15 @@ div#burger div {
 </head>
 
 <body>
+
+<!--
+0) Home & After School
+1) After School Pottery Course
+2) After School Art Club
+3) Home School Art Club
+4) # Summer Camp
+-->
+
 <div id="top"></div>
 
 <div id="content">
@@ -157,6 +172,14 @@ div#burger div {
   </div>
 </div>
 
+<div class="row">
+  <div class="col-sm-12">
+    <center>
+    <div id="tagline">Art, Craft and DIY Studio and Event Venue, Arlington Texas</div>
+    </center>
+  </div>
+</div>
+
 <script>
 if (browser_size["width"] > 600) {
   document.getElementById("logo_container").setAttribute("class", "col-12");
@@ -170,7 +193,7 @@ if (browser_size["width"] > 600) {
 
 <nav class="navbar navbar-expand-sm bg-light navbar-light d-flex">
   <ul class="navbar-nav list-inline mx-auto justify-content-center">
-  {% for i in ["Calendar", "Crafts / Services", "Private Events", "About / Contact", "Commissioned Art", "After School / Summer Camp"] -%}
+  {% for i in ["Calendar", "Crafts / Services", "Private Events", "About / Contact", "After School / Summer Camp"] -%}
   {% if i == "Crafts / Services" %}
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop('dropdown-menu'); return false;" data-toggle="dropdown">Crafts / Services</a>

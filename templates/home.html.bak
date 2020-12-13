@@ -129,10 +129,10 @@ mark {
     <!-- first column -->
 
     <img src="/img/art-market-2-dmn.jpg" class="event_image">
-    <h2><a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/">Catalyst Creative Arts hosts second annual Arlington Art Market</a></h2><hr>
+    <h2><a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/">Catalyst Creative Arts hosts second annual Arlington Art market (Dallas Morning News)</a></h2>
 
     <img src="/img/art-market-2-an.jpg" class="event_image">
-    <h2><a href="https://www.arlingtonnetwork.com/2020/10/28/2nd-annual-art-market-returns-to-arlington/">More about CCA and the second annual Arlington Art Market</a></h2><hr>
+    <h2><a href="https://www.arlingtonnetwork.com/2020/10/28/2nd-annual-art-market-returns-to-arlington/">Read more about CCA and second annual Arlington Art on Arlington Network</a></h2>
 
     <img src="/img/art-market-2-yt.jpg" class="event_image">
     <h2><a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&feature=youtu.be">Watch Culture Buzz: Catalyst Creative Arts</a></h2>
@@ -162,9 +162,6 @@ mark {
     <p>Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through our website, over the phone and in person at our studio and may be redeemed for any of our services.<br/>
     <img src="/img/small/gift-cert-icon.jpg" class="event_image"></p>
 
-    <div id="paper_calendar"></div>
-    {{ calendar.html|safe }}
-
   </div>
 
   <div class="col-sm-1">
@@ -173,6 +170,62 @@ mark {
 </div>
 
 
+
+<div class="row top-buffer">
+
+  <div class="col-sm-1">
+  </div>
+
+  <div class="col-md-10">
+  UP NEXT
+  </div>
+
+  <div class="col-sm-1">
+  </div>
+
+</div>
+
+
+<!--
+<div class="row">
+
+  <div class="col-sm-1">
+  </div>
+
+  <div class="col-md-3">
+
+    <a href="/calendar.html#{{ next_event.eid }}" class="event_link">
+      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="logo"/>
+    </a>
+  </div>
+
+  <div class="col-md-4">
+    <h4>{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h4>
+    <a href="/calendar.html#{{ next_event.eid }}" class="event_link">
+      <h3>{{ next_event.title }}</h3>
+    </a>
+    <div>
+      ${{ next_event.price }}
+    </div>
+
+    <div>
+    {% set event_desc = next_event.description.split(' ') %}
+    {% for e in event_desc -%}{% if loop.index < 30 %}{{ e }} {% endif %}{%- endfor %}
+    ... <a href="/calendar.html#{{ next_event.eid }}" class="event_link">Read More</a>
+    </div>
+
+  </div>
+
+  <div class="col-md-3">
+    <div id="paper_calendar"></div>
+    {{ calendar.html|safe }}
+  </div>
+
+  <div class="col-sm-1">
+  </div>
+
+</div>
+-->
 
 {% if pinned_events %}
 
@@ -220,7 +273,6 @@ mark {
 
 {% endif %}
 
-<!--
 <div class="row top-buffer">
   <div class="col-sm-1" style="text-align: right;">
     <a href="#" onclick="slide_gallery('backward'); return false;" id="home_gallery_backward">«</a>
@@ -244,16 +296,13 @@ mark {
     <a href="#" onclick="slide_gallery('forward'); return false;" id="home_gallery_forward">»</a>
   </div>
 </div>
--->
 
-<!--
 <div class="row">
   <div class="col-sm-12 home_sample_activity">
     Sample activity: <a href="/{{ gallery.name|replace(' ', '-')|lower }}.html">{{ gallery.name|safe }}</a>
-    {# gallery.comment|safe #}
+    <!-- {{ gallery.comment|safe }} -->
   </div>
 </div>
--->
 
 <script>
 var home_gallery_image_list = [
@@ -285,7 +334,7 @@ function slide_gallery(direction) {
     n++;
   }
 }
-//slide_gallery('start');
+slide_gallery('start');
 
 var d = new Date();
 var this_month = d.getMonth()+1;

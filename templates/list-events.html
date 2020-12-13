@@ -292,7 +292,9 @@ function checkTime(event_date_time) {
   //console.log('time until event: ' + (d - n));
   //console.log('time until event: ' + dhm(d - n));
   var event_start_padding = 10; // hours
-  if (d - n > 60*60* event_start_padding *1000) {
+  //if (d - n > 60*60* event_start_padding *1000) {
+  // TEMPORARY:
+  if ((d - n > 60*60* event_start_padding *1000)||(eid == 207)) {
     //console.log("Not within xh window. OK to book.");
   } else {
     //console.log("IS within xh window. HIDE booking option.");
