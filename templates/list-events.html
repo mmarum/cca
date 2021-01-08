@@ -104,7 +104,7 @@ geust_cost = {};
           }
           </script>
         {% else %}
-          {{ e }}
+          {{ e|safe }}
         {% endif %}
       {% endfor %}
       </div>

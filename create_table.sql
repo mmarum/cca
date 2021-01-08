@@ -7,9 +7,10 @@ price INT NOT NULL,
 elimit INT,
 location VARCHAR (200) NOT NULL,
 image VARCHAR (200),
-description VARCHAR (1000),
-price_text VARCHAR (500),
-pinned VARCHAR (200)
+description VARCHAR (5000),
+price_text VARCHAR (2500),
+pinned VARCHAR (1000),
+extra_data VARCHAR (5000),
 );
 
 CREATE TABLE orders (

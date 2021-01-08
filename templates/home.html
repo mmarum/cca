@@ -114,6 +114,15 @@ mark {
     font-size: 16px;
   }
 }
+
+.gift_card_border {
+    /* width: 200px;
+    height: 126px; */
+    border-radius: 8px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(155, 155, 155) 2px 3px 6px 0px;
+}
+
 </style>
 {% endblock %}
 
@@ -128,42 +137,37 @@ mark {
 
     <!-- first column -->
 
-    <img src="/img/art-market-2-dmn.jpg" class="event_image">
-    <h2><a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/">Catalyst Creative Arts hosts second annual Arlington Art Market</a></h2><hr>
-
-    <img src="/img/art-market-2-an.jpg" class="event_image">
-    <h2><a href="https://www.arlingtonnetwork.com/2020/10/28/2nd-annual-art-market-returns-to-arlington/">More about CCA and the second annual Arlington Art Market</a></h2><hr>
-
-    <img src="/img/art-market-2-yt.jpg" class="event_image">
-    <h2><a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&feature=youtu.be">Watch Culture Buzz: Catalyst Creative Arts</a></h2>
+    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s"><img src="/img/gift-card.png" class="event_image gift_card_border"></a>
+    <h2><a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s">CATALYST CREATIVE ARTS Gift Card</a></h2>
+    <p>Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through PayPal, over the phone and in person at our studio and may be redeemed for any of our services.<br/>
+    <div id="paper_calendar"></div>
+    {{ calendar.html|safe }}
 
   </div>
   <div class="col-sm-4">
 
     <!-- second column -->
 
-      <a href="/after-school-summer-camp.html">
-        <!-- <img src="/img/cca-building.jpg" class="event_image"> -->
-        <img src="/img/small/after%20school%20pottery.jpg" class="event_image">
-      </a>
-      <h2><a href="/after-school-summer-camp.html">After School Pottery Program</a></h2>
-      <div>
-        Catalyst Creative Arts is happy to launch our After School Pottery Program. 7 Week Course - Every Wednesday beginning October 7 to November 18, 2020. Recommended for kids 8 years old and up. This comprehensive 7 week program is scheduled weekly on Wednesdays at 3:30 PM and lasts 2 hours. Each week, we will focus on a different pottery technique. <a href="/after-school-summer-camp.html">The course description and registration is here.</a> No prior experience is required.
-      </div>
-
-
+    <a href="/after-school-summer-camp.html"><img src="/img/small/after-school-pottery-program.jpg" class="event_image"></a>
+    <h2><a href="/after-school-summer-camp.html">After School Pottery Program</a></h2>
+    <div>
+        <p>Catalyst Creative Arts is happy to launch our After School Pottery Program.</p>
+        <p>7 Week Course - <font color="orange">Every Thursday</font> <br> <b>beginning January 28 to March 11, 2021</b></p>
+        <p>Recommended for kids 8 years old and up.</p>
+        <p>This comprehensive 7 week program is scheduled weekly on Thursdays at 4:30 PM and lasts 90 minutes. Each week, we will focus on a different pottery technique.</p>
+    </div>
 
   </div>
   <div class="col-sm-3">
 
     <!-- third column -->
 
-    <h2><a href="/calendar.html#95">Gift Certificates Available for Purchase</a></h2>
-    <p>Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through our website, over the phone and in person at our studio and may be redeemed for any of our services.<br/>
-    <img src="/img/small/gift-cert-icon.jpg" class="event_image"></p>
-
-    <div id="paper_calendar"></div>
-    {{ calendar.html|safe }}
+    <a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/"><img src="/img/art-market-2-dmn.jpg" class="event_image"></a>
+    <h2><a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/">Catalyst Creative Arts hosts second annual Arlington Art Market</a></h2><hr>
+    <a href="https://www.arlingtonnetwork.com/2020/10/28/2nd-annual-art-market-returns-to-arlington/"><img src="/img/art-market-2-an.jpg" class="event_image"></a>
+    <h2><a href="https://www.arlingtonnetwork.com/2020/10/28/2nd-annual-art-market-returns-to-arlington/">More about CCA and the second annual Arlington Art Market</a></h2><hr>
+    <a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&feature=youtu.be"><img src="/img/art-market-2-yt.jpg" class="event_image"></a>
+    <h2><a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&feature=youtu.be">Watch Culture Buzz: Catalyst Creative Arts</a></h2>
 
   </div>
 
