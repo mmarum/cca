@@ -1,4 +1,5 @@
 *.log
 *.jpg
+*dump*
 passwords.json
 sendgrid.env
