@@ -4,6 +4,8 @@ import json
 import requests
 sys.path.insert(0, os.path.dirname(__file__))
 
+from update_extra import UpdateExtra
+
 def read_file(file_name):
     f = open(file_name, "r")
     content = f.read()
@@ -36,6 +38,16 @@ def order(environ, start_response):
         orders.append(form_orders)
 
         write_file(f"../app/orders/{event_id}.json", json.dumps(orders, indent=4))
+
+
+        # VARIABLE-TIME STUFF:
+        try:
+            u = UpdateExtra(event_id, "", 0)
+            u.set_via_purchase(form_orders['variable_time_slot'])
+            u.update_extra()
+        except:
+            print(f"NO VARIABLE TIME for {event_id}")
+
 
         ####
         try:

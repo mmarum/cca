@@ -5,6 +5,15 @@ import MySQLdb
 
 # mysql -u catalystcreative_cca catalystcreative_arts -p
 
+"""
+Usage:
+from update_extra import UpdateExtra
+u = UpdateExtra(311, "Feb 6 3-5pm, Feb 6 6-8pm, Feb 7 1-3pm, Feb 7 4-6pm", 20)
+u.set_via_admin()
+u.set_via_purchase("Feb 7 1-3pm")
+u.update_extra()
+"""
+
 dbuser = "catalystcreative_cca"
 dbname = "catalystcreative_arts"
 f = open("data/passwords.json", "r")
@@ -14,9 +23,10 @@ f.close()
 class UpdateExtra:
 
     def __init__(self, eid, price_text, elimit):
-        self.eid = eid 
+        self.eid = int(eid)
         self.contents = price_text
-        self.elimit = elimit
+        self.elimit = int(elimit)
+        self.sql = ""
 
         if ";" in self.contents:
             raise ValueError("contents must not contain semicolon")
@@ -67,7 +77,7 @@ class UpdateExtra:
 
 
     def update_extra(self):
-        if self.sql:
+        if self.sql != "":
             db = MySQLdb.connect(host="localhost", user=dbuser, passwd=dbpass, db=dbname)
             c = db.cursor()
             c.execute(self.sql)

@@ -41,6 +41,7 @@ h1 {
 <input type="hidden" id="state_title"/>
 <input type="hidden" id="state_price"/>
 <input type="hidden" id="state_outside_payment" value="False"/>
+<input type="hidden" id="state_variable_time_slot" value=""/>
 </form>
 
 <script>
@@ -116,11 +117,29 @@ geust_cost = {};
           <div class="form-group">
           <select name="price_variation" id="event_variation" onchange="eventVariation({{ event.eid }}, this.options[this.selectedIndex].value);" class="form-control">
           <option value="">Select options</option>
+
+
           {% set prc = event.price_text.split(',') %}
           {% for p in prc %}
-            {% set variation_name = p.split('@')[0] %}
-            {% set variation_price = p.split('@')[1] %}
-            <option value="{{ variation_price }}">{{ variation_name }} {{ variation_price }}</option>
+
+
+            {% if "am" in event.price_text or "pm" in event.price_text %}
+
+              {% set this_inventory = event.extra_data|get_inventory(p|trim)|int %}
+
+              {% if this_inventory >= 1 %}
+                <option value="{{ event.price }},{{ p }}">{{ p }} ... {{ this_inventory }} spot{% if this_inventory > 1 %}s{% endif %} left</option>
+              {% endif %}
+
+            {% else %}
+
+              {% set variation_name = p.split('@')[0] %}
+              {% set variation_price = p.split('@')[1] %}
+              <option value="{{ variation_price }}">{{ variation_name }} {{ variation_price }}</option>
+
+            {% endif %}
+
+
           {% endfor %}
           </select>
           </div>
@@ -130,22 +149,30 @@ geust_cost = {};
       {% if event.elimit and event.elimit >= 1 %}
         <div class="form-group">
 
-        {% if "scarf" in event.title.lower() %}
-          <select name="quantity" id="quantity_{{ event.eid }}" onchange="geust_change({{ event.eid }}, this.options[this.selectedIndex].value);" class="form-control">
+        {% if "am" in event.price_text or "pm" in event.price_text %}
+          <input type="hidden" name="quantity" id="quantity_{{ event.eid }}" value="1"/>
         {% else %}
-          <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
+
+          {% if "scarf" in event.title.lower() %}
+            <select name="quantity" id="quantity_{{ event.eid }}" onchange="geust_change({{ event.eid }}, this.options[this.selectedIndex].value);" class="form-control">
+          {% else %}
+            <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
+          {% endif %}
+
+          <option value="">Select number of {% if "splash box" in event.title.lower() %}canvases{% else %}guests{% endif %}</option>
+          {% if orders_count[event.eid] %}
+            {% set x=event.elimit|int - orders_count[event.eid] %}
+          {% else %}
+            {% set x=event.elimit|int %}
+          {% endif %}
+          {% for n in range(1, x+1) -%}
+            <option value="{{ n }}">{{ n }}</option>
+          {%- endfor %}
+
+          </select>
+
         {% endif %}
 
-        <option value="">Select number of {% if "splash box" in event.title.lower() %}canvases{% else %}guests{% endif %}</option>
-        {% if orders_count[event.eid] %}
-          {% set x=event.elimit|int - orders_count[event.eid] %}
-        {% else %}
-          {% set x=event.elimit|int %}
-        {% endif %}
-        {% for n in range(1, x+1) -%}
-          <option value="{{ n }}">{{ n }}</option>
-        {%- endfor %}
-        </select>
         </div>
       {% else %}
         <input type="hidden" name="quantity" value="1" id="quantity_{{ event.eid }}"/>
@@ -158,6 +185,7 @@ geust_cost = {};
       <div class="cost_container" id="cost_container_{{ event.eid }}">
         Total: $<span class="cost" id="cost_{{ event.eid }}">0</span>. 
         <!-- <span id="cost_container_text">Click Paypal link below to complete process.</span> -->
+        <div id="extra_data_{{ event.eid }}"></div>
       </div>
 
       {% if "scarf" in event.title.lower() %}
@@ -359,6 +387,7 @@ function geust_change(eid, num) {
 }
 
 function do_things(eid) {
+  console.log("i am doing things");
   geust_plus_scraf_total = geust_total + scraf_total;
   var scraf_detail = '';
   scraf_detail += ' guest count: ' + geust_count + '; guest total: ' + geust_total + '<br>\n';
@@ -409,7 +438,27 @@ function quant(eid) {
 
   }
 
+  console.log("is she hulk a woman");
+
+  // HERE IS WHERE I NEED TO FIX PRICE
+
+  var variable_time_slot = ""
+
+  if (price.match(/,/g) && ( price.match(/am/g) || price.match(/pm/g) ) ) {
+    variable_time_slot = price.split(",")[1]
+    price = price.split(",")[0]
+    console.log(price, variable_time_slot);
+    // Bypass setEventMeta()
+    document.getElementById("state_variable_time_slot").value = variable_time_slot.trim();
+  }
+
   document.getElementById("cost_"+eid).innerHTML = subtotal(quantity, price);
+
+  // NOW APPEND THE variable_time_slot FOR BUYER TO SEE
+  if ( (price) && ( variable_time_slot.match(/am/g) || variable_time_slot.match(/pm/g) ) ) {
+    document.getElementById("extra_data_"+eid).innerHTML = variable_time_slot;
+  }
+
   //document.getElementById("cost_"+eid).innerHTML += ". To complete order, click Paypal button below.";
   document.getElementById("cost_"+eid).style.display = "inline";
   document.getElementById("cost_container_"+eid).style.display = "block";
@@ -459,6 +508,9 @@ function quant(eid) {
         document.getElementById("pay-with").style.display = "none";
 
         console.log(details);
+
+        console.log(getEventMeta("variable_time_slot"));
+
         // Call your server to save the transaction
         //return fetch('/app/paypal-transaction-complete', {
         return fetch('/order/submit', {
@@ -470,6 +522,7 @@ function quant(eid) {
             orderID: data.orderID,
             event_id: getEventMeta("eid"),
             quantity: quant(getEventMeta("eid")),
+            variable_time_slot: getEventMeta("variable_time_slot"),
             details: details
           })
         });

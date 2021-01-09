@@ -12,10 +12,14 @@ import random
 # https://jinja.palletsprojects.com/en/2.10.x/api/
 from jinja2 import Environment, PackageLoader, select_autoescape
 
+from custom_filters import get_inventory
+
 env = Environment(
     loader=PackageLoader('app', 'templates'),
     autoescape=select_autoescape(['html'])
 )
+
+env.filters["get_inventory"] = get_inventory
 
 # TODO: Prevent SQL_injection
 
@@ -36,6 +40,7 @@ import MySQLdb
 from gallery import Gallery
 from writer import scrape_and_write
 import time
+from update_extra import UpdateExtra
 
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -346,13 +351,14 @@ def app(environ, start_response):
                         # Notice zero after purchase_units:
                         data_array.append(order['details']['purchase_units'][0]['amount']['value'])
                         data_array.append(order['details']['purchase_units'][0]['payments']['captures'][0]['amount']['value'])
+                        data_array.append(order['variable_time_slot'])
 
                         # Load database:
-                        fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid"
+                        fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time"
                         #vals = str(data_array).lstrip('[').rstrip(']')
                         vals = data_array
                         #sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
-                        sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
                         c = db.cursor()
                         #c.execute(sql)
@@ -740,6 +746,10 @@ def app(environ, start_response):
         del data_object['append_time']
         del data_array[1]
 
+        # For the variable-field stuff:
+        price_text = data_object["price_text"]
+        elimit = data_object["elimit"]
+
         # Todo: More validation
         events_form = EventsForm(**data_object)
 
@@ -776,14 +786,26 @@ def app(environ, start_response):
             # Now retrieve the eid from the item we just added
             e = data_object['edatetime']
             t = data_object['title'].replace("'", "''")
-            sql2 = f"SELECT eid FROM events WHERE edatetime = '{e}' AND title = '{t}'"
+            sql2 = f"SELECT eid, price_text, elimit FROM events WHERE edatetime = '{e}' AND title = '{t}'"
             #print(sql2)
             d = db.cursor()
             d.execute(sql2)
             eid = int(d.fetchone()[0])
+            price_text = d.fetchone()[1]
+            elimit = int(d.fetchone()[2])
             d.close()
+
         else:
             sql2 = "just an update"
+
+
+        #
+        # TESTING THE NEW VARIABLE-TIME STUFF:
+        u = UpdateExtra(eid, price_text, elimit)
+        u.set_via_admin()
+        u.update_extra()
+        #
+
 
         image_form = ImageForm()
 
