@@ -7,13 +7,19 @@ import calendar
 import datetime
 import random
 
+#from datetime import date
+
 # https://jinja.palletsprojects.com/en/2.10.x/api/
 from jinja2 import Environment, PackageLoader, select_autoescape
+
+from custom_filters import get_inventory
 
 env = Environment(
     loader=PackageLoader('app', 'templates'),
     autoescape=select_autoescape(['html'])
 )
+
+env.filters["get_inventory"] = get_inventory
 
 # TODO: Prevent SQL_injection
 
@@ -34,8 +40,8 @@ import MySQLdb
 from gallery import Gallery
 from writer import scrape_and_write
 import time
+from update_extra import UpdateExtra
 
-#from datetime import date
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -56,20 +62,55 @@ def write_file(file_name, content):
 dbuser = "catalystcreative_cca"
 passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
-
 def make_cal(db, month, year):
     this_calendar = calendar.HTMLCalendar(calendar.SUNDAY)
     combined_cals = ""
-    for m in range(month, month+4):
+
+
+    month_range = []
+    c = 0
+    m = month
+    for i in range(4):
+        if m+c > 12:
+            m = 1
+            c = 0
+        month_range.append(m+c)
+        c += 1
+
+
+    prev_month = 0
+
+
+    for m in month_range:
+
+        if prev_month == 12:
+            year += 1
+
+        if m == 12:
+            next_month = 1
+        else:
+            next_month = m + 1
+
+        if m == 1:
+            prev_month = 12
+        else:
+            prev_month = m - 1
+
+        #print(f"month: {m}")
+        #print(f"year: {year}")
+
         one_month_cal = this_calendar.formatmonth(year, m)
         one_month_cal = one_month_cal.replace("&nbsp;"," ")
-        prev_link = f"<div id='prev_link'><a href='#' onclick='showMonth({m-1}); return false;'>&#171; Prev</a></div>\n"
-        next_link = f"<div id='next_link'><a href='#' onclick='showMonth({m+1}); return false;'>Next &#187;</a></div>\n"
+        prev_link = f"<div id='prev_link'><a href='#' onclick='showMonth({prev_month}); return false;'>&#171; Prev</a></div>\n"
+        next_link = f"<div id='next_link'><a href='#' onclick='showMonth({next_month}); return false;'>Next &#187;</a></div>\n"
         one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
         c = db.cursor()
 
         c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() and (pinned <> 'invisible' or pinned is null)")
         allrows = c.fetchall()
+
+        #print(allrows)
+
         c.close()
         zm = "0"+str(m) if len(str(m)) == 1 else m
         for d in allrows:
@@ -78,8 +119,12 @@ def make_cal(db, month, year):
             zd = "0"+str(day) if len(str(day)) == 1 else day
             one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/calendar.html#{year}-{zm}-{zd}" >{day}</a><')
         combined_cals += one_month_cal
-    return combined_cals
 
+        #print(combined_cals)
+
+        prev_month = m
+
+    return combined_cals
 
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
@@ -306,13 +351,14 @@ def app(environ, start_response):
                         # Notice zero after purchase_units:
                         data_array.append(order['details']['purchase_units'][0]['amount']['value'])
                         data_array.append(order['details']['purchase_units'][0]['payments']['captures'][0]['amount']['value'])
+                        data_array.append(order['variable_time_slot'])
 
                         # Load database:
-                        fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid"
+                        fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time"
                         #vals = str(data_array).lstrip('[').rstrip(']')
                         vals = data_array
                         #sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
-                        sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
                         c = db.cursor()
                         #c.execute(sql)
@@ -335,12 +381,17 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/home':
             # UP-NEXT EVENT
-            month = 11 #today.month
-            year = 2020 #today.year
+            month = int(this_now.strftime("%m"))
+            year = int(this_now.strftime("%Y"))
             html_cal = make_cal(db, month, year)
+
+            #print(html_cal)
+
             db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and (pinned <> 'invisible' or pinned is null) ORDER BY edatetime limit 1")
             r = db.store_result()
             next_event = r.fetch_row(maxrows=1, how=1)[0]
+            #html_cal = ""
+            #next_event = ""
 
             # FEATURED / PINNED EVENTS
             db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and pinned = 'home' ORDER BY edatetime limit 10")
@@ -640,7 +691,8 @@ def app(environ, start_response):
             #print(sql2)
             d = db.cursor()
             d.execute(sql2)
-            pid = int(d.fetchone()[0])
+            results = d.fetchone()
+            pid = int(results = results[0])
             d.close()
         else:
             sql2 = "just an update"
@@ -695,6 +747,10 @@ def app(environ, start_response):
         del data_object['append_time']
         del data_array[1]
 
+        # For the variable-field stuff:
+        price_text = data_object["price_text"]
+        elimit = data_object["elimit"]
+
         # Todo: More validation
         events_form = EventsForm(**data_object)
 
@@ -713,11 +769,13 @@ def app(environ, start_response):
 
 
         else:
-            fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, pinned"
+            # fields MUST match keys coming in via "data_array":
+            fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, pinned, extra_data"
             #vals = str(data_array).lstrip('[').rstrip(']')
             vals = data_array
             #sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
-            sql = f"INSERT INTO events ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            # Number of items (%s) MUST match num of vals coming in via "data_array":
+            sql = f"INSERT INTO events ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
             c = db.cursor()
             #c.execute(sql)
@@ -731,14 +789,38 @@ def app(environ, start_response):
             # Now retrieve the eid from the item we just added
             e = data_object['edatetime']
             t = data_object['title'].replace("'", "''")
-            sql2 = f"SELECT eid FROM events WHERE edatetime = '{e}' AND title = '{t}'"
-            #print(sql2)
+            sql2 = f"SELECT eid, price_text, elimit FROM events WHERE edatetime = '{e}' AND title = '{t}'"
+            print("____", sql2)
             d = db.cursor()
             d.execute(sql2)
-            eid = int(d.fetchone()[0])
+            results = d.fetchone()
+            print("____results", results)
+            print("____type of results", type(results))
+            eid = int(results[0])
+            try:
+                price_text = results[1]
+            except:
+                price_text = ""
+            try:
+                elimit = int(results[2])
+            except:
+                elimit = ""
             d.close()
+
+
+            #
+            # TESTING THE NEW VARIABLE-TIME STUFF:
+            if "am" in price_text or "pm" in price_text:
+                u = UpdateExtra(eid, price_text, elimit)
+                u.set_via_admin()
+                u.update_extra()
+            #
+
+
         else:
             sql2 = "just an update"
+
+
 
         image_form = ImageForm()
 

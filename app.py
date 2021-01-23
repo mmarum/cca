@@ -3,7 +3,10 @@ import sys
 import json
 import re
 import base64
-import calendar
+
+#import calendar
+from paper_calendar import make_cal
+
 import datetime
 import random
 
@@ -62,69 +65,6 @@ def write_file(file_name, content):
 dbuser = "catalystcreative_cca"
 passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
-def make_cal(db, month, year):
-    this_calendar = calendar.HTMLCalendar(calendar.SUNDAY)
-    combined_cals = ""
-
-
-    month_range = []
-    c = 0
-    m = month
-    for i in range(4):
-        if m+c > 12:
-            m = 1
-            c = 0
-        month_range.append(m+c)
-        c += 1
-
-
-    prev_month = 0
-
-
-    for m in month_range:
-
-        if prev_month == 12:
-            year += 1
-
-        if m == 12:
-            next_month = 1
-        else:
-            next_month = m + 1
-
-        if m == 1:
-            prev_month = 12
-        else:
-            prev_month = m - 1
-
-        #print(f"month: {m}")
-        #print(f"year: {year}")
-
-        one_month_cal = this_calendar.formatmonth(year, m)
-        one_month_cal = one_month_cal.replace("&nbsp;"," ")
-        prev_link = f"<div id='prev_link'><a href='#' onclick='showMonth({prev_month}); return false;'>&#171; Prev</a></div>\n"
-        next_link = f"<div id='next_link'><a href='#' onclick='showMonth({next_month}); return false;'>Next &#187;</a></div>\n"
-        one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
-        c = db.cursor()
-
-        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() and (pinned <> 'invisible' or pinned is null)")
-        allrows = c.fetchall()
-
-        #print(allrows)
-
-        c.close()
-        zm = "0"+str(m) if len(str(m)) == 1 else m
-        for d in allrows:
-            day = str(d[0])
-            day = day.split(' ')[0].split('-')[2].lstrip('0')
-            zd = "0"+str(day) if len(str(day)) == 1 else day
-            one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/calendar.html#{year}-{zm}-{zd}" >{day}</a><')
-        combined_cals += one_month_cal
-
-        #print(combined_cals)
-
-        prev_month = m
-
-    return combined_cals
 
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
@@ -175,7 +115,6 @@ def app(environ, start_response):
             c.execute("SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime")
             allrows = c.fetchall()
             c.close()
-
             template = env.get_template("admin-events-list.html")
             response = template.render(allrows=allrows)
 
@@ -189,7 +128,6 @@ def app(environ, start_response):
                 form = EventsForm(**row)
             else:
                 form = EventsForm()
-
             template = env.get_template("admin-events-add-edit.html")
             response = template.render(form=form)
 
@@ -222,7 +160,6 @@ def app(environ, start_response):
             for item in orders_count:
                 key = int(item['eid'])
                 val = int(item['sum_quantity'])
-
                 orders_count_object[key] = val
 
             events_object = {}
@@ -272,7 +209,6 @@ def app(environ, start_response):
             response = template.render(row=row)
 
 
-        #"""
         elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
             db.query(f"SELECT * FROM events WHERE eid = {eid}")
@@ -285,7 +221,6 @@ def app(environ, start_response):
 
             template = env.get_template("book-event.html")
             response = template.render(event_data=row, order_count=order_count)
-        #"""
 
 
         elif environ['PATH_INFO'] == '/gallery/slideshow' or environ['PATH_INFO'].lstrip('/') in galleries_list:
@@ -691,7 +626,8 @@ def app(environ, start_response):
             #print(sql2)
             d = db.cursor()
             d.execute(sql2)
-            pid = int(d.fetchone()[0])
+            results = d.fetchone()
+            pid = int(results = results[0])
             d.close()
         else:
             sql2 = "just an update"
@@ -768,11 +704,13 @@ def app(environ, start_response):
 
 
         else:
-            fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, pinned"
+            # fields MUST match keys coming in via "data_array":
+            fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, pinned, extra_data"
             #vals = str(data_array).lstrip('[').rstrip(']')
             vals = data_array
             #sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
-            sql = f"INSERT INTO events ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            # Number of items (%s) MUST match num of vals coming in via "data_array":
+            sql = f"INSERT INTO events ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
             c = db.cursor()
             #c.execute(sql)
@@ -787,24 +725,36 @@ def app(environ, start_response):
             e = data_object['edatetime']
             t = data_object['title'].replace("'", "''")
             sql2 = f"SELECT eid, price_text, elimit FROM events WHERE edatetime = '{e}' AND title = '{t}'"
-            #print(sql2)
+            print("____", sql2)
             d = db.cursor()
             d.execute(sql2)
-            eid = int(d.fetchone()[0])
-            price_text = d.fetchone()[1]
-            elimit = int(d.fetchone()[2])
+            results = d.fetchone()
+            print("____results", results)
+            print("____type of results", type(results))
+            eid = int(results[0])
+            try:
+                price_text = results[1]
+            except:
+                price_text = ""
+            try:
+                elimit = int(results[2])
+            except:
+                elimit = ""
             d.close()
+
+
+            #
+            # TESTING THE NEW VARIABLE-TIME STUFF:
+            if "am" in price_text or "pm" in price_text:
+                u = UpdateExtra(eid, price_text, elimit)
+                u.set_via_admin()
+                u.update_extra()
+            #
+
 
         else:
             sql2 = "just an update"
 
-
-        #
-        # TESTING THE NEW VARIABLE-TIME STUFF:
-        u = UpdateExtra(eid, price_text, elimit)
-        u.set_via_admin()
-        u.update_extra()
-        #
 
 
         image_form = ImageForm()

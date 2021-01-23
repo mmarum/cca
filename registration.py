@@ -38,10 +38,23 @@ def registration(environ, start_response):
     passwd = json.loads(read_file("../app/data/passwords.json"))[dbuser]
 
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
-    template = env.get_template("summer-camp.html")
+    template = env.get_template("registration.html")
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
 
-    if environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/confirm":
+    method = environ['REQUEST_METHOD']
+    path = environ['PATH_INFO']
+
+    valid_registrations = ["after-school", "summer-camp", "wheel-wars"]
+
+    if path == "" or path == "/":
+        registration_name = "after-school" # set default
+    else:
+        if path.split("/")[1] not in valid_registrations:
+            raise ValueError(f"Error: Path does not represent valid registration name. {path}")
+        registration_name = path.split("/")[1]
+        
+
+    if method == "POST" and path.endswith("/confirm"):
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
         key_val_array = post_input.split('\n')
@@ -102,7 +115,7 @@ def registration(environ, start_response):
 
             # Removing submit because not for the db
             fields.remove('submit')
-            vals.remove('Submit')
+            vals.remove('Continue')
 
             fields = str(fields).lstrip('[').rstrip(']').replace("'", "")
             vals = str(vals).lstrip('[').rstrip(']')
@@ -124,11 +137,11 @@ def registration(environ, start_response):
             rid = int(d.fetchone()[0])
             d.close()
 
-        response = template.render(data=post_input_dict, rid=rid)
+        response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
 
 
     ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/edit":
+    elif method == "POST" and path.endswith("/edit"):
 
         # DE-DUPE THESE NEXT 17 LINES:
 
@@ -157,11 +170,11 @@ def registration(environ, start_response):
         row = r.fetch_row(maxrows=1, how=1)[0]
         print(f"row: {row}")
         form = RegistrationForm(**row)
-        response = template.render(form=form)
+        response = template.render(form=form, registration_name=registration_name)
 
 
     ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/complete":
+    elif method == "POST" and path.endswith("/complete"):
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
         form_registration = json.loads(post_input)
@@ -194,7 +207,7 @@ def registration(environ, start_response):
 
     else:
         form = RegistrationForm()
-        response = template.render(form=form)
+        response = template.render(form=form, registration_name=registration_name)
 
     #response += f"<hr>{str(environ)}"
 
