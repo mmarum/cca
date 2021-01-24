@@ -73,12 +73,13 @@ def registration(environ, start_response):
             except:
                 pass
 
-        # An unchecked checkbox doesn't pass a value so we need this
-        for i in ["session1", "session2", "treatment_permission", "photo_release"]:
-            if i not in fields:
-                post_input_dict[i] = '' 
-                fields.append(i)
-                vals.append('')
+        if registration_name == "after-school":
+            # An unchecked checkbox doesn't pass a value so we need this
+            for i in ["session1", "session2", "treatment_permission", "photo_release"]:
+                if i not in fields:
+                    post_input_dict[i] = '' 
+                    fields.append(i)
+                    vals.append('')
 
         try:
             if int(post_input_dict["rid"]) > 0:
@@ -109,39 +110,49 @@ def registration(environ, start_response):
             c.execute(sql)
             c.close()
 
+            template = env.get_template("after-school.html")
+            response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
+
         # INSERT
         else:
-            # Removing rid becuase this is an insert
-            del fields[0]
-            del vals[0]
 
-            # Removing submit because not for the db
-            fields.remove('submit')
-            vals.remove('Continue')
+            if registration_name == "after-school":
 
-            fields = str(fields).lstrip('[').rstrip(']').replace("'", "")
-            vals = str(vals).lstrip('[').rstrip(']')
-            sql = f"INSERT INTO registration ({fields}) VALUES ({vals})"
+                # Removing rid becuase this is an insert
+                del fields[0]
+                del vals[0]
 
-            print(f"sql: {sql}")
+                # Removing submit because not for the db
+                fields.remove('submit')
+                vals.remove('Continue')
 
-            c = db.cursor()
-            c.execute(sql)
-            c.close()
+                fields = str(fields).lstrip('[').rstrip(']').replace("'", "")
+                vals = str(vals).lstrip('[').rstrip(']')
+                sql = f"INSERT INTO registration ({fields}) VALUES ({vals})"
 
-            # TODO: Need to solve for refresh problem:
-            # if user refreshes then they'll keep inserting new row
-            # Possibly by adding a create_time field
+                print(f"sql: {sql}")
 
-            sql2 = f"SELECT max(rid) FROM registration"
-            d = db.cursor()
-            d.execute(sql2)
-            rid = int(d.fetchone()[0])
-            d.close()
+                c = db.cursor()
+                c.execute(sql)
+                c.close()
 
-        template = env.get_template("after-school.html")
-        response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
+                # TODO: Need to solve for refresh problem:
+                # if user refreshes then they'll keep inserting new row
+                # Possibly by adding a create_time field
 
+                sql2 = f"SELECT max(rid) FROM registration"
+                d = db.cursor()
+                d.execute(sql2)
+                rid = int(d.fetchone()[0])
+                d.close()
+
+                template = env.get_template("after-school.html")
+                response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
+
+            elif registration_name == "wheel-wars":
+
+                template = env.get_template("wheel-wars.html")
+                response = template.render(data=post_input_dict, registration_name=registration_name)
 
     ####
     elif method == "POST" and path.endswith("/edit"):

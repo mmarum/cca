@@ -26,10 +26,13 @@ h5 {
 <h3>Registration & Release Form</h3>
 </center>
 
-{% if data and rid %}
+{% for item in data %}
+  {{ item }}
+{% endfor %}
+
+{% if data %}
 
 <form action="/registration/{{ registration_name }}/edit" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
-<input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
 
 <div class="row">
 <div class="col-sm-12 bg-light">
@@ -41,7 +44,7 @@ h5 {
 <div class="col-sm-4">
 {% for k, v in data.items() %}
   {% if k.startswith('parent_name') or k.startswith('pickup1_name') %}</div><div class="col-sm-4">{% endif %}
-  {% if k != "rid" and k != "order_id" and k != "submit" %}
+  {% if k != "order_id" and k != "submit" %}
     {% if v and v != "0" %}
       {{ k }}: <span id="{{ k }}">{{ v }}</span><br/>
     {% endif %}
@@ -95,7 +98,6 @@ h5 {
 <hr>
 
 <form action="/registration/{{ registration_name }}/confirm" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
-{{ form.rid }}
 
 <div class="row">
   <div class="col-sm-12">
