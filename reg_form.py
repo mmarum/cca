@@ -35,20 +35,22 @@ class RegistrationForm(Form):
 
 
 class RegFormWheelWars(Form):
-    rid = HiddenField("rid", description="rid")
-    order_id = HiddenField("Order ID", description="Order ID")
-    """
-    event_date
-    name
-    phone_number
-    age
-    city
-    career
-    Can you use a pottery wheel?
-    Brief description of pottery experience:
-    Brief description of the pottery items you have made on the wheel:
-    Future pottery Interests:
-    Attach several photos of your pottery wheel work. (Is that possible?)
-    Add Photo/Social Media Release
-    """
+    rid = HiddenField("rid", description="")
+    order_id = HiddenField("Order ID", description="")
+    registration_name = HiddenField("Registration Name", description="")
+    event_date = HiddenField("Event Date", description="")
+    name = StringField("Name", description="Name")
+    phone_number = StringField("Phone Number", description="Phone Number")
+    age = StringField("Age", description="Age")
+    city = StringField("City", description="City")
+    career = StringField("Career", description="Career")
+    use_wheel = StringField("Can you use a pottery wheel?", description="Can you use a pottery wheel?")
+    experience = StringField("Pottery Experience", description="Brief description of pottery experience")
+    items = StringField("Pottery Items", description="Brief description of the pottery items you have made on the wheel")
+    interests = StringField("Pottery Interests", description="Pottery Interests")
+    photos = HiddenField("Photos", description="")
+    treatment_permission = BooleanField("Emergency Treatment Permission", [validators.required()], description="")
+    photo_release = BooleanField("Photo/Social Media Release", [validators.required()], description="")
+    signature = StringField("Signature", [validators.required()], description="")
+    submit = SubmitField("Continue", description="Continue")
 

@@ -1,0 +1,433 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts After School Pottery Program Registration{% endblock %}
+
+{% block html_head %}
+<style>
+h5 {
+  padding-top: 20px;
+}
+{% if form %}
+{% if not form.camper2_name.data %}#camper2_group, {% else %}#add_camper2, {% endif %}
+{% if not form.camper3_name.data %}#camper3_group, {% else %}#add_camper3, {% endif %}
+{% endif %}
+#paypal-button-container {
+  display: none;
+}
+.total {
+  padding: 10px;
+  margin: 10px;
+}
+#total {
+  background-color: LightGray;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<script>
+// Temporary bandaid:
+var session_dates = {};
+session_dates[1] = "Week 1: June 22 - 26, 2020";
+session_dates[2] = "Week 2: July 13 - 17, 2020";
+</script>
+
+<center>
+<h1>Catalyst Creative Arts After School Pottery Program 2020</h1>
+<h3>Registration & Release Form</h3>
+</center>
+
+{% if data and rid %}
+
+<form action="/registration/{{ registration_name }}/edit" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
+<input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
+
+<div class="row">
+<div class="col-sm-12 bg-light">
+<h5>Confirm your information</h5>
+</div>
+</div>
+
+<div class="row">
+<div class="col-sm-4">
+{% for k, v in data.items() %}
+  {% if k.startswith('parent_name') or k.startswith('pickup1_name') %}</div><div class="col-sm-4">{% endif %}
+  {% if k != "rid" and k != "order_id" and k != "submit" %}
+    {% if v and v != "0" %}
+      {{ k }}: <span id="{{ k }}">{{ v }}</span><br/>
+    {% endif %}
+  {% endif %}
+{% endfor %}
+</div>
+</div>
+
+<script>var page='confirm';</script>
+
+<div class="row">
+  <div class="col-sm-12 text-center border rounded total">
+    Participants: <span id="number_of_campers"></span>. Number of sessions: <span id="number_of_sessions"></span>. Total: $<span id="total"></span>.
+  </div>
+</div>
+
+<div class="row" id="edit_continue_row">
+  <div class="col-sm-6 text-right">
+    <button type="button" class="btn btn-warning" onClick="edit(); return false;">Edit</button>
+  </div>
+  <div class="col-sm-6">
+    <button type="button" class="btn btn-success" onClick="continuePay(); return false;">Continue</button>
+  </div>
+</div>
+</form>
+
+{% endif %}
+
+{% if form %}
+
+<form action="/registration/{{ registration_name }}/confirm" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
+{{ form.rid }}
+
+<div class="row">
+  <div class="col-sm-12">
+    <h5>PARTICIPANT(S) INFORMATION</h5>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+    {{ form.camper1_name.label(class="form-text text-muted") }}
+    {{ form.camper1_name(class="form-control") }}
+    <p id="add_camper2"><a href="#" onclick="showMore(2); return false;">Add a second participant</a></p>
+  </div>
+  <div class="col-sm-4">
+    {{ form.camper1_age.label(class="form-text text-muted") }}
+    {{ form.camper1_age(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.camper1_grade.label(class="form-text text-muted") }}
+    {{ form.camper1_grade(class="form-control") }}
+  </div>
+</div>
+
+<div id="camper2_group">
+<div class="row">
+  <div class="col-sm-4">
+    {{ form.camper2_name.label(class="form-text text-muted") }}
+    {{ form.camper2_name(class="form-control") }}
+    <p id="add_camper3"><a href="#" onclick="showMore(3); return false;">Add a third participant</a></p>
+  </div>
+  <div class="col-sm-4">
+    {{ form.camper2_age.label(class="form-text text-muted") }}
+    {{ form.camper2_age(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.camper2_grade.label(class="form-text text-muted") }}
+    {{ form.camper2_grade(class="form-control") }}
+  </div>
+</div>
+</div>
+
+<div id="camper3_group">
+<div class="row">
+  <div class="col-sm-4">
+    {{ form.camper3_name.label(class="form-text text-muted") }}
+    {{ form.camper3_name(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.camper3_age.label(class="form-text text-muted") }}
+    {{ form.camper3_age(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.camper3_grade.label(class="form-text text-muted") }}
+    {{ form.camper3_grade(class="form-control") }}
+  </div>
+</div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <h5>PARENT/GUARDIAN INFORMATION</h5>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+    {{ form.parent_name.label(class="form-text text-muted") }}
+    {{ form.parent_name(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.parent_address.label(class="form-text text-muted") }}
+    {{ form.parent_address(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.parent_city.label(class="form-text text-muted") }}
+    {{ form.parent_city(class="form-control") }}
+  </div>
+</div>
+  
+<div class="row">
+  <div class="col-sm-4">
+    {{ form.parent_state.label(class="form-text text-muted") }}
+    {{ form.parent_state(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.parent_zip.label(class="form-text text-muted") }}
+    {{ form.parent_zip(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.parent_email.label(class="form-text text-muted") }}
+    {{ form.parent_email(class="form-control") }}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-4">
+    {{ form.parent_phone.label(class="form-text text-muted") }}
+    {{ form.parent_phone(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.parent_em_name.label(class="form-text text-muted") }}
+    {{ form.parent_em_name(class="form-control") }}
+  </div>
+  <div class="col-sm-4">
+    {{ form.parent_em_phone.label(class="form-text text-muted") }}
+    {{ form.parent_em_phone(class="form-control") }}
+  </div>
+</div>
+  
+<div class="row">
+  <div class="col-sm-12">
+    <h5>PERSON(S) AUTHORIZED TO PICK UP PARTICIPANT</h5>
+  </div>
+</div>
+    
+<div class="row">
+  <div class="col-sm-6">
+    {{ form.pickup1_name.label(class="form-text text-muted") }}
+    {{ form.pickup1_name(class="form-control") }}
+  </div>
+  <div class="col-sm-6">
+    {{ form.pickup1_phone.label(class="form-text text-muted") }}
+    {{ form.pickup1_phone(class="form-control") }}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-6">
+    {{ form.pickup2_name.label(class="form-text text-muted") }}
+    {{ form.pickup2_name(class="form-control") }}
+  </div>
+  <div class="col-sm-6">
+    {{ form.pickup2_phone.label(class="form-text text-muted") }}
+    {{ form.pickup2_phone(class="form-control") }}
+  </div>
+</div>
+
+<!--
+<div class="row">
+  <div class="col-sm-12">
+    <h5>Check Sessions You Are Registering For</h5>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    {{ form.session1 }}
+    {{ form.session1.label }}
+  </div>
+</div>
+    
+<div class="row">
+  <div class="col-sm-12">
+    {{ form.session2 }}
+    {{ form.session2.label }}
+  </div>
+</div>
+-->
+    
+<div class="row">
+  <div class="col-sm-12">
+{{ form.treatment_permission }}
+{{ form.treatment_permission.label }}<br/>
+<small>In case of emergency and in the event that none of the emergency contacts can be reached, CATALYST CREATIVE ARTS will need signed authorization (below) to seek medical assistance for your child. I give permission to the CATALYST CREATIVE ARTS, its employees and designated representatives, to use whatever emergency (e.g., first aid, disaster evacuation) measures are judged necessary by them for the care and protection of my child while under supervision of the CATALYST CREATIVE ARTS. In case of medical emergency, I understand that my child will be transported to appropriate medical facilities by a local emergency unit for treatment if the local emergency resource (police or paramedics) deems it necessary. It is understood that in some medical situations, the staff will need to contact the local emergency resource before the parent, child's physician and/ or other emergency contacts acting on the parents' behalf.</small>
+  </div>
+</div>
+    
+<div class="row">
+  <div class="col-sm-12">
+{{ form.photo_release }}
+{{ form.photo_release.label }}<br/>
+<small>I, the undersigned, grant Catalyst Creative, LLC d/b/a CATALYST CREATIVE ARTS, permission to use any pictures taken in public view of myself individually, my child (participant(s) listed above), or any in which I (or the participant(s)) appear in whole or in part during After School Pottery Program. I understand that these pictures may be reproduced in print and electronic media specifically to promote CATALYST CREATIVE ARTS. I waive any right to inspect or approve said pictures, or any captions or accompanying texts that may be used in connection with them, or to approve the use to which said materials may be applied.</small>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    {{ form.signature.label(class="form-text text-muted") }}
+    {{ form.signature(class="form-control") }}
+    <p><small>Typing your name into the input field above serves as your signature.</small></p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    {{ form.submit(class="form-control btn btn-success", onClick="validate(); return false;") }}
+  </div>
+</div>
+
+</form>
+
+<script>var page='add-edit';</script>
+
+{% endif %}
+
+{% if data and data.parent_name == "__TEST__" %}
+<h1>SANDBOX</h1>
+<script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
+// SANDBOX
+</script>
+{% else %}
+<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+// PRODUCTION
+</script>
+{% endif %}
+
+<div id="paypal-button-container" class="text-center top-buffer"></div>
+
+<script>
+
+function calculate() {
+  var camperNameLen = {};
+  var total = 0;
+  var number_of_campers = 0;
+  var number_of_sessions = 1;
+  var first_camper_price = 200;
+  var more_camper_price = 165;
+  for (i = 1; i <= 3; i++) {
+    //console.log(i);
+    try {
+      camperNameLen[i] = document.getElementById("camper"+i+"_name").innerHTML.length;
+      //console.log(camperNameLen[i]);
+    } catch(err) {
+      camperNameLen[i] = 0;
+      //console.log('fail'+camperNameLen[i]);
+    }
+    if (camperNameLen[i] > 0) {
+      number_of_campers += 1;
+      if (total >= 200) {
+        total += more_camper_price;
+      } else {
+        total += first_camper_price;
+      }
+    }
+  }
+
+  // USERS CAN REGISTER FOR MULTIPLE SESSIONS:
+  try {
+    if ((document.getElementById("session1").innerHTML)&&(document.getElementById("session2").innerHTML)) {
+      total = total * 2;
+      number_of_sessions = 2;
+    }
+  } catch(err) {
+    // nothing
+  }
+
+  document.getElementById("total").innerHTML = total;
+  document.getElementById("number_of_campers").innerHTML = number_of_campers;
+  document.getElementById("number_of_sessions").innerHTML = number_of_sessions;
+
+  for (i = 1; i <= 2; i++) {
+    try {
+      if (document.getElementById("session"+i).innerHTML == "y") {
+        document.getElementById("session"+i).innerHTML = session_dates[i];
+        document.getElementById("number_of_sessions").innerHTML += " ("+session_dates[i]+")";
+      }
+    } catch(err) {
+      // nothing
+    }
+  }
+
+  return total;
+}
+
+if (page == "confirm") {
+  calculate();
+}
+
+function validate() {
+  if ((document.getElementById("session1").checked === true)||(document.getElementById("session2").checked === true)) {
+    document.registration_form.submit();
+    return true;
+  } else {
+    alert('Please choose a session.');
+    return false;
+  }
+}
+
+function showMore(n) {
+  document.getElementById("camper"+n+"_group").style.display = "block";
+  document.getElementById("add_camper"+n).style.display = "none";
+}
+
+function edit() {
+  document.registration_form.submit();
+  return true;
+}
+
+function continuePay() {
+  document.getElementById("paypal-button-container").style.display = "block";
+  return false;
+}
+
+// PAYPAL STUFF
+if (page == "confirm") {
+  paypal.Buttons({
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: calculate()
+          }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        //alert('Transaction completed by ' + details.payer.name.given_name);
+
+        var transaction_completed_text = "Transaction complete. Thank you " + details.payer.name.given_name;
+        transaction_completed_text += " Order ID: " + details.id;
+        document.getElementById("paypal-button-container").style.display = 'none';
+        document.getElementById("edit_continue_row").innerHTML = transaction_completed_text;
+        document.getElementById("edit_continue_row").style.backgroundColor = "green";
+
+        //console.log(details);
+        // Call your server to save the transaction
+        //return fetch('/app/paypal-transaction-complete', {
+        return fetch('/registration/{{ registration_name }}/complete', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            {% if data and rid %}registration_id: {{ rid }},{% endif %}
+            order_id: data.orderID,
+            parent_name: document.getElementById("parent_name").innerHTML,
+            parent_address: document.getElementById("parent_address").innerHTML,
+            parent_city: document.getElementById("parent_city").innerHTML,
+            parent_state: document.getElementById("parent_state").innerHTML,
+            parent_zip: document.getElementById("parent_zip").innerHTML,
+            parent_email: document.getElementById("parent_email").innerHTML,
+            parent_phone: document.getElementById("parent_phone").innerHTML,
+            number_of_campers: document.getElementById("number_of_campers").innerHTML,
+            number_of_sessions: document.getElementById("number_of_sessions").innerHTML,
+            total_cost: document.getElementById("total").innerHTML,
+            details: details
+          })
+        });
+      });
+    }
+  }).render('#paypal-button-container');
+}
+</script>
+
+{% endblock %}

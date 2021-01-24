@@ -3,7 +3,7 @@ import sys
 import json
 import requests
 import MySQLdb
-from reg_form import RegistrationForm
+from reg_form import RegistrationForm, RegFormWheelWars
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 #python3.6.8
@@ -26,7 +26,7 @@ def write_file(file_name, content):
     return True
 
 env = Environment(
-    loader=PackageLoader('registration', ''), # blank for no templates dir
+    loader=PackageLoader('registration', 'templates'),
     autoescape=select_autoescape(['html'])
 )
 
@@ -38,7 +38,7 @@ def registration(environ, start_response):
     passwd = json.loads(read_file("../app/data/passwords.json"))[dbuser]
 
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
-    template = env.get_template("registration.html")
+
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
 
     method = environ['REQUEST_METHOD']
@@ -52,6 +52,8 @@ def registration(environ, start_response):
         if path.split("/")[1] not in valid_registrations:
             raise ValueError(f"Error: Path does not represent valid registration name. {path}")
         registration_name = path.split("/")[1]
+
+    print("registration_name", registration_name)
         
 
     if method == "POST" and path.endswith("/confirm"):
@@ -137,6 +139,7 @@ def registration(environ, start_response):
             rid = int(d.fetchone()[0])
             d.close()
 
+        template = env.get_template("after-school.html")
         response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
 
 
@@ -165,11 +168,17 @@ def registration(environ, start_response):
         print(f"post_input_dict: {post_input_dict}")
         rid = post_input_dict["rid"]
 
-        db.query(f"SELECT * FROM registration WHERE rid = {rid}")
-        r = db.store_result()
-        row = r.fetch_row(maxrows=1, how=1)[0]
-        print(f"row: {row}")
-        form = RegistrationForm(**row)
+        if registration_name == "wheel-wars":
+            form = RegFormWheelWars(**row)
+            template = env.get_template("wheel-wars.html")
+        else:
+            db.query(f"SELECT * FROM registration WHERE rid = {rid}")
+            r = db.store_result()
+            row = r.fetch_row(maxrows=1, how=1)[0]
+            print(f"row: {row}")
+            form = RegistrationForm(**row)
+            template = env.get_template("after-school.html")
+
         response = template.render(form=form, registration_name=registration_name)
 
 
@@ -202,11 +211,17 @@ def registration(environ, start_response):
         c.execute(sql)
         c.close()
 
-
         response = "200"
 
     else:
-        form = RegistrationForm()
+
+        if registration_name == "wheel-wars":
+            form = RegFormWheelWars()
+            template = env.get_template("wheel-wars.html")
+        else:
+            form = RegistrationForm()
+            template = env.get_template("after-school.html")
+
         response = template.render(form=form, registration_name=registration_name)
 
     #response += f"<hr>{str(environ)}"

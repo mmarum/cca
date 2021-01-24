@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+<meta property="og:site_name" content="Catalyst Creative Arts"/>
+<meta property="og:title" content="Catalyst Creative Arts"/>
+
+<meta property="og:description" content="Arlington art craft and DIY studio and event venue"/>
+<meta name="description" content="Arlington art craft and DIY studio and event venue"/>
+
+<meta property="og:image" content="https://www.catalystcreativearts.com/img/logo.png"/>
+<meta property="og:url" content="https://www.catalystcreativearts.com/"/>
+
+<meta name="keywords" content="Parties, birthday, girls night out, date night, parents night out, corporate event, team building, fundraiser, lessons, bachelorette, shower, office party, christmas party, holiday party, summer art camp, workshops, after school art,  DIY, mommy and me, art show, walk-in, art market, byob, crafts, mobile events, gift certificates, mother's day, art studio, event venue, art gallery, art school, DIY bar"/>
+
+<link rel="stylesheet" 
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
+    crossorigin="anonymous">
+
+<title>{% block title %}{% endblock %}</title>
+
+{% block html_head %}{% endblock %}
+
+<script>
+var browser_size = {
+  width: window.innerWidth || document.body.clientWidth,
+  height: window.innerHeight || document.body.clientHeight
+}
+</script>
+
+<style>
+.top-buffer { 
+  padding: 10px 0 10px 0;
+  margin: 10px 0 10px 0;
+  border-bottom: 1px dashed LightGray;
+}
+table {
+  width: 100%;
+}
+td {
+  border-bottom: 1px solid LightGray;
+  border-right: 1px solid LightGray;
+  padding: 5px;
+  padding: 5px;
+}
+@media only screen and (max-width: 600px) {
+  #nav_container {
+    display: none;
+  }
+  .top-buffer {
+    padding: 0px;
+    margin: 0px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    padding: 10px;
+  }
+  h4 {
+    font-size: 1rem;
+    margin-top: 10px;
+  }
+  .logo {
+    padding: 10px 0 10px 0;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
+}
+@media only screen and (min-width: 600px) {
+  div#burger div {
+    display: none;
+  }
+}
+.logo {
+  width: 100%;
+  max-width: 915px;
+}
+div#burger div {
+  margin-top: 10px;
+  width: 35px;
+  height: 5px;
+  background-color: black;
+  margin: 6px 0;
+  
+}
+#buns {
+  
+}
+</style>
+
+</head>
+
+<body>
+<div id="top"></div>
+
+<div id="content">
+
+<div class="container">
+
+<div class="row d-flex h-100">
+  <div class="col-2 justify-content-center align-self-center" id="burger" onclick="navbardrop('nav_container'); return false;">
+    <div id="buns">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+  <div class="col-10" id="logo_container">
+    <center>
+    <a href="/home.html"><img src="/img/logo.png" class="logo"/></a>
+    </center>
+  </div>
+</div>
+
+<script>
+if (browser_size["width"] > 600) {
+  document.getElementById("logo_container").setAttribute("class", "col-12");
+}
+</script>
+
+<div class="row navbar_row">
+  <div class="col">
+
+<div id="nav_container">
+
+<nav class="navbar navbar-expand-sm bg-light navbar-light d-flex">
+  <ul class="navbar-nav list-inline mx-auto justify-content-center">
+  {% for i in ["Calendar", "Crafts/Services", "Private-Events", "About/Contact", "Commissioned-Art", "After-School/Summer-Camp"] -%}
+  {% if i == "Crafts/Services" %}
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop('dropdown-menu'); return false;" data-toggle="dropdown">Crafts/Services</a>
+      <div class="dropdown-menu"  id="dropdown-menu">
+      {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling"] -%}
+        {# "Paint your own pottery", "Specialty Classes", "Custom built" #}
+        <a class="dropdown-item" href="/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
+      {%- endfor %}
+      </div>
+    </li>
+  {% else %}
+    <li class="nav-item"><a class="nav-link" href="/{{ i|replace('/', '-')|lower }}.html">{{ i }}</a></li>
+  {% endif %}
+  {%- endfor%}
+  </ul>
+</nav>
+
+</div>
+
+  </div><!-- close col -->
+</div><!-- close row -->
+
+{% block content %}{% endblock %}
+
+</div><!-- close container -->
+
+<div id="footer" class="text-center bg-light top-buffer">
+{% block footer %}
+<div>400 E. Division St. Ste 100 Arlington, TX 76011 | (972) 446-0444</div>
+<div><a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a></div>
+<a href="https://www.facebook.com/PaintingWithInfluence" alt="Facebook">Facebook</a> | 
+<a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a> | 
+<a href="hhtps://www.instagram.com/paintingwithinfluence" alt="Instagram">Instagram</a>
+{% endblock %}
+</div>
+
+</div><!-- close content -->
+
+<script>
+function navbardrop(div_id_name) {
+  var navbardrop_state = document.getElementById(div_id_name).style.display;
+  if (navbardrop_state == "block") {
+    navbardrop_state = "none";
+  } else {
+    navbardrop_state = "block";
+  }
+  document.getElementById(div_id_name).style.display = navbardrop_state;
+}
+</script>
+
+</body>
+
+</html>
