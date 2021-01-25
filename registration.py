@@ -5,6 +5,8 @@ import requests
 import MySQLdb
 from reg_form import RegistrationForm, RegFormWheelWars
 from jinja2 import Environment, PackageLoader, select_autoescape
+import time
+
 
 #python3.6.8
 #requests
@@ -57,6 +59,7 @@ def registration(environ, start_response):
         
 
     if method == "POST" and path.endswith("/confirm"):
+        print("step: confirm")
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
         key_val_array = post_input.split('\n')
@@ -151,11 +154,32 @@ def registration(environ, start_response):
 
             elif registration_name == "wheel-wars":
 
+                post_input_dict["registration_name"] = "Wheel Wars"
+                post_input_dict["event_date"] = "Saturday March 27, 2021"
+
+                if post_input_dict["rid"] == "":
+
+                    epoch_now = time.time()
+                    rid = epoch_now
+                    post_input_dict["rid"] = rid
+
+                    reg_file = "data/wheel-wars.json"
+
+                    f = open(reg_file, "r")
+                    reg_data = json.loads(f.read())
+
+                    reg_data[rid] = post_input_dict
+
+                    f = open(reg_file, "w")
+                    f.write(json.dumps(reg_data, indent=4))
+                    f.close()
+
                 template = env.get_template("wheel-wars.html")
-                response = template.render(data=post_input_dict, registration_name=registration_name)
+                response = template.render(data=post_input_dict, rid=post_input_dict["rid"], registration_name=registration_name)
 
     ####
     elif method == "POST" and path.endswith("/edit"):
+        print("step: edit")
 
         # DE-DUPE THESE NEXT 17 LINES:
 
@@ -180,7 +204,9 @@ def registration(environ, start_response):
         rid = post_input_dict["rid"]
 
         if registration_name == "wheel-wars":
-            form = RegFormWheelWars(**row)
+            reg_data = json.loads(read_file("data/wheel-wars.json"))
+            this_reg_data = reg_data[rid]
+            form = RegFormWheelWars(**this_reg_data)
             template = env.get_template("wheel-wars.html")
         else:
             db.query(f"SELECT * FROM registration WHERE rid = {rid}")
@@ -195,6 +221,7 @@ def registration(environ, start_response):
 
     ####
     elif method == "POST" and path.endswith("/complete"):
+        print("step: complete")
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
         form_registration = json.loads(post_input)
