@@ -98,22 +98,46 @@ def registration(environ, start_response):
 
         # UPDATE
         if action == "update":
-            keys_vals = ""
-            for k, v in post_input_dict.items():
-                if k != "submit":
-                    keys_vals += str(f"{k}='{v}', ")
-            keys_vals = keys_vals.rstrip(', ')
 
-            rid = post_input_dict["rid"]
-            sql = f"UPDATE registration SET {keys_vals} WHERE rid = {rid}"
+            if registration_name == "after-school":
 
-            print(f"sql: {sql}")
+                rid = int(post_input_dict["rid"])
 
-            c = db.cursor()
-            c.execute(sql)
-            c.close()
+                keys_vals = ""
+                for k, v in post_input_dict.items():
+                    if k != "submit":
+                        keys_vals += str(f"{k}='{v}', ")
+                keys_vals = keys_vals.rstrip(', ')
 
-            template = env.get_template("after-school.html")
+                sql = f"UPDATE registration SET {keys_vals} WHERE rid = {rid}"
+
+                print(f"sql: {sql}")
+
+                c = db.cursor()
+                c.execute(sql)
+                c.close()
+
+                template = env.get_template("after-school.html")
+
+            elif registration_name == "wheel-wars":
+
+                rid = str(post_input_dict["rid"])
+
+                if rid and rid != "":
+
+                    reg_file = "data/wheel-wars.json"
+
+                    f = open(reg_file, "r")
+                    reg_data = json.loads(f.read())
+
+                    reg_data[rid] = post_input_dict
+
+                    f = open(reg_file, "w")
+                    f.write(json.dumps(reg_data, indent=4))
+                    f.close()
+
+                template = env.get_template("wheel-wars.html")
+
             response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
 
         # INSERT
@@ -159,7 +183,7 @@ def registration(environ, start_response):
 
                 if post_input_dict["rid"] == "":
 
-                    epoch_now = time.time()
+                    epoch_now = int(time.time())
                     rid = epoch_now
                     post_input_dict["rid"] = rid
 
@@ -221,35 +245,75 @@ def registration(environ, start_response):
 
     ####
     elif method == "POST" and path.endswith("/complete"):
+
+
+
         print("step: complete")
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-        form_registration = json.loads(post_input)
-        try:
-            registrations = json.loads(read_file(f"../app/registration/registrations.json"))
-        except:
-            registrations = []
-        registrations.append(form_registration)
-        write_file(f"../app/registration/registrations.json", json.dumps(registrations, indent=4))
 
-        passwd = json.loads(read_file("../app/data/passwords.json"))["catalystemail"]
-        url = "https://www.catalystcreativearts.com/email/submit"
-        data = {"subject": "CCA Summer camp registration", "content": f"{json.dumps(registrations, indent=4)}"}
-        headers = {"Content-Type": "application/json"}
-        r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
-        print(r.status_code)
+        if registration_name == "after-school":
 
-        registration_id = int(form_registration["registration_id"])
-        order_id = form_registration["order_id"]
-        sql = f"UPDATE registration SET order_id = '{order_id}' WHERE rid = {registration_id}"
+            form_registration = json.loads(post_input)
+            try:
+                registrations = json.loads(read_file(f"../app/registration/registrations.json"))
+            except:
+                registrations = []
+            registrations.append(form_registration)
+            write_file(f"../app/registration/registrations.json", json.dumps(registrations, indent=4))
 
-        print(f"sql: {sql}")
+            passwd = json.loads(read_file("../app/data/passwords.json"))["catalystemail"]
+            url = "https://www.catalystcreativearts.com/email/submit"
+            data = {"subject": "CCA Summer camp registration", "content": f"{json.dumps(registrations, indent=4)}"}
+            headers = {"Content-Type": "application/json"}
+            r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd))
+            print(r.status_code)
 
-        c = db.cursor()
-        c.execute(sql)
-        c.close()
+            registration_id = int(form_registration["registration_id"])
+            order_id = form_registration["order_id"]
+            sql = f"UPDATE registration SET order_id = '{order_id}' WHERE rid = {registration_id}"
 
-        response = "200"
+            print(f"sql: {sql}")
+
+            c = db.cursor()
+            c.execute(sql)
+            c.close()
+
+            response = "200"
+
+        elif registration_name == "wheel-wars":
+
+            key_val_array = post_input.split('\n')
+            post_input_dict = {}
+            fields = []
+            vals = []
+            for key_val in key_val_array:
+                try:
+                    key = key_val.split('=')[0].strip()
+                    val = key_val.split('=')[1].strip()
+                    post_input_dict[key] = val
+                    fields.append(key)
+                    vals.append(val)
+                except:
+                    pass
+
+            rid = str(post_input_dict["rid"])
+
+            if rid and rid != "":
+
+                reg_file = "data/wheel-wars.json"
+
+                f = open(reg_file, "r")
+                reg_data = json.loads(f.read())
+
+                reg_data[rid]["status"] = "complete"
+
+                f = open(reg_file, "w")
+                f.write(json.dumps(reg_data, indent=4))
+                f.close()
+
+            template = env.get_template("wheel-wars.html")
+            response = template.render(status="complete", registration_name=registration_name)
 
     else:
 

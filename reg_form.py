@@ -36,12 +36,12 @@ class RegistrationForm(Form):
 
 class RegFormWheelWars(Form):
     rid = HiddenField("rid", description="")
-    order_id = HiddenField("Order ID", description="")
+    status = HiddenField("status", description="")
     registration_name = HiddenField("Registration Name", description="")
     event_date = HiddenField("Event Date", description="")
     name = StringField("Name", description="Name")
     phone_number = StringField("Phone Number", description="Phone Number")
-    age = StringField("Age", description="Age")
+    age = StringField("Age", description="Must be 18 years or older")
     city = StringField("City", description="City")
     career = StringField("Career", description="Career")
     use_wheel = StringField("Can you use a pottery wheel?", description="Can you use a pottery wheel?")

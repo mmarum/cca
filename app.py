@@ -73,7 +73,7 @@ def app(environ, start_response):
 
     #today = date.today() #today.year, today.month, today.day
 
-    pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp"]
+    pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp", "wheel-wars"]
 
     #galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18, "string-art": 19, "pottery-lessons": 20}
 

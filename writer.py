@@ -19,6 +19,7 @@ groups = {
     "about-contact", 
     "custom-built",
     "after-school-summer-camp",
+    "wheel-wars",
     "cart"
 ],
 "galleries": [

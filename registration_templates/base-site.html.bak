@@ -27,12 +27,6 @@
 
 <title>{% block title %}{% endblock %}</title>
 
-<script>
-//if (location.protocol !== 'https:') {
-//  location.replace(`https:${location.href.substring(location.protocol.length)}`);
-//}
-</script>
-
 {% block html_head %}{% endblock %}
 
 <script>
@@ -46,11 +40,7 @@ var browser_size = {
 .top-buffer { 
   padding: 10px 0 10px 0;
   margin: 10px 0 10px 0;
-  border-top: 1px dashed LightGray;
-}
-.top-buffer-no-line { 
-  padding: 10px 0 10px 0;
-  margin: 10px 0 10px 0;
+  border-bottom: 1px dashed LightGray;
 }
 table {
   width: 100%;
@@ -66,15 +56,11 @@ td {
     display: none;
   }
   .top-buffer {
-    padding: 15px 0 15px 0;
-    margin: 15px 0 15px 0;
-    border-bottom: 3px dashed Gray;
-  }
-  .event_image {
-    width: 100%;
+    padding: 0px;
+    margin: 0px;
   }
   h1 {
-    font-size: 1.0rem;
+    font-size: 1.5rem;
     padding: 10px;
   }
   h4 {
@@ -87,19 +73,10 @@ td {
   h3 {
     font-size: 1.25rem;
   }
-  img {
-    width: 100%;
-  }
 }
-#tagline {
-  font-size: 20px;
-}
-@media only screen and (min-width: 601px) {
+@media only screen and (min-width: 600px) {
   div#burger div {
     display: none;
-  }
-  #tagline {
-    font-size: 30px;
   }
 }
 .logo {
@@ -117,43 +94,14 @@ div#burger div {
 #buns {
   
 }
-#top_right_cart_container {
-  display: none;
-  width: 50px;
-  position: absolute;
-  top: 20px;
-  right: 20px;
-}
-.cart_icon {
-  width: 50px;
-}
-#top_right_cart_total {
-  margin-left: 22px;
-}
 </style>
 
 </head>
 
 <body>
-
-<!--
-0) Home & After School
-1) After School Pottery Course
-2) After School Art Club
-3) Home School Art Club
-4) # Summer Camp
--->
-
 <div id="top"></div>
 
 <div id="content">
-
-<div id="top_right_cart_container">
-  <a href="/cart">
-  <img src="/img/cart.png" class="cart_icon"/>
-  <div id="top_right_cart_total"></div>
-  </a>
-</div>
 
 <div class="container">
 
@@ -167,15 +115,7 @@ div#burger div {
   </div>
   <div class="col-10" id="logo_container">
     <center>
-    <a href="/"><img src="/img/logo.png" class="logo"/></a>
-    </center>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-sm-12">
-    <center>
-    <div id="tagline">Art, Craft and DIY Studio and Event Venue, Arlington Texas</div>
+    <a href="/home.html"><img src="/img/logo.png" class="logo"/></a>
     </center>
   </div>
 </div>
@@ -193,18 +133,19 @@ if (browser_size["width"] > 600) {
 
 <nav class="navbar navbar-expand-sm bg-light navbar-light d-flex">
   <ul class="navbar-nav list-inline mx-auto justify-content-center">
-  {% for i in ["Calendar", "Crafts / Services", "Private Events", "About / Contact", "After School / Summer Camp", "Wheel Wars"] -%}
-  {% if i == "Crafts / Services" %}
+  {% for i in ["Calendar", "Crafts/Services", "Private-Events", "About/Contact", "Commissioned-Art", "After-School/Summer-Camp"] -%}
+  {% if i == "Crafts/Services" %}
     <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop('dropdown-menu'); return false;" data-toggle="dropdown">Crafts / Services</a>
+      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop('dropdown-menu'); return false;" data-toggle="dropdown">Crafts/Services</a>
       <div class="dropdown-menu"  id="dropdown-menu">
-      {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling", "Pottery Painting", "String Art", "Pottery Lessons"] -%}
+      {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling"] -%}
+        {# "Paint your own pottery", "Specialty Classes", "Custom built" #}
         <a class="dropdown-item" href="/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
       {%- endfor %}
       </div>
     </li>
   {% else %}
-    <li class="nav-item"><a class="nav-link" href="/{{ i|replace(' / ', '-')|replace(' ', '-')|replace('/', '-')|lower }}.html">{{ i }}</a></li>
+    <li class="nav-item"><a class="nav-link" href="/{{ i|replace('/', '-')|lower }}.html">{{ i }}</a></li>
   {% endif %}
   {%- endfor%}
   </ul>
@@ -223,9 +164,9 @@ if (browser_size["width"] > 600) {
 {% block footer %}
 <div>400 E. Division St. Ste 100 Arlington, TX 76011 | (972) 446-0444</div>
 <div><a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a></div>
-<a href="https://www.facebook.com/catalystcreativeart/" alt="Facebook">Facebook</a> | 
+<a href="https://www.facebook.com/PaintingWithInfluence" alt="Facebook">Facebook</a> | 
 <a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a> | 
-<a href="https://www.instagram.com/catalystcreativearts/" alt="Instagram">Instagram</a>
+<a href="hhtps://www.instagram.com/paintingwithinfluence" alt="Instagram">Instagram</a>
 {% endblock %}
 </div>
 
@@ -241,42 +182,6 @@ function navbardrop(div_id_name) {
   }
   document.getElementById(div_id_name).style.display = navbardrop_state;
 }
-</script>
-
-<script>
-
-function make_request_get_total(session_id) {
-  fetch('/cart-api/total', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify({
-      session_id: session_id
-    })
-  })
-  .then(response=>response.json())
-  .then(data=>{
-    console.log(data); 
-    document.getElementById("top_right_cart_container").style.display = "block";
-    document.getElementById("top_right_cart_total").innerHTML = data;
-  })
-}
-
-function checkCartTotal() {
-  // FIRST CHECK IF USER HAS SESSION COOKIE
-  var session_id = document.cookie.split("=")[1];
-  if (session_id) {
-    console.log(session_id)
-    // MAKE A REQUEST TO THE NEW CART API
-    console.log("request to cart api for total");
-    make_request_get_total(session_id);
-  } else {
-    console.log("No session_id");
-  }
-}
-
-checkCartTotal();
 </script>
 
 </body>
