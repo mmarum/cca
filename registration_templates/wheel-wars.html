@@ -6,6 +6,15 @@
 h5 {
   padding-top: 20px;
 }
+.extra_padding {
+  padding: 10px;
+  margin: 10px;
+}
+@media only screen and (min-width: 601px) {
+  .row {
+    padding-top: 30px;
+  }
+}
 </style>
 {% endblock %}
 
@@ -103,15 +112,7 @@ Wheel Wars Saturday March 27, 2021
 </div>
 
 <div class="row">
-  <div class="col-sm-12 top-buffer">
-{{ form.treatment_permission }}
-{{ form.treatment_permission.label(for="treatment_permission") }}<br/>
-<small>In case of emergency and in the event that none of the emergency contacts can be reached, CATALYST CREATIVE ARTS will need signed authorization (below) to seek medical assistance for your child. I give permission to the CATALYST CREATIVE ARTS, its employees and designated representatives, to use whatever emergency (e.g., first aid, disaster evacuation) measures are judged necessary by them for the care and protection of my child while under supervision of the CATALYST CREATIVE ARTS. In case of medical emergency, I understand that my child will be transported to appropriate medical facilities by a local emergency unit for treatment if the local emergency resource (police or paramedics) deems it necessary. It is understood that in some medical situations, the staff will need to contact the local emergency resource before the parent, child's physician and/ or other emergency contacts acting on the parents' behalf.</small>
-  </div>
-</div>
-    
-<div class="row">
-  <div class="col-sm-12 top-buffer">
+  <div class="col-sm-12 extra_padding">
 {{ form.photo_release }}
 {{ form.photo_release.label(for="photo_release") }}<br/>
 <small>I, the undersigned, grant Catalyst Creative, LLC d/b/a CATALYST CREATIVE ARTS, permission to use any pictures taken in public view of myself individually, my child (participant(s) listed above), or any in which I (or the participant(s)) appear in whole or in part during Wheel Wars competition. I understand that these pictures may be reproduced in print and electronic media specifically to promote CATALYST CREATIVE ARTS. I waive any right to inspect or approve said pictures, or any captions or accompanying texts that may be used in connection with them, or to approve the use to which said materials may be applied</small>
@@ -119,7 +120,7 @@ Wheel Wars Saturday March 27, 2021
 </div>
 
 <div class="row">
-  <div class="col-sm-12 top-buffer">
+  <div class="col-sm-12 extra_padding">
     {{ form.signature.label(class="form-text text-muted") }}
     {{ form.signature(class="form-control") }}
     <p><small>Typing your name into the input field above serves as your signature.</small></p>
@@ -127,7 +128,7 @@ Wheel Wars Saturday March 27, 2021
 </div>
 
 <div class="row">
-  <div class="col-sm-12 top-buffer">
+  <div class="col-sm-12 extra_padding">
     {{ form.submit(class="form-control btn btn-success") }}
   </div>
 </div>
@@ -141,6 +142,11 @@ Thank you for registering. We will contact you soon.
 {% endif %}
 
 <script>
+{% if form %}
+  document.getElementById("age").placeholder = "{{ form.age.description }}";
+  document.getElementById("items").placeholder = "{{ form.items.description }}";
+{% endif %}
+
 function edit() {
   document.registration_form.submit();
   return true;

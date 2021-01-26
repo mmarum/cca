@@ -1,4 +1,4 @@
-from wtforms import Form, DateTimeField, StringField, SubmitField, HiddenField, RadioField, BooleanField, TextAreaField, FileField, validators
+from wtforms import Form, DateTimeField, StringField, SubmitField, HiddenField, RadioField, BooleanField, TextAreaField, FileField, SelectField, validators
 from wtforms.validators import InputRequired, DataRequired, ValidationError, url
 
 class RegistrationForm(Form):
@@ -44,12 +44,11 @@ class RegFormWheelWars(Form):
     age = StringField("Age", description="Must be 18 years or older")
     city = StringField("City", description="City")
     career = StringField("Career", description="Career")
-    use_wheel = StringField("Can you use a pottery wheel?", description="Can you use a pottery wheel?")
-    experience = StringField("Pottery Experience", description="Brief description of pottery experience")
-    items = StringField("Pottery Items", description="Brief description of the pottery items you have made on the wheel")
+    use_wheel = SelectField("Can you use a pottery wheel?", choices=[('Yes', 'Yes'), ('No', 'No'), ('Need practice', 'Need practice')])
+    experience = SelectField("Pottery Experience", choices=[('None', 'None'), ('Taken lessons', 'Taken lessons'), ('Own a wheel', 'Own a wheel')])
+    items = StringField("Pottery Items", description="List pottery items you can make")
     interests = StringField("Pottery Interests", description="Pottery Interests")
     photos = HiddenField("Photos", description="")
-    treatment_permission = BooleanField("Emergency Treatment Permission", [validators.required()], description="")
     photo_release = BooleanField("Photo/Social Media Release", [validators.required()], description="")
     signature = StringField("Signature", [validators.required()], description="")
     submit = SubmitField("Continue", description="Continue")
