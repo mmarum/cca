@@ -193,13 +193,13 @@ if (browser_size["width"] > 600) {
 
 <nav class="navbar navbar-expand-sm bg-light navbar-light d-flex">
   <ul class="navbar-nav list-inline mx-auto justify-content-center">
-  {% for i in ["Calendar", "Crafts / Services", "Private Events", "About / Contact", "After School / Summer Camp", "Wheel Wars"] -%}
-  {% if i == "Crafts / Services" %}
+  {% for i in ["Calendar", "Crafts & Services", "Private Events", "About Us", "After School", "Summer Camp", "Wheel Wars", "3 Wednesdays Workshop"] -%}
+  {% if i == "Crafts & Services" %}
     <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop('dropdown-menu'); return false;" data-toggle="dropdown">Crafts / Services</a>
+      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop('dropdown-menu'); return false;" data-toggle="dropdown">Crafts & Services</a>
       <div class="dropdown-menu"  id="dropdown-menu">
       {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling", "Pottery Painting", "String Art", "Pottery Lessons"] -%}
-        <a class="dropdown-item" href="/{{ i|replace(' ', '-')|replace(',', '')|lower }}.html">{{ i }}</a>
+        <a class="dropdown-item" href="/{{ i|replace(' ', '-')|replace(',', '')|replace('&', '')|lower }}.html">{{ i }}</a>
       {%- endfor %}
       </div>
     </li>
@@ -222,7 +222,8 @@ if (browser_size["width"] > 600) {
 <div id="footer" class="text-center bg-light top-buffer">
 {% block footer %}
 <div>400 E. Division St. Ste 100 Arlington, TX 76011 | (972) 446-0444</div>
-<div><a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a></div>
+<a href="/about-us.html" alt="Contact Us">Contact Us</a> | 
+<a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a> |
 <a href="https://www.facebook.com/catalystcreativeart/" alt="Facebook">Facebook</a> | 
 <a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a> | 
 <a href="https://www.instagram.com/catalystcreativearts/" alt="Instagram">Instagram</a>

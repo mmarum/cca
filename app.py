@@ -73,7 +73,7 @@ def app(environ, start_response):
 
     #today = date.today() #today.year, today.month, today.day
 
-    pages = ["private-events", "about-contact", "custom-built", "after-school-summer-camp", "wheel-wars"]
+    pages = ["private-events", "about-us", "custom-built", "after-school", "summer-camp", "wheel-wars", "3-wednesdays-workshop"]
 
     #galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18, "string-art": 19, "pottery-lessons": 20}
 
@@ -95,7 +95,7 @@ def app(environ, start_response):
     "water-marbling": 13,
     #"private-events": 14,
     #"custom-counter-tops-tables": 15,
-    #"about-contact": 16,
+    #"about-us": 16,
     "pottery-painting": 18,
     "string-art": 19,
     "pottery-lessons": 20
@@ -367,6 +367,12 @@ def app(environ, start_response):
             response = template.render(allrows=allrows)
 
 
+        elif environ['PATH_INFO'] == '/admin/registration2':
+            data = json.loads(read_file("../registration/data/wheel-wars.json"))
+            template = env.get_template("admin-registration2.html")
+            response = template.render(data=data)
+
+
         elif environ['PATH_INFO'] == '/summer-camp-registration':
             template = env.get_template("summer-camp-registration.html")
             form = RegistrationForm()
@@ -527,12 +533,12 @@ def app(environ, start_response):
 
         write_file(f"data/contactus.json", json.dumps(data_object, indent=4))
 
-        #template = env.get_template("about-contact.html")
+        #template = env.get_template("about-us.html")
         #response = template.render(thanks=data_object[str(this_now)])
 
-        page_content = str(read_file(f"data/about-contact.html"))
+        page_content = str(read_file(f"data/about-us.html"))
         template = env.get_template("pages.html")
-        page_name = "about-contact"
+        page_name = "about-us"
         response = template.render(page_name=page_name, page_content=page_content, email=email)
 
 

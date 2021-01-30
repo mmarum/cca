@@ -30,6 +30,7 @@ Wheel Wars Saturday March 27, 2021
 <div class="row">
   <div class="col-sm-12">
     <h5>{% if data %}CONFIRM YOUR{% else %}PARTICIPANT{% endif %} INFORMATION</h5>
+    (Eight competitors will be chosen)
   </div>
 </div>
 
@@ -112,7 +113,7 @@ Wheel Wars Saturday March 27, 2021
 </div>
 
 <div class="row">
-  <div class="col-sm-12 extra_padding">
+  <div class="col-sm-12">
 {{ form.photo_release }}
 {{ form.photo_release.label(for="photo_release") }}<br/>
 <small>I, the undersigned, grant Catalyst Creative, LLC d/b/a CATALYST CREATIVE ARTS, permission to use any pictures taken in public view of myself individually, my child (participant(s) listed above), or any in which I (or the participant(s)) appear in whole or in part during Wheel Wars competition. I understand that these pictures may be reproduced in print and electronic media specifically to promote CATALYST CREATIVE ARTS. I waive any right to inspect or approve said pictures, or any captions or accompanying texts that may be used in connection with them, or to approve the use to which said materials may be applied</small>
@@ -120,7 +121,7 @@ Wheel Wars Saturday March 27, 2021
 </div>
 
 <div class="row">
-  <div class="col-sm-12 extra_padding">
+  <div class="col-sm-12">
     {{ form.signature.label(class="form-text text-muted") }}
     {{ form.signature(class="form-control") }}
     <p><small>Typing your name into the input field above serves as your signature.</small></p>
@@ -128,8 +129,9 @@ Wheel Wars Saturday March 27, 2021
 </div>
 
 <div class="row">
-  <div class="col-sm-12 extra_padding">
-    {{ form.submit(class="form-control btn btn-success") }}
+  <div class="col-sm-12">
+    You will be contacted once registration is completed.<br/>
+    {{ form.submit(class="form-control btn btn-success", onClick="validate(); return false;") }}
   </div>
 </div>
 
@@ -137,14 +139,30 @@ Wheel Wars Saturday March 27, 2021
 
 {% elif status == "complete" %}
 
-Thank you for registering. We will contact you soon.
+Thank you for registering. We will contact you soon for details.
 
 {% endif %}
 
 <script>
 {% if form %}
-  document.getElementById("age").placeholder = "{{ form.age.description }}";
-  document.getElementById("items").placeholder = "{{ form.items.description }}";
+document.getElementById("age").placeholder = "{{ form.age.description }}";
+document.getElementById("items").placeholder = "{{ form.items.description }}";
+
+function validate() {
+  if (document.getElementById("name").value == "") {
+    alert('Please add your name.');
+    return false;
+  } else if (document.getElementById("phone_number").value == "") {
+    alert('Please add your phone number.');
+    return false;
+  //} else if (Number(document.getElementById("age").value) < 18) {
+  //  alert('Must be 18 or older.');
+  //  return false;
+  } else {
+    document.registration_form.submit();
+    return true;
+  }
+}
 {% endif %}
 
 function edit() {

@@ -1,0 +1,40 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin View Registration{% endblock %}
+
+{% block html_head %}
+<style>
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1350px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h1>Registration Version 2 Data</h1>
+
+<table class="table table-striped">
+
+<tr class="p-3 mb-2 bg-light text-dark">
+{% for key, val in data.items() %}
+  {% if loop.index == 1 %}
+    {% for k, v in val.items() %}
+      <td>{{ k }}</td>
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+</tr>
+
+{% for key, val in data.items() %}
+  <tr>
+  {% for k, v in val.items() %}
+    <td>{{ v }}</td>
+  {% endfor %}
+  </tr>
+{% endfor %}
+
+</table>
+
+{% endblock %}

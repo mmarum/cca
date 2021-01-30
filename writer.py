@@ -16,10 +16,13 @@ groups = {
     "home",
     "calendar",
     "private-events", 
-    "about-contact", 
+    #"about-contact", 
+    "about-us", 
     "custom-built",
-    "after-school-summer-camp",
+    "after-school",
+    "summer-camp",
     "wheel-wars",
+    "3-wednesdays-workshop",
     "cart"
 ],
 "galleries": [
