@@ -9,6 +9,8 @@ source /home/catalystcreative/virtualenv/app/3.6/bin/activate; cd /home/catalyst
 source /home/catalystcreative/virtualenv/app/3.6/bin/activate; cd /home/catalystcreative/app; python writer.py galleries
 """
 
+domain = "https://www.catalystcreativearts.com"
+
 # TODO: the lists below need to be de-duped or automated
 
 groups = {
@@ -18,7 +20,7 @@ groups = {
     "private-events", 
     #"about-contact", 
     "about-us", 
-    "custom-built",
+    #"custom-built",
     "after-school",
     "summer-camp",
     "wheel-wars",
@@ -46,6 +48,14 @@ groups = {
 ]
 }
 
+sitemap_pages = groups["pages"]
+sitemap_galleries = groups["galleries"]
+sitemap_list = sitemap_pages + sitemap_galleries
+sitemap_list.remove('home')
+sitemap_list.remove('cart')
+sitemap_list.insert(0, '')
+#print("sitemap_list", sitemap_list)
+
 
 def read_file(file_name):
     f = open(file_name, "r")
@@ -61,12 +71,22 @@ def write_file(file_name, content):
     return True
 
 
+sitemap_content = ""
+for x in sitemap_list:
+    if x == "":
+        sitemap_content += f"{domain}/\n"
+    else:
+        sitemap_content += f"{domain}/{x}.html\n"
+write_file("../www/sitemap.txt", sitemap_content)
+print("sitemap_content\n", sitemap_content)
+
+
 user = "catalystcreative"
 passw = json.loads(read_file("data/passwords.json"))[user]
 
 
 def get_page_contents(path):
-    r = requests.get(f'https://www.catalystcreativearts.com/app/{path}', auth=(f'{user}', f'{passw}'))
+    r = requests.get(f'{domain}/app/{path}', auth=(f'{user}', f'{passw}'))
     print(r.url)
     if r.status_code == 200:
         print(r.status_code)

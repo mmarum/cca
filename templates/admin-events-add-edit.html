@@ -9,7 +9,21 @@ input, textarea, label, button {
 textarea.form-control {
  height: 100px;
 }
-
+#series_all, #series_2, #series_3, #series_4, #series_5,
+#series_2_box, #series_3_box, #series_4_box, #series_5_box {
+  display: none;
+}
+#series_all {
+  background-color: WhiteSmoke;
+  border: 1px dashed LightGray;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+}
+label {
+  padding: 0px;
+  margin: 0px;
+}
 </style>
 <!-- https://jqueryui.com/datepicker/ -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -19,12 +33,25 @@ textarea.form-control {
 $( function() {
   $( "#edatetime" ).datepicker({ dateFormat: 'yy-mm-dd' });
 } );
+$( function() {
+  $( "#series_2" ).datepicker({ dateFormat: 'yy-mm-dd' });
+} );
+$( function() {
+  $( "#series_3" ).datepicker({ dateFormat: 'yy-mm-dd' });
+} );
+$( function() {
+  $( "#series_4" ).datepicker({ dateFormat: 'yy-mm-dd' });
+} );
+$( function() {
+  $( "#series_5" ).datepicker({ dateFormat: 'yy-mm-dd' });
+} );
 function appendTime() {
   var append_time = document.getElementById("append_time");
   var edatetime = document.getElementById("edatetime");
   edatetime.value = edatetime.value.split(' ')[0] + " " + append_time.value;
 }
 </script>
+
 {% endblock %}
 
 {% block content %}
@@ -47,6 +74,17 @@ function appendTime() {
   {% else %}
     {{ field(autocomplete="off", class="form-control") }}
   {% endif %}
+
+  {% if field.name == "duration" %}
+    <div><input type="checkbox" name="is_series" id="is_series" value="n" onClick="isSeries();"><label for="is_series">is series?</label></div>
+    <div id="series_all">
+    <div id="series_2_box"><input type="text" name="series_2" id="series_2" placeholder="2nd date & time of this event series" autocomplete="off" class="form-control"> &nbsp; &nbsp; <a href="#" onclick="add_another(3); return false;">add a third date in this series</a></div>
+    <div id="series_3_box"><input type="text" name="series_3" id="series_3" placeholder="3rd date & time of this event series" autocomplete="off" class="form-control"> &nbsp; &nbsp; <a href="#" onclick="add_another(4); return false;">add a fourth date in this series</a></div>
+    <div id="series_4_box"><input type="text" name="series_4" id="series_4" placeholder="4th date & time of this event series" autocomplete="off" class="form-control"> &nbsp; &nbsp; <a href="#" onclick="add_another(5); return false;">add fifth date in this series</a></div>
+    <div id="series_5_box"><input type="text" name="series_5" id="series_5" placeholder="5th date & time of this event series" autocomplete="off" class="form-control"></div>
+    </div>
+  {% endif %}
+
 {% endfor %}
 </form>
 
@@ -68,6 +106,27 @@ function appendTime() {
     {% endif %}
   {% endfor %}
 {% endif %}
+</script>
+
+<script>
+function isSeries() {
+  is_series_val = document.getElementById("is_series").value;
+  if (is_series_val == "y") {
+    document.getElementById("is_series").value = "n";
+    console.log("setting is_series to n");
+    document.getElementById("series_all").style.display = "none";
+  } else {
+    document.getElementById("is_series").value = "y";
+    console.log("setting is_series to y");
+    document.getElementById("series_all").style.display = "block";
+    document.getElementById("series_2").style.display = "block";
+    document.getElementById("series_2_box").style.display = "block";
+  }
+}
+function add_another(n) {
+  document.getElementById("series_"+n).style.display = "block";
+  document.getElementById("series_"+n+"_box").style.display = "block";
+}
 </script>
 
 {% endblock %}
