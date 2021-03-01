@@ -46,17 +46,36 @@ def registration(environ, start_response):
     method = environ['REQUEST_METHOD']
     path = environ['PATH_INFO']
 
-    valid_registrations = ["after-school", "summer-camp", "wheel-wars"]
+    valid_registrations = ["after-school", "summer-camp", "wheel-wars", "testing-123"]
 
     if path == "" or path == "/":
-        registration_name = "after-school" # set default
+        registration_name = "summer-camp" # set default
     else:
         if path.split("/")[1] not in valid_registrations:
             raise ValueError(f"Error: Path does not represent valid registration name. {path}")
         registration_name = path.split("/")[1]
 
     print("registration_name", registration_name)
-        
+    print("path", path)
+    print("method", method)
+
+    if "summer-camp" in path:
+        if path.endswith("art_camp_1"):
+            reg_title = "Art Camp 1: Ages 7 & Up - June 21-25, 2021 - 9am-12pm"
+        elif path.endswith("art_camp_2"):
+            reg_title = "Art Camp 2: Ages 12 & Up - June 21-25, 2021 - 2pm-5pm"
+        elif path.endswith("art_camp_3"):
+            reg_title = "Art Camp 3: Ages 7 & Up - July 12-16, 2021 - 9am-12pm"
+        elif path.endswith("art_camp_4"):
+            reg_title = "Art Camp 4: Ages 12 & Up - July 12-16, 2021 - 9am-12pm"
+        elif path.endswith("pottery_camp_1"):
+            reg_title = "Pottery Camp - 8 & Up - July 19-23, 2021 - 9am-12pm"
+    elif path.endswith("after-school"):
+        reg_title = "After School Pottery Program 2020"
+    else:
+        reg_title = ""
+
+    print("reg_title", reg_title)
 
     if method == "POST" and path.endswith("/confirm"):
         print("step: confirm")
@@ -76,7 +95,7 @@ def registration(environ, start_response):
             except:
                 pass
 
-        if registration_name == "after-school":
+        if registration_name == "summer-camp":
             # An unchecked checkbox doesn't pass a value so we need this
             for i in ["session1", "session2", "treatment_permission", "photo_release"]:
                 if i not in fields:
@@ -99,7 +118,7 @@ def registration(environ, start_response):
         # UPDATE
         if action == "update":
 
-            if registration_name == "after-school":
+            if registration_name == "summer-camp":
 
                 rid = int(post_input_dict["rid"])
 
@@ -117,7 +136,7 @@ def registration(environ, start_response):
                 c.execute(sql)
                 c.close()
 
-                template = env.get_template("after-school.html")
+                template = env.get_template("summer-camp.html")
 
             elif registration_name == "wheel-wars":
 
@@ -138,12 +157,12 @@ def registration(environ, start_response):
 
                 template = env.get_template("wheel-wars.html")
 
-            response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
+            response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name, reg_title=reg_title)
 
         # INSERT
         else:
 
-            if registration_name == "after-school":
+            if registration_name == "summer-camp":
 
                 # Removing rid becuase this is an insert
                 del fields[0]
@@ -173,8 +192,8 @@ def registration(environ, start_response):
                 rid = int(d.fetchone()[0])
                 d.close()
 
-                template = env.get_template("after-school.html")
-                response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
+                template = env.get_template("summer-camp.html")
+                response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name, reg_title=reg_title)
 
             elif registration_name == "wheel-wars":
 
@@ -199,7 +218,7 @@ def registration(environ, start_response):
                     f.close()
 
                 template = env.get_template("wheel-wars.html")
-                response = template.render(data=post_input_dict, rid=post_input_dict["rid"], registration_name=registration_name)
+                response = template.render(data=post_input_dict, rid=post_input_dict["rid"], registration_name=registration_name, reg_title=reg_title)
 
     ####
     elif method == "POST" and path.endswith("/edit"):
@@ -238,9 +257,9 @@ def registration(environ, start_response):
             row = r.fetch_row(maxrows=1, how=1)[0]
             print(f"row: {row}")
             form = RegistrationForm(**row)
-            template = env.get_template("after-school.html")
+            template = env.get_template("summer-camp.html")
 
-        response = template.render(form=form, registration_name=registration_name)
+        response = template.render(form=form, registration_name=registration_name, reg_title=reg_title)
 
 
     ####
@@ -252,7 +271,7 @@ def registration(environ, start_response):
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
-        if registration_name == "after-school":
+        if registration_name == "summer-camp":
 
             form_registration = json.loads(post_input)
             try:
@@ -313,7 +332,14 @@ def registration(environ, start_response):
                 f.close()
 
             template = env.get_template("wheel-wars.html")
-            response = template.render(status="complete", registration_name=registration_name)
+            response = template.render(status="complete", registration_name=registration_name, reg_title=reg_title)
+
+
+    ####
+    elif path.endswith("/testing-123"):
+        response = str(environ)
+        write_file("testing-123.txt", response)
+
 
     else:
 
@@ -322,9 +348,9 @@ def registration(environ, start_response):
             template = env.get_template("wheel-wars.html")
         else:
             form = RegistrationForm()
-            template = env.get_template("after-school.html")
+            template = env.get_template("summer-camp.html")
 
-        response = template.render(form=form, registration_name=registration_name)
+        response = template.render(form=form, registration_name=registration_name, reg_title=reg_title)
 
     #response += f"<hr>{str(environ)}"
 

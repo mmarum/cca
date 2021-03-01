@@ -78,7 +78,7 @@ for x in sitemap_list:
     else:
         sitemap_content += f"{domain}/{x}.html\n"
 write_file("../www/sitemap.txt", sitemap_content)
-print("sitemap_content\n", sitemap_content)
+#print("sitemap_content\n", sitemap_content)
 
 
 user = "catalystcreative"

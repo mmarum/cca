@@ -74,7 +74,9 @@ geust_cost = {};
 
       {% if event.price_text and "," in event.price_text %}
       {% else %}
-        <div>${{ event.price }}</div>
+        {% if event.price|int > 0 %}
+          <div>${{ event.price }}</div>
+        {% endif %}
       {% endif %}
 
       <!--
@@ -89,7 +91,11 @@ geust_cost = {};
       -->
 
       <div>{{ event.location }}</div>
-      <div id="book_now_{{ event.eid }}"><a href="/calendar.html#{{ event.eid }}">Book Now</a></div>
+      <div id="book_now_{{ event.eid }}">
+        {% if event.title.lower() != "closed" %}
+          <a href="/calendar.html#{{ event.eid }}">Book Now</a>
+        {% endif %}
+      </div>
 
       <div>
       {% set event_desc = event.description.split('\n') %}
@@ -112,7 +118,15 @@ geust_cost = {};
 
       <form class="quantity_form" id="quantity_form_{{ event.eid }}">
 
-      {% if event.price_text %}
+
+      {# TEMPORARY #}
+      {% if event.title == "Resin Charcuterie Board 2 Part Couples Event" %}
+        <p style="background-color: #EEE;">Registration for this event has been closed.</p>
+      {% endif %}
+
+
+      {# title reference is just TEMPORARY #}
+      {% if event.price_text and event.title != "Resin Charcuterie Board 2 Part Couples Event" %}
         {% if "," in event.price_text %}
           <div class="form-group">
           <select name="price_variation" id="event_variation" onchange="eventVariation({{ event.eid }}, this.options[this.selectedIndex].value);" class="form-control">

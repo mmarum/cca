@@ -75,6 +75,7 @@ function appendTime() {
     {{ field(autocomplete="off", class="form-control") }}
   {% endif %}
 
+  {#
   {% if field.name == "duration" %}
     <div><input type="checkbox" name="is_series" id="is_series" value="n" onClick="isSeries();"><label for="is_series">is series?</label></div>
     <div id="series_all">
@@ -84,6 +85,7 @@ function appendTime() {
     <div id="series_5_box"><input type="text" name="series_5" id="series_5" placeholder="5th date & time of this event series" autocomplete="off" class="form-control"></div>
     </div>
   {% endif %}
+  #}
 
 {% endfor %}
 </form>

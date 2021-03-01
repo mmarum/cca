@@ -648,18 +648,21 @@ def app(environ, start_response):
     ####
     ####
     elif environ['REQUEST_METHOD'] == "POST":
+
+        print("HERE AAA")
+
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+
+        print("post_input", post_input)
 
         data_object = {}
         data_array = []
 
         post_input_array = post_input.split('------')
 
-
         #with open("stderr.log", "a") as logfile:
         #    logfile.write(str(f"++++{post_input}++++"))
-
 
         for d in post_input_array:
             post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
@@ -667,6 +670,17 @@ def app(environ, start_response):
             if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and not post_data_val.startswith('-----'):
                 data_object[post_data_key] = post_data_val
                 data_array.append(post_data_val)
+
+        print("data_object", data_object)
+        print("data_array", data_array)
+
+
+        # TEMPORARILY removing series input data
+        #data_object_temp = data_object
+        #for k, v in data_object_temp.items():
+        #    if "series" in k:
+        #        del data_object[k]
+
 
         # If form passes an eid value then query
         # is an update as opposed to an insert
