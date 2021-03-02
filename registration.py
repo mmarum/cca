@@ -59,25 +59,18 @@ def registration(environ, start_response):
     print("path", path)
     print("method", method)
 
-    if "summer-camp" in path:
-        if path.endswith("art_camp_1"):
-            reg_title = "Art Camp 1: Ages 7 & Up - June 21-25, 2021 - 9am-12pm"
-        elif path.endswith("art_camp_2"):
-            reg_title = "Art Camp 2: Ages 12 & Up - June 21-25, 2021 - 2pm-5pm"
-        elif path.endswith("art_camp_3"):
-            reg_title = "Art Camp 3: Ages 7 & Up - July 12-16, 2021 - 9am-12pm"
-        elif path.endswith("art_camp_4"):
-            reg_title = "Art Camp 4: Ages 12 & Up - July 12-16, 2021 - 9am-12pm"
-        elif path.endswith("pottery_camp_1"):
-            reg_title = "Pottery Camp - 8 & Up - July 19-23, 2021 - 9am-12pm"
+    camps = ["art_camp_1", "art_camp_2", "art_camp_3", "art_camp_4", "pottery_camp_1"]
+    if "summer-camp" in path and path.split("/")[2] in camps:
+        session_detail = path.split("/")[2]
     elif path.endswith("after-school"):
-        reg_title = "After School Pottery Program 2020"
+        session_detail = "After School Pottery Program 2020"
     else:
-        reg_title = ""
+        session_detail = ""
 
-    print("reg_title", reg_title)
+    print("session_detail", session_detail)
 
-    if method == "POST" and path.endswith("/confirm"):
+    #if method == "POST" and path.endswith("/confirm"):
+    if path.endswith("/confirm"):
         print("step: confirm")
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
@@ -95,9 +88,9 @@ def registration(environ, start_response):
             except:
                 pass
 
-        if registration_name == "summer-camp":
+        if registration_name in ["summer-camp", "after-school"]:
             # An unchecked checkbox doesn't pass a value so we need this
-            for i in ["session1", "session2", "treatment_permission", "photo_release"]:
+            for i in ["treatment_permission", "photo_release"]:
                 if i not in fields:
                     post_input_dict[i] = '' 
                     fields.append(i)
@@ -118,7 +111,7 @@ def registration(environ, start_response):
         # UPDATE
         if action == "update":
 
-            if registration_name == "summer-camp":
+            if registration_name in ["summer-camp", "after-school"]:
 
                 rid = int(post_input_dict["rid"])
 
@@ -157,12 +150,12 @@ def registration(environ, start_response):
 
                 template = env.get_template("wheel-wars.html")
 
-            response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name, reg_title=reg_title)
+            response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
 
         # INSERT
         else:
 
-            if registration_name == "summer-camp":
+            if registration_name in ["summer-camp", "after-school"]:
 
                 # Removing rid becuase this is an insert
                 del fields[0]
@@ -193,7 +186,7 @@ def registration(environ, start_response):
                 d.close()
 
                 template = env.get_template("summer-camp.html")
-                response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name, reg_title=reg_title)
+                response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
 
             elif registration_name == "wheel-wars":
 
@@ -218,10 +211,11 @@ def registration(environ, start_response):
                     f.close()
 
                 template = env.get_template("wheel-wars.html")
-                response = template.render(data=post_input_dict, rid=post_input_dict["rid"], registration_name=registration_name, reg_title=reg_title)
+                response = template.render(data=post_input_dict, rid=post_input_dict["rid"], registration_name=registration_name)
 
     ####
-    elif method == "POST" and path.endswith("/edit"):
+    #elif method == "POST" and path.endswith("/edit"):
+    elif path.endswith("/edit"):
         print("step: edit")
 
         # DE-DUPE THESE NEXT 17 LINES:
@@ -259,19 +253,18 @@ def registration(environ, start_response):
             form = RegistrationForm(**row)
             template = env.get_template("summer-camp.html")
 
-        response = template.render(form=form, registration_name=registration_name, reg_title=reg_title)
+        response = template.render(form=form, registration_name=registration_name)
 
 
     ####
-    elif method == "POST" and path.endswith("/complete"):
-
-
+    #elif method == "POST" and path.endswith("/complete"):
+    elif path.endswith("/complete"):
 
         print("step: complete")
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
-        if registration_name == "summer-camp":
+        if registration_name in ["summer-camp", "after-school"]:
 
             form_registration = json.loads(post_input)
             try:
@@ -332,7 +325,7 @@ def registration(environ, start_response):
                 f.close()
 
             template = env.get_template("wheel-wars.html")
-            response = template.render(status="complete", registration_name=registration_name, reg_title=reg_title)
+            response = template.render(status="complete", registration_name=registration_name)
 
 
     ####
@@ -350,7 +343,7 @@ def registration(environ, start_response):
             form = RegistrationForm()
             template = env.get_template("summer-camp.html")
 
-        response = template.render(form=form, registration_name=registration_name, reg_title=reg_title)
+        response = template.render(form=form, registration_name=registration_name, session_detail=session_detail)
 
     #response += f"<hr>{str(environ)}"
 

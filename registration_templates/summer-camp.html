@@ -7,6 +7,15 @@
 h5 {
   padding-top: 20px;
 }
+#session_detail_box {
+  background-color: LightGray;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+}
+.top-pad {
+  padding-top: 10px;
+}
 {% if form %}
 {% if not form.camper2_name.data %}#camper2_group, {% else %}#add_camper2, {% endif %}
 {% if not form.camper3_name.data %}#camper3_group, {% else %}#add_camper3, {% endif %}
@@ -15,40 +24,101 @@ h5 {
   display: none;
 }
 .total {
+  background-color: LightGray;
   padding: 10px;
   margin: 10px;
-}
-#total {
-  background-color: LightGray;
+  text-align: center;
 }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<script>
-// Temporary bandaid:
-var session_dates = {};
-session_dates[1] = "Week 1: June 22 - 26, 2020";
-session_dates[2] = "Week 2: July 13 - 17, 2020";
-</script>
-
 <center>
-{% if reg_title %}
-  <h1>{{ reg_title }}</h1>
-{% else %}
-  Error
-{% endif %}
 <h3>Registration & Release Form</h3>
 </center>
 
+{% if form %}
+  {% if form.session_detail.data %}
+    {% set session_name = form.session_detail.data %}
+  {% elif session_detail %}
+    {% set session_name = session_detail %}
+  {% else %}
+    ERROR AAA
+  {% endif %}
+{% elif data and rid %}
+  {% if data["session_detail"] %}
+    {% set session_name = data["session_detail"] %}
+  {% elif session_detail %}
+    {% set session_name = session_detail %}
+  {% else %}
+    ERROR BBB
+  {% endif %}
+{% endif %}
+
+<div id="session_detail_box">
+
+You chose:<br>
+
+{% if session_name == "art_camp_1" %}
+<h5>Art Camp 1: Ages 7 &amp; Up - June 21-25, 2021 - 9am-12pm</h5>
+Mon - Resin over collage, pottery wheel work<br>
+Tue - Fluid Art, pottery painting<br>
+Wed - Printmaking<br>
+Thu - Water marbling, glaze pottery wheel item<br>
+Fri - Abstract acrylic paint self portrait<br>
+
+{% elif session_name == "art_camp_2" %}
+<h5>Art Camp 2: Ages 12 &amp; Up - June 21-25, 2021 - 2pm-5pm</h5>
+Mon - Resin over collage, pottery wheel work<br>
+Tue - Macrame key chain, resin over collage<br>
+Wed - Relief block printmaking<br>
+Thu - Printmaking, water marbling, glaze pottery wheel item<br>
+Fri - Watercolor technique practice, watercolor painting<br>
+
+{% elif session_name == "art_camp_3" %}
+<h5>Art Camp 3: Ages 7 &amp; Up - July 12-16, 2021 - 9am-12pm</h5>
+Mon - Resin over collage, pottery wheel work<br>
+Tue - Fluid art, pottery painting<br>
+Wed - Printmaking<br>
+Thu - Water marbling, glaze pottery wheel item<br>
+Fri - Abstract acrylic paint self portrait<br>
+
+{% elif session_name == "art_camp_4" %}
+<h5>Art Camp 4: Ages 12 &amp; Up - July 12-16, 2021 - 9am-12pm</h5>
+Mon - Resin over collage, pottery wheel work<br>
+Tue - Macrame key chain, resin over collage<br>
+We - Relief block printmaking<br>
+Thu - Printmaking, water marbling, glaze pottery wheel item<br>
+Fri - Watercolor technique practice, watercolor painting<br>
+
+{% elif session_name == "pottery_camp_1" %}
+<h5>Pottery Camp - 8 &amp; Up - July 19-23, 2021 - 9am-12pm</h5>
+Mon - Introduction and handbuilding techniques practice<br>
+Tue - Slab formed bowl<br>
+Wed - Slab formed box or planter<br>
+Thu - Pinch pot, pottery wheel work<br>
+Fri - Glaze pottery<br>
+
+{% elif session_name == "After School Pottery Program 2020" %}
+<h5>After School Pottery Program 2020</h5>
+
+{% endif %}
+
+</div>
+
 {% if data and rid %}
+
+{# THIS IS THE CONFIRM SCREEN #}
+
+{# data #}
+
 
 <form action="/registration/{{ registration_name }}/edit" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
 <input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
 
-{% if reg_title %}
-<input type="hidden" name="session_detail" id="session_detail" value="{{ reg_title }}"/>
+{% if data and data["session_detail"] %}
+<input type="hidden" name="session_detail" id="session_detail" value="{{ data['session_detail'] }}"/>
 {% endif %}
 
 <div class="row">
@@ -61,29 +131,28 @@ session_dates[2] = "Week 2: July 13 - 17, 2020";
 <div class="col-sm-4">
 {% for k, v in data.items() %}
   {% if k.startswith('parent_name') or k.startswith('pickup1_name') %}</div><div class="col-sm-4">{% endif %}
-  {% if k != "rid" and k != "order_id" and k != "submit" %}
+  {% if k != "rid" and k != "order_id" and k != "submit" and k != "session_detail" %}
     {% if v and v != "0" %}
       {{ k }}: <span id="{{ k }}">{{ v }}</span><br/>
     {% endif %}
+  {% endif %}
+  {% if k == "camper3_grade" %}
+    number_of_campers: <span id="number_of_campers"></span><br>
   {% endif %}
 {% endfor %}
 </div>
 </div>
 
-<script>var page='confirm';</script>
+<div class="total">Total: $<span id="total"></span></div>
 
-<div class="row">
-  <div class="col-sm-12 text-center border rounded total">
-    Participants: <span id="number_of_campers"></span>. Number of sessions: <span id="number_of_sessions"></span>. Total: $<span id="total"></span>.
-  </div>
-</div>
+<script>var page='confirm';</script>
 
 <div class="row" id="edit_continue_row">
   <div class="col-sm-6 text-right">
-    <button type="button" class="btn btn-warning" onClick="edit(); return false;">Edit</button>
+    <button type="button" class="btn btn-warning" onClick="edit(); return false;">Edit Info</button>
   </div>
   <div class="col-sm-6">
-    <button type="button" class="btn btn-success" onClick="continuePay(); return false;">Continue</button>
+    <button type="button" class="btn btn-success" onClick="continuePay(); return false;">Pay with PayPal</button>
   </div>
 </div>
 </form>
@@ -92,8 +161,17 @@ session_dates[2] = "Week 2: July 13 - 17, 2020";
 
 {% if form %}
 
+{# THIS IS THE INITIAL AND EDIT SCREEN #}
+
 <form action="/registration/{{ registration_name }}/confirm" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
 {{ form.rid }}
+{{ form.session_detail }}
+
+{% if session_detail %}
+<script>
+document.getElementById("session_detail").value = "{{ session_detail|safe }}";
+</script>
+{% endif %}
 
 <div class="row">
   <div class="col-sm-12">
@@ -231,29 +309,7 @@ session_dates[2] = "Week 2: July 13 - 17, 2020";
   </div>
 </div>
 
-<!--
-<div class="row">
-  <div class="col-sm-12">
-    <h5>Check Sessions You Are Registering For</h5>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-sm-12">
-    {{ form.session1 }}
-    {{ form.session1.label }}
-  </div>
-</div>
-    
-<div class="row">
-  <div class="col-sm-12">
-    {{ form.session2 }}
-    {{ form.session2.label }}
-  </div>
-</div>
--->
-    
-<div class="row">
+<div class="row top-pad">
   <div class="col-sm-12">
 {{ form.treatment_permission }}
 {{ form.treatment_permission.label }}<br/>
@@ -261,7 +317,7 @@ session_dates[2] = "Week 2: July 13 - 17, 2020";
   </div>
 </div>
     
-<div class="row">
+<div class="row top-pad">
   <div class="col-sm-12">
 {{ form.photo_release }}
 {{ form.photo_release.label }}<br/>
@@ -269,7 +325,7 @@ session_dates[2] = "Week 2: July 13 - 17, 2020";
   </div>
 </div>
 
-<div class="row">
+<div class="row top-pad">
   <div class="col-sm-12">
     {{ form.signature.label(class="form-text text-muted") }}
     {{ form.signature(class="form-control") }}
@@ -279,7 +335,7 @@ session_dates[2] = "Week 2: July 13 - 17, 2020";
 
 <div class="row">
   <div class="col-sm-12">
-    {{ form.submit(class="form-control btn btn-success", onClick="validate(); return false;") }}
+    {{ form.submit(class="form-control btn btn-success") }}
   </div>
 </div>
 
@@ -308,17 +364,16 @@ function calculate() {
   var camperNameLen = {};
   var total = 0;
   var number_of_campers = 0;
-  var number_of_sessions = 1;
   var first_camper_price = 200;
-  var more_camper_price = 165;
+  var more_camper_price = 180;
   for (i = 1; i <= 3; i++) {
     //console.log(i);
     try {
       camperNameLen[i] = document.getElementById("camper"+i+"_name").innerHTML.length;
-      //console.log(camperNameLen[i]);
+      console.log(camperNameLen[i]);
     } catch(err) {
       camperNameLen[i] = 0;
-      //console.log('fail'+camperNameLen[i]);
+      console.log('fail'+camperNameLen[i]);
     }
     if (camperNameLen[i] > 0) {
       number_of_campers += 1;
@@ -327,49 +382,18 @@ function calculate() {
       } else {
         total += first_camper_price;
       }
+      console.log("total: " + total);
     }
-  }
-
-  // USERS CAN REGISTER FOR MULTIPLE SESSIONS:
-  try {
-    if ((document.getElementById("session1").innerHTML)&&(document.getElementById("session2").innerHTML)) {
-      total = total * 2;
-      number_of_sessions = 2;
-    }
-  } catch(err) {
-    // nothing
   }
 
   document.getElementById("total").innerHTML = total;
   document.getElementById("number_of_campers").innerHTML = number_of_campers;
-  document.getElementById("number_of_sessions").innerHTML = number_of_sessions;
-
-  for (i = 1; i <= 2; i++) {
-    try {
-      if (document.getElementById("session"+i).innerHTML == "y") {
-        document.getElementById("session"+i).innerHTML = session_dates[i];
-        document.getElementById("number_of_sessions").innerHTML += " ("+session_dates[i]+")";
-      }
-    } catch(err) {
-      // nothing
-    }
-  }
 
   return total;
 }
 
 if (page == "confirm") {
   calculate();
-}
-
-function validate() {
-  if ((document.getElementById("session1").checked === true)||(document.getElementById("session2").checked === true)) {
-    document.registration_form.submit();
-    return true;
-  } else {
-    alert('Please choose a session.');
-    return false;
-  }
 }
 
 function showMore(n) {
@@ -428,7 +452,6 @@ if (page == "confirm") {
             parent_email: document.getElementById("parent_email").innerHTML,
             parent_phone: document.getElementById("parent_phone").innerHTML,
             number_of_campers: document.getElementById("number_of_campers").innerHTML,
-            number_of_sessions: document.getElementById("number_of_sessions").innerHTML,
             total_cost: document.getElementById("total").innerHTML,
             details: details
           })
