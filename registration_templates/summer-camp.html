@@ -136,7 +136,7 @@ Fri - Glaze pottery<br>
       {{ k }}: <span id="{{ k }}">{{ v }}</span><br/>
     {% endif %}
   {% endif %}
-  {% if k == "camper3_grade" %}
+  {% if k == "camper3_age" %}
     number_of_campers: <span id="number_of_campers"></span><br>
   {% endif %}
 {% endfor %}
@@ -189,10 +189,12 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
     {{ form.camper1_age.label(class="form-text text-muted") }}
     {{ form.camper1_age(class="form-control") }}
   </div>
+  {#
   <div class="col-sm-4">
     {{ form.camper1_grade.label(class="form-text text-muted") }}
     {{ form.camper1_grade(class="form-control") }}
   </div>
+  #}
 </div>
 
 <div id="camper2_group">
@@ -206,10 +208,12 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
     {{ form.camper2_age.label(class="form-text text-muted") }}
     {{ form.camper2_age(class="form-control") }}
   </div>
+  {#
   <div class="col-sm-4">
     {{ form.camper2_grade.label(class="form-text text-muted") }}
     {{ form.camper2_grade(class="form-control") }}
   </div>
+  #}
 </div>
 </div>
 
@@ -223,10 +227,12 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
     {{ form.camper3_age.label(class="form-text text-muted") }}
     {{ form.camper3_age(class="form-control") }}
   </div>
+  {#
   <div class="col-sm-4">
     {{ form.camper3_grade.label(class="form-text text-muted") }}
     {{ form.camper3_grade(class="form-control") }}
   </div>
+  #}
 </div>
 </div>
 

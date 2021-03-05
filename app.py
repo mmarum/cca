@@ -359,18 +359,25 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/registration':
-            c = db.cursor()
-            c.execute("SELECT * FROM registration ORDER BY rid desc")
-            allrows = c.fetchall()
-            c.close()
-            template = env.get_template("admin-registration.html")
-            response = template.render(allrows=allrows)
+            #c = db.cursor()
+            #c.execute("SELECT * FROM registration ORDER BY session_detail")
+            #allrows = c.fetchall()
+            #c.close()
 
+            db.query("SELECT * FROM registration ORDER BY session_detail")
+            r = db.store_result()
+            allrows = r.fetch_row(maxrows=100, how=1)
 
-        elif environ['PATH_INFO'] == '/admin/registration2':
             data = json.loads(read_file("../registration/data/wheel-wars.json"))
-            template = env.get_template("admin-registration2.html")
-            response = template.render(data=data)
+
+            template = env.get_template("admin-registration.html")
+            response = template.render(allrows=allrows, data=data)
+
+
+        #elif environ['PATH_INFO'] == '/admin/registration2':
+        #    data = json.loads(read_file("../registration/data/wheel-wars.json"))
+        #    template = env.get_template("admin-registration2.html")
+        #    response = template.render(data=data)
 
 
         elif environ['PATH_INFO'] == '/summer-camp-registration':

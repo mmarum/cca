@@ -12,50 +12,62 @@
 {% endblock %}
 
 {% block content %}
-<h1>2020 Summer Camp Registration</h1>
+
+<p><a href="#wheel-wars">Wheel Wars Registration</a></p>
+
+<h1>Summer Camp & After School Registration</h1>
+
 <table class="table table-striped">
-<tr class="p-3 mb-2 bg-light text-dark">
 
-<td>rid</td>
-<td>order_id</td>
-<td>camper1_name</td>
-<td>camper1_age</td>
-<td>camper1_grade</td>
-<td>camper2_name</td>
-<td>camper2_age</td>
-<td>camper2_grade</td>
-<td>camper3_name</td>
-<td>camper3_age</td>
-<td>camper3_grade</td>
-<td>parent_name</td>
-<td>parent_address</td>
-<td>parent_city</td>
-<td>parent_state</td>
-<td>parent_zip</td>
-<td>parent_email</td>
-<td>parent_phone</td>
-<td>parent_em_name</td>
-<td>parent_em_phone</td>
-<td>pickup1_name</td>
-<td>pickup1_phone</td>
-<td>pickup2_name</td>
-<td>pickup2_phone</td>
-<td>session1</td>
-<td>session2</td>
-<td>treatment_permission</td>
-<td>photo_release</td>
-<td>signature</td>
+{% for row in allrows %}
+{% if loop.first %}
+  <tr>
+  <th>Session</th>
+  {% for key, val in row.items() %}
+    <th>{{ key|replace("_", " ") }}</th>
+  {% endfor %}
+  </tr>
+{% endif %}
+{% endfor %}
 
-</tr>
 
 {% for row in allrows %}
   <tr>
-    {% for item in row %}
-      <td>{{ item }}</td>
-    {% endfor %}
+  <td>{{ row.session_detail }}</td>
+  {% for key, val in row.items() %}
+    <td>{{ val }}</td>
+  {% endfor %}
   </tr>
 {% endfor %}
 
 </table>
+
+<hr>
+
+<a name="wheel-wars"><h1>Wheel Wars</h1></a>
+
+<table class="table table-striped">
+
+<tr class="p-3 mb-2 bg-light text-dark">
+{% for key, val in data.items() %}
+  {% if loop.index == 1 %}
+    {% for k, v in val.items() %}
+      <th>{{ k }}</th>
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+</tr>
+
+{% for key, val in data.items() %}
+  <tr>
+  {% for k, v in val.items() %}
+    <td>{{ v }}</td>
+  {% endfor %}
+  </tr>
+{% endfor %}
+
+</table>
+
+
 
 {% endblock %}
