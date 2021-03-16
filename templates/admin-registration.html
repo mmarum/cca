@@ -49,6 +49,7 @@
 <table class="table table-striped">
 
 <tr class="p-3 mb-2 bg-light text-dark">
+<th></th>
 {% for key, val in data.items() %}
   {% if loop.index == 1 %}
     {% for k, v in val.items() %}
@@ -60,6 +61,7 @@
 
 {% for key, val in data.items() %}
   <tr>
+  <td>{{ loop.index }}</td>
   {% for k, v in val.items() %}
     <td>{{ v }}</td>
   {% endfor %}

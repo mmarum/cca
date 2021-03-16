@@ -52,10 +52,6 @@ img.check {
   margin: 10px 0 10px 0;
   /* border-bottom: 1px dashed LightGray; */
 }
-#cart_sum_top, #cart_sum_bottom {
-  text-align: right;
-  border: 20px;
-}
 </style>
 {% endblock %}
 
@@ -66,17 +62,33 @@ img.check {
 <div class="col-sm-1">
 </div>
 
-<div class="col-md-10">
-  <div id="cart_sum_top">
-    Checkout Subtotal: $
-  </div>
-  <div id="cart_contents">
-  </div>
-  <div id="cart_sum_bottom">
-    Checkout Subtotal: $
-  </div>
-  <div>
+<div class="col-md-3 text-center">
+  <h2>Shopping Cart</h2>
+</div>
+
+<div class="col-md-4 text-center">
   <a href="/app/products">More shopping</a>
+</div>
+
+<div class="col-md-3 text-center">
+  (x items) Subtotal: $<span id="subtotal_value">0</span>
+  <button type="button" class="btn btn-info">Proceed to Checkout</button>
+</div>
+
+<div class="col-sm-1">
+</div>
+
+</div>
+
+<!-- -->
+
+<div class="row">
+
+<div class="col-sm-1">
+</div>
+
+<div class="col-md-10">
+  <div id="cart_contents">
   </div>
 </div>
 
@@ -98,7 +110,7 @@ function make_request_get_list(session_id) {
   })
   .then(response=>response.json())
   .then(data=>{
-    //console.log(data); 
+    console.log(data); 
 
     var arrLen = data.length;
     var product_total_sum = 0;
@@ -108,7 +120,8 @@ function make_request_get_list(session_id) {
       obj = data[i];
       //console.log(obj.name);
       product_image = '<img src="/img/small/' + obj.image_path_array.split(',')[1] + '" class="product_image"/>';
-      product_name = obj.name.toLowerCase().replace(' ', '-');
+      product_name = obj.name.toLowerCase().replace(/ /g, '-');
+      product_desc = obj.description;
       product_total = obj.price * obj.quantity;
       //line = product_image + ' ' + obj.name + ' price: $' + obj.price + ' quantity: ' + obj.quantity + ' $' + product_total;
 
@@ -141,6 +154,11 @@ function make_request_get_list(session_id) {
 </form>
 
 </div>
+
+<div>
+${product_desc}
+</div>
+
 </div>
 <div class="col-sm-1"></div>
 </div>
@@ -149,9 +167,9 @@ function make_request_get_list(session_id) {
       lines += line;
       product_total_sum += product_total;
     }
-    document.getElementById("cart_sum_top").innerHTML += product_total_sum;
+    document.getElementById("subtotal_value").innerHTML = product_total_sum;
     document.getElementById("cart_contents").innerHTML = lines;
-    document.getElementById("cart_sum_bottom").innerHTML += product_total_sum;
+    //document.getElementById("cart_sum_bottom").innerHTML += product_total_sum;
   })
 }
 

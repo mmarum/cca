@@ -17,11 +17,14 @@ h5 {
   padding-top: 10px;
 }
 {% if form %}
-{% if not form.camper2_name.data %}#camper2_group, {% else %}#add_camper2, {% endif %}
-{% if not form.camper3_name.data %}#camper3_group, {% else %}#add_camper3, {% endif %}
+{% if not form.camper2_name.data %}#camper2_group, #add_camper2, {% endif %}
+{% if not form.camper3_name.data %}#camper3_group, #add_camper3, {% endif %}
 {% endif %}
 #paypal-button-container {
   display: none;
+}
+#add_camper2, #add_camper3 {
+  padding-top: 10px;
 }
 .total {
   background-color: LightGray;
@@ -57,8 +60,6 @@ h5 {
 {% endif %}
 
 <div id="session_detail_box">
-
-You chose:<br>
 
 {% if session_name == "art_camp_1" %}
 <h5>Art Camp 1: Ages 7 &amp; Up - June 21-25, 2021 - 9am-12pm</h5>
@@ -183,18 +184,17 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
   <div class="col-sm-4">
     {{ form.camper1_name.label(class="form-text text-muted") }}
     {{ form.camper1_name(class="form-control") }}
-    <p id="add_camper2"><a href="#" onclick="showMore(2); return false;">Add a second participant</a></p>
   </div>
   <div class="col-sm-4">
     {{ form.camper1_age.label(class="form-text text-muted") }}
-    {{ form.camper1_age(class="form-control") }}
+    {{ form.camper1_age(class="form-control", onfocus="showMore('add_camper2');") }}
   </div>
-  {#
-  <div class="col-sm-4">
-    {{ form.camper1_grade.label(class="form-text text-muted") }}
-    {{ form.camper1_grade(class="form-control") }}
+</div>
+
+<div class="row" id="add_camper2">
+  <div class="col-sm-12">
+    <p><a href="#" onclick="showMore(2); return false;">Add a second participant</a></p>
   </div>
-  #}
 </div>
 
 <div id="camper2_group">
@@ -202,19 +202,18 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
   <div class="col-sm-4">
     {{ form.camper2_name.label(class="form-text text-muted") }}
     {{ form.camper2_name(class="form-control") }}
-    <p id="add_camper3"><a href="#" onclick="showMore(3); return false;">Add a third participant</a></p>
   </div>
   <div class="col-sm-4">
     {{ form.camper2_age.label(class="form-text text-muted") }}
-    {{ form.camper2_age(class="form-control") }}
+    {{ form.camper2_age(class="form-control", onfocus="showMore('add_camper3');") }}
   </div>
-  {#
-  <div class="col-sm-4">
-    {{ form.camper2_grade.label(class="form-text text-muted") }}
-    {{ form.camper2_grade(class="form-control") }}
-  </div>
-  #}
 </div>
+</div>
+
+<div class="row" id="add_camper3">
+  <div class="col-sm-12">
+    <p><a href="#" onclick="showMore(3); return false;">Add a third participant</a></p>
+  </div>
 </div>
 
 <div id="camper3_group">
@@ -227,12 +226,6 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
     {{ form.camper3_age.label(class="form-text text-muted") }}
     {{ form.camper3_age(class="form-control") }}
   </div>
-  {#
-  <div class="col-sm-4">
-    {{ form.camper3_grade.label(class="form-text text-muted") }}
-    {{ form.camper3_grade(class="form-control") }}
-  </div>
-  #}
 </div>
 </div>
 
@@ -403,8 +396,12 @@ if (page == "confirm") {
 }
 
 function showMore(n) {
-  document.getElementById("camper"+n+"_group").style.display = "block";
-  document.getElementById("add_camper"+n).style.display = "none";
+  if (n == "add_camper2" || n == "add_camper3") {
+    document.getElementById(n).style.display = "block";
+  } else {
+    document.getElementById("camper"+n+"_group").style.display = "block";
+    document.getElementById("add_camper"+n).style.display = "none";
+  }
 }
 
 function edit() {

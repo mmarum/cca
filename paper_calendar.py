@@ -41,7 +41,7 @@ def make_cal(db, month, year):
         one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
         c = db.cursor()
 
-        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() and (pinned <> 'invisible' or pinned is null)")
+        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() and (tags <> 'invisible' or tags is null)")
         allrows = c.fetchall()
 
         #print(allrows)

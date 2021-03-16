@@ -56,7 +56,29 @@ function appendTime() {
 
 {% block content %}
 
-<form action="/app/" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
+<form action="/app/" method="POST" enctype="multipart/form-data" name="add_edit_form" id="this_form">
+
+{% if form.eid.data and "series" in form.tags.data %}
+{% set items = form.tags.data %}
+{% set tags = items.split(' ') %}
+{% for tag in tags %}
+  {% if "series" in tag %}
+    <small class="form-text text-muted">
+      This event is a series and belongs to: {{ tag }}
+    </small>
+  {% endif %}
+{% endfor %}
+{% endif %}
+
+{% if children %}
+  <small class="form-text text-muted">
+  This event is a series and is the parent event. Child events are:
+  {% for child in children %}
+    {{ child[0] }}
+  {% endfor %}
+  </small>
+{% endif %}
+
 {% for field in form %}
   {% if field.name != "eid" and field.name != "submit" and field.name != "image" %}
     {% if form.eid.data %}
@@ -70,7 +92,8 @@ function appendTime() {
     {% endif %}
     <input id="append_time" name="append_time" autocomplete="off" type="text" placeholder="00:00:00" onblur="appendTime()" class="form-control"/>
   {% elif field.name == "submit" %}
-    {{ field(autocomplete="off", class="form-control btn btn-success") }}
+    {# field(autocomplete="off", class="form-control btn btn-success") #}
+    <input autocomplete="off" class="form-control btn btn-success" id="btn_submit" name="btn_submit" type="submit" value="Next">
   {% else %}
     {{ field(autocomplete="off", class="form-control") }}
   {% endif %}
@@ -88,29 +111,45 @@ function appendTime() {
   #}
 
 {% endfor %}
+
 </form>
 
-<button type="button" class="btn btn-warning" onClick="onclick=location.reload();location.href='/app/admin/events/list'">Cancel</button>
+<button type="button" class="btn btn-warning" onclick="location.href='/app/admin/events/list'">Cancel</button>
 
 {% if form.eid.data %}
-  <button type="button" class="btn btn-danger">
-    <a href="/app/admin/events/delete?eid={{ form.eid.data }}" onclick="return confirm('Are you sure?');">Delete</a>
-  </button>
+<button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure?')) location.href='/app/admin/events/delete?eid={{ form.eid.data }}';">Delete</button>
 {% endif %}
+
+{% if form.eid.data and "series" not in form.tags.data %}
+<button type="button" class="btn btn-info" onclick="eventDupe();">Duplicate</button>
+{% endif %}
+
 
 {% if not form.eid.data %}
   <script>
   {% for field in form %}
-    {% if field.name == "price_text" or field.name == "pinned" %}
+    {% if field.name == "price_text" or field.name == "tags" %}
       document.getElementById("{{ field.name }}").placeholder = "{{ field.description }}";
     {% else %}
       document.getElementById("{{ field.name }}").placeholder = "{{ field.name }}";
     {% endif %}
   {% endfor %}
+  </script>
 {% endif %}
-</script>
 
 <script>
+function eventDupe() {
+  document.getElementById("eid").value = "";
+  var edatetime = document.getElementById("edatetime").value;
+  var d;
+  d = new Date(edatetime);
+  d.setSeconds(d.getSeconds() + 10);
+  document.getElementById("edatetime").value = d.toISOString();
+  document.getElementById("tags").value += " series={{ form.eid.data }}"
+  console.log(d.toISOString());
+  document.add_edit_form.submit();
+}
+/*
 function isSeries() {
   is_series_val = document.getElementById("is_series").value;
   if (is_series_val == "y") {
@@ -129,6 +168,7 @@ function add_another(n) {
   document.getElementById("series_"+n).style.display = "block";
   document.getElementById("series_"+n+"_box").style.display = "block";
 }
+*/
 </script>
 
 {% endblock %}

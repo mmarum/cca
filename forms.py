@@ -17,7 +17,7 @@ class EventsForm(Form):
     price_text = StringField("Variable time or price", description="Variable time or price")
     # (time) Feb 6 3-5pm, Feb 6 6-8pm, Feb 7 1-3pm, Feb 7 4-6pm, test
     # (price) one red @ $10, two blue @ $5, a bird @ $20
-    pinned = StringField("Pinned", description="Pinned: home, cart, fluid-art, alcohol-ink OR invisible")
+    tags = StringField("Tags", description="Tags: home, cart, fluid-art, alcohol-ink OR invisible")
     extra_data = HiddenField("", description="")
     submit = SubmitField("Next", description="Next")
     #abc = StringField('abc', [InputRequired()], render_kw={"placeholder": "test"})

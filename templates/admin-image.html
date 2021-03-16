@@ -35,6 +35,9 @@ $( function() {
 
 <p style="padding-top: 10px;">
 <button type="button" class="btn btn-primary" onclick="javascript:location.href='/app/admin/events/list'">Finished adding/editing event. Go back to list</button>
+{% if eid.eid %}
+<button type="button" class="btn btn-secondary" onclick="javascript:location.href='/app/admin/events/add-edit?eid={{ eid.eid }}'">Or continue editing</button>
+{% endif %}
 </p>
 
 <hr>

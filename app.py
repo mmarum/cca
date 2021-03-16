@@ -126,10 +126,16 @@ def app(environ, start_response):
                 r = db.store_result()
                 row = r.fetch_row(maxrows=1, how=1)[0]
                 form = EventsForm(**row)
+
+                c = db.cursor()
+                c.execute(f"SELECT * FROM events WHERE tags like '%series={eid}%'")
+                children = c.fetchall()
+                c.close()
             else:
                 form = EventsForm()
+                children = None
             template = env.get_template("admin-events-add-edit.html")
-            response = template.render(form=form)
+            response = template.render(form=form, children=children)
 
 
         elif environ['PATH_INFO'] == "/admin/events/delete":
@@ -146,7 +152,7 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/list/events' or environ['PATH_INFO'] == '/calendar':
 
-            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (pinned <> 'invisible' or pinned is null) ORDER BY edatetime")
+            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) ORDER BY edatetime")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
@@ -180,7 +186,8 @@ def app(environ, start_response):
 
             template = env.get_template("list-events.html")
             response = template.render(events=allrows, 
-                orders_count=orders_count_object, events_object=events_object, 
+                orders_count=orders_count_object, 
+                events_object=events_object, 
                 test=test)
 
 
@@ -322,16 +329,16 @@ def app(environ, start_response):
 
             #print(html_cal)
 
-            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and (pinned <> 'invisible' or pinned is null) ORDER BY edatetime limit 1")
+            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and (tags <> 'invisible' or tags is null) ORDER BY edatetime limit 1")
             r = db.store_result()
             next_event = r.fetch_row(maxrows=1, how=1)[0]
             #html_cal = ""
             #next_event = ""
 
             # FEATURED / PINNED EVENTS
-            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and pinned = 'home' ORDER BY edatetime limit 10")
+            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and tags = 'home' ORDER BY edatetime limit 10")
             r = db.store_result()
-            pinned_events = r.fetch_row(maxrows=10, how=1)
+            events_tagged_home = r.fetch_row(maxrows=10, how=1)
 
             # GALLERY / SLIDESHOW
             #random_number = random.randint(1,len(galleries_dict))
@@ -342,7 +349,7 @@ def app(environ, start_response):
 
             template = env.get_template("home.html")
             response = template.render(next_event=next_event, calendar={"html": html_cal}, 
-                pinned_events=pinned_events, gallery=gallery, images=images)
+                events_tagged_home=events_tagged_home, gallery=gallery, images=images)
 
 
         elif environ['PATH_INFO'] == '/admin/pages':
@@ -674,7 +681,7 @@ def app(environ, start_response):
         for d in post_input_array:
             post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
             post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and not post_data_val.startswith('-----'):
+            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and "submit" not in post_data_key and not post_data_val.startswith('-----'):
                 data_object[post_data_key] = post_data_val
                 data_array.append(post_data_val)
 
@@ -732,7 +739,7 @@ def app(environ, start_response):
 
         else:
             # fields MUST match keys coming in via "data_array":
-            fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, pinned, extra_data"
+            fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, tags, extra_data"
             #vals = str(data_array).lstrip('[').rstrip(']')
             vals = data_array
             #sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
