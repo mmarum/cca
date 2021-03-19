@@ -169,6 +169,7 @@ def app(environ, start_response):
                 orders_count_object[key] = val
 
             events_object = {}
+            parent = {}
             for row in allrows:
                 eid = row["eid"]
                 events_object[eid] = {}
@@ -176,6 +177,11 @@ def app(environ, start_response):
                 events_object[eid]["title"] = row["title"]
                 events_object[eid]["price"] = row["price"]
                 events_object[eid]["price_text"] = row["price_text"]
+
+                if "series" in row["tags"]:
+                    parent[eid] = re.sub('^.*series=(\d+).*$', r'\1', row["tags"])
+                else:
+                    parent[eid] = ""
 
             events_object = json.dumps(events_object)
 
@@ -188,6 +194,7 @@ def app(environ, start_response):
             response = template.render(events=allrows, 
                 orders_count=orders_count_object, 
                 events_object=events_object, 
+                parent=parent, 
                 test=test)
 
 

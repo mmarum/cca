@@ -143,7 +143,24 @@ function eventDupe() {
   var edatetime = document.getElementById("edatetime").value;
   var d;
   d = new Date(edatetime);
-  d.setSeconds(d.getSeconds() + 10);
+
+  /*
+  can't always be plus 10 seconds
+  needs to create a time that's not already used
+  optimally we'd check db but for now
+  we'll go with random time
+  */
+
+  // create random two digit number
+  // replace 10 with that random num
+  var rand_sec = Math.floor(Math.random() * 60) + 10;
+  d.setSeconds(d.getSeconds() + rand_sec);
+
+  // create random two digit number AGAIN
+  // replace 10 with that random num AGAIN
+  var rand_min = Math.floor(Math.random() * 60) + 10;
+  d.setMinutes(d.getMinutes() + rand_min);
+
   document.getElementById("edatetime").value = d.toISOString();
   document.getElementById("tags").value += " series={{ form.eid.data }}"
   console.log(d.toISOString());

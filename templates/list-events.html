@@ -116,14 +116,18 @@ geust_cost = {};
       {% endfor %}
       </div>
 
-      <form class="quantity_form" id="quantity_form_{{ event.eid }}">
 
+      {# IDENTIFY EVENT SERIES OR NOT #}
+      {% if parent[event.eid] == "" %}
+      {#    #}
+
+
+      <form class="quantity_form" id="quantity_form_{{ event.eid }}">
 
       {# TEMPORARY #}
       {% if event.title == "Resin Charcuterie Board 2 Part Couples Event" %}
         <p style="background-color: #EEE;">Registration for this event has been closed.</p>
       {% endif %}
-
 
       {# title reference is just TEMPORARY #}
       {% if event.price_text and event.title != "Resin Charcuterie Board 2 Part Couples Event" %}
@@ -132,10 +136,8 @@ geust_cost = {};
           <select name="price_variation" id="event_variation" onchange="eventVariation({{ event.eid }}, this.options[this.selectedIndex].value);" class="form-control">
           <option value="">Select options</option>
 
-
           {% set prc = event.price_text.split(',') %}
           {% for p in prc %}
-
 
             {% if "am" in event.price_text or "pm" in event.price_text %}
 
@@ -153,7 +155,6 @@ geust_cost = {};
 
             {% endif %}
 
-
           {% endfor %}
           </select>
           </div>
@@ -161,6 +162,7 @@ geust_cost = {};
       {% endif %}
 
       {% if event.elimit and event.elimit >= 1 %}
+
         <div class="form-group">
 
         {% if "am" in event.price_text or "pm" in event.price_text %}
@@ -168,7 +170,8 @@ geust_cost = {};
         {% else %}
 
           {% if "scarf" in event.title.lower() %}
-            <select name="quantity" id="quantity_{{ event.eid }}" onchange="geust_change({{ event.eid }}, this.options[this.selectedIndex].value);" class="form-control">
+            <select name="quantity" id="quantity_{{ event.eid }}" onchange="geust_change({{ event.eid }}, 
+              this.options[this.selectedIndex].value);" class="form-control">
           {% else %}
             <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
           {% endif %}
@@ -188,13 +191,23 @@ geust_cost = {};
         {% endif %}
 
         </div>
+
       {% else %}
         <input type="hidden" name="quantity" value="1" id="quantity_{{ event.eid }}"/>
       {% endif %}
 
-        <!-- Optional: Guests: <input type="text" name="guest_list" id="guest_list" /> -->
+      <!-- Optional: Guests: <input type="text" name="guest_list" id="guest_list" /> -->
 
       </form>
+
+
+      {# IDENTIFY EVENT SERIES OR NOT #}
+      {% else %}
+        This event is part of a series.<br>
+        See <a href="/calendar.html#{{ parent[event.eid] }}">the first event of this series</a> for purchase options.
+      {% endif %}
+      {#    #}
+
 
       <div class="cost_container" id="cost_container_{{ event.eid }}">
         Total: $<span class="cost" id="cost_{{ event.eid }}">0</span>. 
@@ -203,8 +216,10 @@ geust_cost = {};
       </div>
 
       {% if "scarf" in event.title.lower() %}
-        <button class="special" id="subtract_scraf_{{ event.eid }}" type="button" class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'subtract')">Subtract scarf</button>
-        <button class="special" id="special_{{ event.eid }}" type="button" class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'add')">Add additional scarf for $28</button>
+        <button class="special" id="subtract_scraf_{{ event.eid }}" type="button" 
+          class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'subtract')">Subtract scarf</button>
+        <button class="special" id="special_{{ event.eid }}" type="button" 
+          class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'add')">Add additional scarf for $28</button>
         <script>
           geust_cost[{{ event.eid }}] = {{ event.price }};
         </script>

@@ -13,4 +13,3 @@ cp /home/catalystcreative/registration/templates/*.* /home/catalystcreative/app/
 cp /home/catalystcreative/email/email.py /home/catalystcreative/app/cca/email.py
 cp /home/catalystcreative/cart-api/cart.py /home/catalystcreative/app/cca/cart.py
 
-

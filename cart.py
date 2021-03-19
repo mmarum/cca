@@ -111,7 +111,11 @@ def cart_api(environ, start_response):
         row = r.fetch_row(maxrows=1, how=1)[0]
         cp_id = row["id"]
 
-        sql = f"UPDATE cart_products SET quantity = {quantity} WHERE id = {cp_id}"
+        if quantity == 0:
+            sql = f"DELETE FROM cart_products WHERE id = {cp_id}"
+        else:
+            sql = f"UPDATE cart_products SET quantity = {quantity} WHERE id = {cp_id}"
+
         c = db.cursor()
         c.execute(sql)
         c.close()
@@ -146,7 +150,11 @@ def cart_api(environ, start_response):
         except:
             rows = {}
 
-        #print(f'rows: {str(rows)}')
+        print("rows", rows)
+
+        if not rows:
+            response = "cart empty"
+            return [response.encode()]
  
         pids = []
         quantities = {}
@@ -156,12 +164,12 @@ def cart_api(environ, start_response):
             pids.append(p)
             quantities[p] = obj['quantity']
 
-        #print(f"quantities: {str(quantities)}")
-        #print(f'pids1: {str(pids)}')
+        print("quantities", quantities)
+        print("pids", pids)
 
         pids = str(pids).strip('[').strip(']')
 
-        #print(f'pids2: {pids}')
+        print("pids", pids)
 
         db.query(f"select * from products where pid in ({pids})")
         r = db.store_result()
