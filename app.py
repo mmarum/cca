@@ -150,6 +150,23 @@ def app(environ, start_response):
                 response = ""
 
 
+        #### ####
+        #### ####
+        elif environ['PATH_INFO'] == '/build-individual-event':
+            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() \
+                and (tags <> 'invisible' or tags is null) ORDER BY edatetime")
+            e = db.store_result()
+            allrows = e.fetch_row(maxrows=100, how=1)
+            template = env.get_template("event.html")
+            for event in allrows:
+                eid = event["eid"]
+                content = template.render(event=event)
+                write_file(f"../www/event/{eid}.html", content)
+            response = "build-individual-event"
+        #### ####
+        #### ####
+
+
         elif environ['PATH_INFO'] == '/list/events' or environ['PATH_INFO'] == '/calendar':
 
             db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) ORDER BY edatetime")

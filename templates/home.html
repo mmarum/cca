@@ -169,6 +169,16 @@ mark {
 
     <hr>
 
+    {% if next_event %}
+    <h2>Next Event</h2>
+    <h2>{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h2>
+    <a href="/calendar.html#{{ next_event.eid }}">
+      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
+    </a>
+    <h2><a href="/calendar.html#{{ next_event.eid }}">{{ next_event.title }}</a></h2>
+    <hr>
+    {% endif %}
+
 
     <!-- first column end -->
 
@@ -206,13 +216,12 @@ mark {
 
     <hr>
 
-
     <!-- second column end -->
 
   </div>
   <div class="col-sm-3">
 
-    <!-- third column -->
+    <!-- third column start -->
 
     <div id="paper_calendar"></div>
     {{ calendar.html|safe }}
@@ -226,14 +235,16 @@ mark {
     <a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&feature=youtu.be"><img src="/img/art-market-2-yt.jpg" class="event_image"></a>
     <h2><a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&feature=youtu.be">Watch Culture Buzz: Catalyst Creative Arts</a></h2>
 
+    <hr>
+
+    <!-- third column end -->
+
   </div>
 
   <div class="col-sm-1">
   </div>
 
 </div>
-
-
 
 {% if events_tagged_home %}
 

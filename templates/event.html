@@ -1,0 +1,93 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Event: {{ event.title }}{% endblock %}
+
+{% block html_head %}
+<style>
+.event_image {
+  max-width: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+  <div class="col-sm-1">
+  </div>
+
+  <div class="col-md-2">
+    <a href="/calendar.html#{{ event.eid }}">
+      <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
+    </a>
+  </div>
+
+  <div class="col-lg-8">
+
+    <h4>
+      {{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} 
+      <span class="duration" id="duration_{{ event.eid }}">({{ event.duration }} hrs)</span>
+    </h4>
+    <a href="/calendar.html#{{ event.eid }}">
+      <h3>{{ event.title }}</h3>
+    </a>
+
+    <div>
+    {% set event_desc = event.description.split('\n') %}
+    {% for e in event_desc %}
+      {% if e.startswith("http") %}
+        <a href="{{ e }}">Buy tickets</a>
+      {% else %}
+        <p>{{ e|safe }}</p>
+      {% endif %}
+    {% endfor %}
+    </div>
+
+    <p>{{ event.location }}</p>
+
+    {% if event.price_text and "," in event.price_text %}
+    {% else %}
+      {% if event.price|int > 0 %}
+        <p>${{ event.price }} per guest</p>
+      {% endif %}
+    {% endif %}
+
+    {% if event.elimit and event.elimit >= 1 %}
+      <form class="form-group">
+      <select id="quantity" class="form-control" onclick="getSubtotal();">
+      <option value="">Select number of guests</option>
+      {% for n in range(event.elimit) %}
+      <option value="{{ n }}">{{ n }}</option>
+      {% endfor %}
+      </select>
+      </form>
+    {% endif %}
+
+    <p>Total: $<span id="subtotal">0</span></p>
+
+    <button onclick="whatIsTheSubtotal();">What is the subtotal?</button>
+
+  </div>
+
+  <div class="col-sm-1">
+  </div>
+
+</div>
+
+<script>
+var price_per_guest = {{ event.price }};
+function getSubtotal() {
+  var q = document.getElementById("quantity");
+  number_of_guests = q.options[q.selectedIndex].value;
+  subtotal = price_per_guest * number_of_guests;
+  console.log("subtotal: " + subtotal);
+  document.getElementById("subtotal").innerHTML = subtotal;
+  return subtotal;
+}
+function whatIsTheSubtotal() {
+  alert(getSubtotal());
+}
+</script>
+
+{% endblock %}
+

@@ -71,7 +71,7 @@ img.check {
 </div>
 
 <div class="col-md-3 text-center">
-  (x items) Subtotal: $<span id="subtotal_value">0</span>
+  (<span id="subtotal_cart_total"></span> items) Subtotal: $<span id="subtotal_value">0</span>
   <button type="button" class="btn btn-info">Proceed to Checkout</button>
 </div>
 
@@ -232,6 +232,8 @@ function updateQuantity(pid, quantity) {
       document.getElementById("row_"+pid).innerHTML = "";
       document.getElementById("row_"+pid).style.display = "none";
     }
+
+    make_request_get_total(session_id);
 
   } else {
     console.log("Error. Still no session_id");

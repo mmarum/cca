@@ -226,7 +226,8 @@ if (browser_size["width"] > 600) {
 <a href="/about-us.html" alt="Contact Us">Contact Us</a> | 
 <a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a> |
 <a href="https://www.facebook.com/catalystcreativeart/" alt="Facebook">Facebook</a> | 
-<a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a> | 
+<!-- <a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a> | -->
+<a href="https://www.tiktok.com/@catalystcreativearts" alt="TikTok">TikTok</a> | 
 <a href="https://www.instagram.com/catalystcreativearts/" alt="Instagram">Instagram</a>
 {% endblock %}
 </div>
@@ -259,9 +260,10 @@ function make_request_get_total(session_id) {
   })
   .then(response=>response.json())
   .then(data=>{
-    console.log(data); 
+    console.log("get_total_cost: " + data); 
     document.getElementById("top_right_cart_container").style.display = "block";
     document.getElementById("top_right_cart_total").innerHTML = data;
+    document.getElementById("subtotal_cart_total").innerHTML = data;
   })
 }
 
