@@ -6,6 +6,19 @@
 .event_image {
   max-width: 100%;
 }
+.row {
+  padding-top: 15px;
+}
+#paypal-button-container {
+  display: none;
+}
+#thanks {
+  color: Green;
+}
+select {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
 </style>
 {% endblock %}
 
@@ -43,29 +56,120 @@
     {% endfor %}
     </div>
 
-    <p>{{ event.location }}</p>
+    <p>Location: {{ event.location }}</p>
 
     {% if event.price_text and "," in event.price_text %}
     {% else %}
-      {% if event.price|int > 0 %}
-        <p>${{ event.price }} per guest</p>
+      {% if event.price|int > 0 and "series" not in event.tags %}
+        <p>Price: ${{ event.price }} per guest</p>
       {% endif %}
     {% endif %}
 
-    {% if event.elimit and event.elimit >= 1 %}
-      <form class="form-group">
-      <select id="quantity" class="form-control" onclick="getSubtotal();">
-      <option value="">Select number of guests</option>
-      {% for n in range(event.elimit) %}
-      <option value="{{ n }}">{{ n }}</option>
+
+    <form id="quantity_form" class="form-group">
+
+
+    {# VARIABLE TIME #}
+    {# Feb 6 3-5pm, Feb 6 6-8pm, Feb 7 1-3pm, Feb 7 4-6pm #}
+    {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
+      <select id="variable_time" class="form-control" onclick="getSubtotal();">
+      <option value="">Select time slot</option>
+      {% set prc = event.price_text.split(',') %}
+      {% for p in prc %}
+        {% if "am" in event.price_text or "pm" in event.price_text %}
+          {% set inv = event.extra_data|get_inventory(p|trim)|int %}
+          {% if inv >= 1 %}
+            <option value="{{ event.price }},{{ p }}">{{ p }} ... 
+              {{ inv }} spot{% if inv > 1 %}s{% endif %} left</option>
+          {% endif %}
+        {% endif %}
       {% endfor %}
       </select>
-      </form>
+    {% endif %}
+    {# VARIABLE TIME END #}
+
+
+    {# VARIABLE PRICE #}
+    {# one red @ $10, two blue @ $5, a bird @ $20 #}
+    {% if "," in event.price_text and ("am" not in event.price_text and "pm" not in event.price_text) %}
+      <select id="variable_price" class="form-control" onclick="getSubtotal();">
+      <option value="">Select an item</option>
+      {% set prc = event.price_text.split(',') %}
+      {% for p in prc %}
+        {% if "am" in event.price_text or "pm" in event.price_text %}
+        {% else %}
+          {% if "@" in p %}
+            {% set variation_name = p.split('@')[0] %}
+            {% set variation_price = p.split('@')[1] %}
+            <option value="{{ variation_price }}">{{ variation_name }} {{ variation_price }}</option>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      </select>
+    {% endif %}
+    {# VARIABLE PRICE END #}
+
+
+    {# REGULAR EVENT #}
+    {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
+    {% else %}
+    {% if event.elimit and event.elimit >= 1 and "series" not in event.tags %}
+      <select id="guest_quantity" class="form-control" onclick="getSubtotal();">
+      <option value="">Select number of guests</option>
+      {% for n in range(1, event.elimit) %}
+        <option value={{ n }}>{{ n }} guest{% if n > 1 %}s{% endif %}</option>
+      {% endfor %}
+      </select>
+    {% endif %}
+    {% endif %}
+    {# REGULAR EVENT END #}
+
+
+    {# SCARF SPECIALS #}
+    {% if "scarf" in event.title.lower() %}
+      <select id="additional_scarf_quantity" class="form-control" onclick="getSubtotal();">
+      <option value=0>Optional: Select additional scarf for $28</option>
+      <option value=1>1 additional scarf</option>
+      <option value=2>2 additional scarves</option>
+      <option value=3>3 additional scarves</option>
+      </select>
+    {% endif %}
+    {# SCARF SPECIALS END #}
+
+
+    </form>
+
+
+    {# EVENT SERIES #}
+    {% if "series" in event.tags %}
+      {% set tags = event.tags.split(" ") %}
+      {% for tag in tags %}
+        {% if "series" in tag %}
+          {% set parent = tag.split("=")[1] %}
+          <p><a href="/event/{{ parent }}.html">See the first event of this series for purchase options.</a></p>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    {# EVENT SERIES END #}
+
+
+    {% if event.title != "Private Event" and "series" not in event.tags %}
+    <p>Total: $<span id="subtotal">0</span></p>
     {% endif %}
 
-    <p>Total: $<span id="subtotal">0</span></p>
+    <div id="thanks"></div>
 
-    <button onclick="whatIsTheSubtotal();">What is the subtotal?</button>
+    <div id="paypal-button-container" class="text-center"></div>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
+    // SANDBOX
+    </script>
+
+    <!--
+    <script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+    // PRODUCTION
+    </script>
+    -->
 
   </div>
 
@@ -76,17 +180,105 @@
 
 <script>
 var price_per_guest = {{ event.price }};
+var event_id = {{ event.eid }};
+var additional_scarf_cost = 28;
+
+
+function getOptionValue(id) {
+  var q = document.getElementById(id);
+  val = q.options[q.selectedIndex].value;
+  return val;
+}
+
+
+function getScarfSubtotal() {
+  additional_scarf_quantity = getOptionValue("additional_scarf_quantity");
+  scarf_subtotal = additional_scarf_quantity * additional_scarf_cost;
+  console.log("additional_scarf_quantity: " + additional_scarf_quantity);
+  console.log("scarf_subtotal: " + scarf_subtotal);
+  return scarf_subtotal;
+}
+
+
 function getSubtotal() {
-  var q = document.getElementById("quantity");
-  number_of_guests = q.options[q.selectedIndex].value;
-  subtotal = price_per_guest * number_of_guests;
+  {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
+    quantity = 1; // for variable time
+  {% else %}
+    quantity = getOptionValue("guest_quantity");
+  {% endif %}
+  {% if "," in event.price_text and ("am" not in event.price_text and "pm" not in event.price_text) %}
+    variable_price_choice = getOptionValue("variable_price");
+    var variable_price = variable_price_choice.replace(/^.*\$/, "");
+    console.log("variable_price: " + variable_price);
+    subtotal = variable_price * quantity;
+  {% else %}
+    subtotal = price_per_guest * quantity;
+  {% endif %}
+  if (subtotal > 0) {
+    document.getElementById("paypal-button-container").style.display = "block";
+  }
   console.log("subtotal: " + subtotal);
+  {% if "scarf" in event.title.lower() %}
+    subtotal += getScarfSubtotal();
+  {% endif %}
   document.getElementById("subtotal").innerHTML = subtotal;
   return subtotal;
 }
-function whatIsTheSubtotal() {
-  alert(getSubtotal());
+
+
+function checkTime(edatetime) {
+  var d = edatetime * 1000;
+  var n = Date.now();
+  var dd = new Date(d);
+  var nn = new Date(n);
+  var time_window = 10; // hours
+  if (d - n > 60*60* time_window *1000) {
+    //console.log("NOT within xh window. OK to book.");
+  } else {
+    //console.log("IS within xh window. HIDE booking option.");
+    document.getElementById("quantity_form").style.display = "none";
+    var msg = "Event occurs within " + time_window + " hours. Call to see if this event is still available.";
+    document.getElementById("thanks").innerHTML = msg;
+  }
 }
+
+
+checkTime({{ event.edatetime.timestamp() }});
+
+
+paypal.Buttons({
+  createOrder: function(data, actions) {
+    return actions.order.create({
+      purchase_units: [{
+        amount: {
+          value: getSubtotal()
+        }
+      }]
+    });
+  },
+  onApprove: function(data, actions) {
+    return actions.order.capture().then(function(details) {
+      var thanks_text = "Transaction complete. Thank you " + details.payer.name.given_name;
+      thanks_text += ". Order ID: " + details.id;
+      document.getElementById("thanks").innerHTML += thanks_text;
+      document.getElementById("paypal-button-container").style.display = "none";
+      document.getElementById("quantity_form").style.display = "none";
+      console.log(details);
+      return fetch('/order/submit', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          orderID: data.orderID,
+          event_id: event_id,
+          quantity: getOptionValue(),
+          details: details
+        })
+      });
+    });
+  }
+}).render('#paypal-button-container');
 </script>
 
 {% endblock %}

@@ -317,7 +317,11 @@ def app(environ, start_response):
                         # Notice zero after purchase_units:
                         data_array.append(order['details']['purchase_units'][0]['amount']['value'])
                         data_array.append(order['details']['purchase_units'][0]['payments']['captures'][0]['amount']['value'])
-                        data_array.append(order['variable_time_slot'])
+
+                        try:
+                            data_array.append(order['variable_time_slot'])
+                        except:
+                            data_array.append('no variable time slot')
 
                         # Load database:
                         fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time"
