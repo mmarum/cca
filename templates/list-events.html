@@ -59,7 +59,7 @@ geust_cost = {};
     </div>
 
     <div class="col-md-2">
-      <a href="/calendar.html#{{ event.eid }}">
+      <a href="/event/{{ event.eid }}.html">
         <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
       </a>
     </div>
@@ -68,10 +68,12 @@ geust_cost = {};
         {{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} 
         <span class="duration" id="duration_{{ event.eid }}">({{ event.duration }} hrs)</span>
       </h4>
-      <a href="/calendar.html#{{ event.eid }}">
+      <a href="/event/{{ event.eid }}.html">
         <h3>{{ event.title }}</h3>
       </a>
 
+     
+      <!--
       {% if event.price_text and "," in event.price_text %}
       {% else %}
         {% if event.price|int > 0 %}
@@ -79,7 +81,6 @@ geust_cost = {};
         {% endif %}
       {% endif %}
 
-      <!--
         <div>
           Max: {{ event.elimit }} people.
           <mark>
@@ -88,32 +89,23 @@ geust_cost = {};
             </span> seats remaining
           </mark>
         </div>
-      -->
 
       <div>{{ event.location }}</div>
+
       <div id="book_now_{{ event.eid }}">
         {% if event.title.lower() != "closed" %}
-          <a href="/calendar.html#{{ event.eid }}">Book Now</a>
+          <a href="/event/{{ event.eid }}.html">Book Now</a>
         {% endif %}
       </div>
+      -->
 
       <div>
-      {% set event_desc = event.description.split('\n') %}
-      {% for e in event_desc %}
-        {% if e.startswith("http") %}
-          <a href="{{ e }}">Buy tickets</a>
-          <script>
-          if (window.location.hash) {
-            var hash = window.location.hash.substr(1);
-            if ((/^([0-9]{1,9})$/.test(hash)) && (hash == {{ event.eid }})) {
-              document.getElementById("state_outside_payment").value = "True";
-            }
-          }
-          </script>
-        {% else %}
-          <p>{{ e|safe }}</p>
+      {% set event_desc = event.description.split('. ') %}
+      {% for sentence in event_desc -%}
+        {% if loop.index <= 5 %}
+          {{ sentence|safe }}{% else %}.
         {% endif %}
-      {% endfor %}
+      {%- endfor %}
       </div>
 
 
@@ -204,7 +196,7 @@ geust_cost = {};
       {# IDENTIFY EVENT SERIES OR NOT #}
       {% else %}
         This event is part of a series.<br>
-        See <a href="/calendar.html#{{ parent[event.eid] }}">the first event of this series</a> for purchase options.
+        See <a href="/event/{{ parent[event.eid] }}.html">the first event of this series</a> for purchase options.
       {% endif %}
       {#    #}
 

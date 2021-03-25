@@ -6,6 +6,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from update_extra import UpdateExtra
 
+domain = "https://www.catalystcreativearts.com"
+
 def read_file(file_name):
     f = open(file_name, "r")
     content = f.read()
@@ -17,6 +19,10 @@ def write_file(file_name, content):
     f.write(content)
     f.close()
     return True
+
+
+user = "catalystcreative"
+passw = json.loads(read_file("../app/data/passwords.json"))[user]
 
 
 def order(environ, start_response):
@@ -45,6 +51,15 @@ def order(environ, start_response):
             u = UpdateExtra(event_id, "", 0)
             u.set_via_purchase(form_orders['variable_time_slot'])
             u.update_extra()
+
+            # Now rebuild the page so it reflects accurate inventory numbers
+            r = requests.get(f'{domain}/app/build-individual-event?eid={event_id}', auth=(f'{user}', f'{passw}'))
+            print("rebuilding", r.url)
+            if r.status_code == 200:
+                print(r.status_code)
+                return r.text
+            else:
+                raise ValueError(f'get_page_contents fail: {path} {r.status_code}')
         except:
             print(f"NO VARIABLE TIME for {event_id}")
 
@@ -65,7 +80,7 @@ def order(environ, start_response):
         ####
 
         passwd = json.loads(read_file("../app/data/passwords.json"))["catalystemail"]
-        url = "https://www.catalystcreativearts.com/email/submit"
+        url = f"{domain}/email/submit"
 
         data = {"subject": "CCA Event purchase", "content": f"{json.dumps(orders, indent=4)}"}
         headers = {"Content-Type": "application/json"}

@@ -25,7 +25,8 @@ groups = {
     "summer-camp",
     "wheel-wars",
     "3-wednesdays-workshop",
-    "cart"
+    "cart",
+    "build-individual-event"
 ],
 "galleries": [
     "commissioned-art",

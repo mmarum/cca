@@ -30,21 +30,20 @@ select {
   </div>
 
   <div class="col-md-2">
-    <a href="/calendar.html#{{ event.eid }}">
-      <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
-    </a>
+    <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
   </div>
 
   <div class="col-lg-8">
 
     <h4>
       {{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} 
-      <span class="duration" id="duration_{{ event.eid }}">({{ event.duration }} hrs)</span>
+      <span class="duration" id="duration">({{ event.duration }} hrs)</span>
     </h4>
-    <a href="/calendar.html#{{ event.eid }}">
-      <h3>{{ event.title }}</h3>
-    </a>
 
+    <h3>{{ event.title }}</h3>
+
+
+    {# BUY TICKETS ELSEWHERE #}
     <div>
     {% set event_desc = event.description.split('\n') %}
     {% for e in event_desc %}
@@ -55,15 +54,20 @@ select {
       {% endif %}
     {% endfor %}
     </div>
+    {# BUY TICKETS ELSEWHERE END #}
 
-    <p>Location: {{ event.location }}</p>
 
+    <p id="location">Location: {{ event.location }}</p>
+
+
+    <p id="price">
     {% if event.price_text and "," in event.price_text %}
     {% else %}
       {% if event.price|int > 0 and "series" not in event.tags %}
-        <p>Price: ${{ event.price }} per guest</p>
+        Price: ${{ event.price }} per guest
       {% endif %}
     {% endif %}
+    </p>
 
 
     <form id="quantity_form" class="form-group">
@@ -72,15 +76,14 @@ select {
     {# VARIABLE TIME #}
     {# Feb 6 3-5pm, Feb 6 6-8pm, Feb 7 1-3pm, Feb 7 4-6pm #}
     {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
-      <select id="variable_time" class="form-control" onclick="getSubtotal();">
+      <select id="variable_time" class="form-control" onchange="getSubtotal();">
       <option value="">Select time slot</option>
       {% set prc = event.price_text.split(',') %}
       {% for p in prc %}
         {% if "am" in event.price_text or "pm" in event.price_text %}
           {% set inv = event.extra_data|get_inventory(p|trim)|int %}
           {% if inv >= 1 %}
-            <option value="{{ event.price }},{{ p }}">{{ p }} ... 
-              {{ inv }} spot{% if inv > 1 %}s{% endif %} left</option>
+            <option value="{{ p.strip() }}">{{ p.strip() }} ... {{ inv }} spot{% if inv > 1 %}s{% endif %} left</option>
           {% endif %}
         {% endif %}
       {% endfor %}
@@ -92,7 +95,7 @@ select {
     {# VARIABLE PRICE #}
     {# one red @ $10, two blue @ $5, a bird @ $20 #}
     {% if "," in event.price_text and ("am" not in event.price_text and "pm" not in event.price_text) %}
-      <select id="variable_price" class="form-control" onclick="getSubtotal();">
+      <select id="variable_price" class="form-control" onchange="getSubtotal();">
       <option value="">Select an item</option>
       {% set prc = event.price_text.split(',') %}
       {% for p in prc %}
@@ -114,7 +117,7 @@ select {
     {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
     {% else %}
     {% if event.elimit and event.elimit >= 1 and "series" not in event.tags %}
-      <select id="guest_quantity" class="form-control" onclick="getSubtotal();">
+      <select id="guest_quantity" class="form-control" onchange="getSubtotal();">
       <option value="">Select number of guests</option>
       {% for n in range(1, event.elimit) %}
         <option value={{ n }}>{{ n }} guest{% if n > 1 %}s{% endif %}</option>
@@ -127,7 +130,7 @@ select {
 
     {# SCARF SPECIALS #}
     {% if "scarf" in event.title.lower() %}
-      <select id="additional_scarf_quantity" class="form-control" onclick="getSubtotal();">
+      <select id="additional_scarf_quantity" class="form-control" onchange="getSubtotal();">
       <option value=0>Optional: Select additional scarf for $28</option>
       <option value=1>1 additional scarf</option>
       <option value=2>2 additional scarves</option>
@@ -153,23 +156,23 @@ select {
     {# EVENT SERIES END #}
 
 
-    {% if event.title != "Private Event" and "series" not in event.tags %}
-    <p>Total: $<span id="subtotal">0</span></p>
-    {% endif %}
+    <p id="total">Total: $<span id="subtotal">0</span></p>
 
     <div id="thanks"></div>
 
     <div id="paypal-button-container" class="text-center"></div>
 
+
+    <!--
     <script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
     // SANDBOX
     </script>
+    -->
 
-    <!--
     <script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
     // PRODUCTION
     </script>
-    -->
+
 
   </div>
 
@@ -243,7 +246,51 @@ function checkTime(edatetime) {
 }
 
 
-checkTime({{ event.edatetime.timestamp() }});
+checkTime("{{ event.edatetime.timestamp() }}");
+
+
+function hidePurchase() {
+  document.getElementById("location").style.display = "none";
+  document.getElementById("total").style.display = "none";
+  document.getElementById("price").style.display = "none";
+  document.getElementById("quantity_form").style.display = "none";
+}
+
+{# BUY TICKETS ELSEWHERE #}
+{% for e in event_desc -%}
+  {% if e.startswith("http") %}
+    hidePurchase();
+    console.log("Hiding purchase because but ticket elsewhere");
+  {% endif %}
+{%- endfor %}
+
+
+{# PRIVATE EVENTS #}
+{% if "private event" in event.title.lower() or "series" in event.tags %}
+  hidePurchase();
+  console.log("Hiding purchase because private event or series");
+{% endif %}
+
+
+function getGuestQuantity() {
+  try {
+    quantity = getOptionValue("guest_quantity");
+  }
+  catch(err) {
+    quantity = 1;
+    console.log("reading guest_quantity: " + err.message);
+  }
+  return quantity;
+}
+
+
+function getVariableTimeSlot() {
+  {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
+    return getOptionValue("variable_time");
+  {% else %}
+    return "";
+  {% endif %}
+}
 
 
 paypal.Buttons({
@@ -272,7 +319,8 @@ paypal.Buttons({
         body: JSON.stringify({
           orderID: data.orderID,
           event_id: event_id,
-          quantity: getOptionValue(),
+          quantity: getGuestQuantity(),
+          variable_time_slot: getVariableTimeSlot(),
           details: details
         })
       });

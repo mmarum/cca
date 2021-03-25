@@ -172,10 +172,10 @@ mark {
     {% if next_event %}
     <h2>Next Event</h2>
     <h2>{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h2>
-    <a href="/calendar.html#{{ next_event.eid }}">
+    <a href="/event/{{ next_event.eid }}.html">
       <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
     </a>
-    <h2><a href="/calendar.html#{{ next_event.eid }}">{{ next_event.title }}</a></h2>
+    <h2><a href="/event/{{ next_event.eid }}.html">{{ next_event.title }}</a></h2>
     <hr>
     {% endif %}
 
@@ -264,7 +264,7 @@ mark {
   </div>
 
   <div class="col-md-3">
-    <a href="/calendar.html#{{ event.eid }}" class="event_link">
+    <a href="/event/{{ event.eid }}.html" class="event_link">
       <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="logo"/>
     </a>
   </div>
@@ -273,13 +273,13 @@ mark {
     {% if event.eid != 95 %}
       <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h4>
     {% endif %}
-    <a href="/calendar.html#{{ event.eid }}" class="event_link">
+    <a href="/event/{{ event.eid }}.html" class="event_link">
       <h3>{{ event.title }}</h3>
     </a>
     <div>
     {% set event_desc = event.description.split(' ') %}
     {% for e in event_desc -%}{% if loop.index < 30 %}{{ e }} {% endif %}{%- endfor %}
-    ... <a href="/calendar.html#{{ event.eid }}" class="event_link">Read More</a>
+    ... <a href="/event/{{ event.eid }}.html" class="event_link">Read More</a>
     </div>
   </div>
 

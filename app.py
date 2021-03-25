@@ -153,8 +153,12 @@ def app(environ, start_response):
         #### ####
         #### ####
         elif environ['PATH_INFO'] == '/build-individual-event':
-            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() \
-                and (tags <> 'invisible' or tags is null) ORDER BY edatetime")
+            if environ['QUERY_STRING']:
+                eid = int(environ['QUERY_STRING'].split("=")[1])
+                db.query(f"SELECT * FROM events WHERE eid = {eid}")
+            else:
+                db.query("SELECT * FROM events WHERE edatetime >= CURTIME() \
+                    and (tags <> 'invisible' or tags is null) ORDER BY edatetime")
             e = db.store_result()
             allrows = e.fetch_row(maxrows=100, how=1)
             template = env.get_template("event.html")
