@@ -20,28 +20,74 @@ select {
   margin-bottom: 10px;
 }
 </style>
+
+{% set desc = event.description.split('\n') %}
+{% set img = event.image.replace(" ", "%20") %}
+
+{% if event.location.startswith("400 E. Division St") and "private event" not in event.title.lower() %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "{{ event.title }}",
+  "startDate": "{{ event.edatetime }}",
+  "endDate": "",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "location": {
+    "@type": "Place",
+    "name": "Studio",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "400 E. Division St. Ste 100",
+      "addressLocality": "Arlington",
+      "postalCode": "76011",
+      "addressRegion": "TX",
+      "addressCountry": "US"
+    }
+  },
+  "image": [
+    "https://www.catalystcreativearts.com/img/small/{{ img }}"
+   ],
+  "description": "{% for s in desc %}{% if loop.index <= 3 %}{{ s|safe }} {% endif %}{% endfor %}",
+  "offers": {
+    "@type": "Offer",
+    "url": "https://www.catalystcreativearts.com/event/{{ event.eid }}.html",
+    "price": "{{ event.price }}",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "validFrom": ""
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": "Catalyst Creative Arts",
+    "url": "https://www.catalystcreativearts.com"
+  }
+}
+</script>
+{% endif %}
+
 {% endblock %}
 
 {% block content %}
-
+{% set img = event.image.replace(" ", "%20") %}
 <div class="row">
 
   <div class="col-sm-1">
   </div>
 
   <div class="col-md-2">
-    <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
+    <img alt="{{ img }}" src="/img/small/{{ img }}" class="event_image"/>
   </div>
 
   <div class="col-lg-8">
 
-    <h4>
-      {{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} 
+    <h1>{{ event.title }}</h1>
+
+    <h2>
+      {{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ') }} 
       <span class="duration" id="duration">({{ event.duration }} hrs)</span>
-    </h4>
-
-    <h3>{{ event.title }}</h3>
-
+    </h2>
 
     {# BUY TICKETS ELSEWHERE #}
     <div>

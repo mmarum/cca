@@ -65,7 +65,7 @@ geust_cost = {};
     </div>
     <div class="col-lg-8">
       <h4>
-        {{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }} 
+        {{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ') }} 
         <span class="duration" id="duration_{{ event.eid }}">({{ event.duration }} hrs)</span>
       </h4>
       <a href="/event/{{ event.eid }}.html">

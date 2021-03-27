@@ -27,7 +27,7 @@ groups = {
     "3-wednesdays-workshop",
     "cart",
     "build-individual-event"
-],
+  ],
 "galleries": [
     "commissioned-art",
     "acrylic-painting",
@@ -46,14 +46,31 @@ groups = {
     "pottery-painting",
     "string-art",
     "pottery-lessons"
-]
+  ],
+"events": [
+    "event/344",
+    "event/345",
+    "event/352",
+    "event/362",
+    "event/365",
+    "event/369",
+    "event/371",
+    "event/372",
+    "event/374",
+    "event/376",
+    "event/384",
+    "event/388",
+    "event/389"
+  ]
 }
 
 sitemap_pages = groups["pages"]
 sitemap_galleries = groups["galleries"]
-sitemap_list = sitemap_pages + sitemap_galleries
+sitemap_events = groups["events"]
+sitemap_list = sitemap_pages + sitemap_galleries + sitemap_events
 sitemap_list.remove('home')
 sitemap_list.remove('cart')
+sitemap_list.remove('build-individual-event')
 sitemap_list.insert(0, '')
 #print("sitemap_list", sitemap_list)
 
