@@ -3,14 +3,8 @@
 
 {% block html_head %}
 <style>
-.event_image {
-  max-width: 100%;
-}
 .row {
   padding-top: 15px;
-}
-#paypal-button-container {
-  display: none;
 }
 #thanks {
   color: Green;
@@ -264,7 +258,7 @@ function getSubtotal() {
     subtotal = price_per_guest * quantity;
   {% endif %}
   if (subtotal > 0) {
-    document.getElementById("paypal-button-container").style.display = "block";
+    //document.getElementById("paypal-button-container").style.display = "block";
   }
   console.log("subtotal: " + subtotal);
   {% if "scarf" in event.title.lower() %}
@@ -288,6 +282,7 @@ function checkTime(edatetime) {
     document.getElementById("quantity_form").style.display = "none";
     var msg = "Event occurs within " + time_window + " hours. Call to see if this event is still available.";
     document.getElementById("thanks").innerHTML = msg;
+    document.getElementById("paypal-button-container").style.display = "none";
   }
 }
 
@@ -300,6 +295,7 @@ function hidePurchase() {
   document.getElementById("total").style.display = "none";
   document.getElementById("price").style.display = "none";
   document.getElementById("quantity_form").style.display = "none";
+  document.getElementById("paypal-button-container").style.display = "none";
 }
 
 {# BUY TICKETS ELSEWHERE #}
@@ -307,6 +303,7 @@ function hidePurchase() {
   {% if e.startswith("http") %}
     hidePurchase();
     console.log("Hiding purchase because but ticket elsewhere");
+    document.getElementById("paypal-button-container").style.display = "none";
   {% endif %}
 {%- endfor %}
 
@@ -367,6 +364,9 @@ paypal.Buttons({
           event_id: event_id,
           quantity: getGuestQuantity(),
           variable_time_slot: getVariableTimeSlot(),
+          {% if "scarf" in event.title.lower() -%}
+          total_number_scarf: (getScarfSubtotal() / additional_scarf_cost) + Number(getOptionValue("guest_quantity")),
+          {%- endif %}
           details: details
         })
       });

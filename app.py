@@ -322,17 +322,25 @@ def app(environ, start_response):
                         data_array.append(order['details']['purchase_units'][0]['amount']['value'])
                         data_array.append(order['details']['purchase_units'][0]['payments']['captures'][0]['amount']['value'])
 
+                        # FOR VARIABLE_TIME FIELD
                         try:
                             data_array.append(order['variable_time_slot'])
                         except:
                             data_array.append('no variable time slot')
 
+                        # FOR EXTRA_DATA FIELD
+                        try:
+                            total_number_scarf = json.dumps({ "total_number_scarf": int(order['total_number_scarf']) })
+                            data_array.append(total_number_scarf)
+                        except:
+                            data_array.append('not an event with scarf')
+
                         # Load database:
-                        fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time"
+                        fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time, extra_data"
                         #vals = str(data_array).lstrip('[').rstrip(']')
                         vals = data_array
                         #sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
-                        sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                        sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
                         c = db.cursor()
                         #c.execute(sql)

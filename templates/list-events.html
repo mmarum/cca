@@ -1,104 +1,30 @@
 {% extends "base-site.html" %}
 {% block title %}Catalyst Creative Arts Events List{% endblock %}
-
 {% block html_head %}
-<script>
-window.onhashchange = function() {
-  window.location.reload();
-}
-</script>
-<style>
-#paypal-button-container, #pay-with, .special, .special2, .check_time, .quantity_form, .cost, .cost_container, .duration {
-  display: none;
-}
-.event_image {
-  max-width: 100%;
-}
-.quantity_form, .cost {
-  margin-top: 10px;
-  max-width: 350px;
-}
-.date {
-  font-size: 150%;
-}
-h1 {
-  /* border-bottom: 1px dashed LightGray; */
-}
-.cost_container {
-  margin-bottom: 10px;
-  padding: 10px;
-  background-color: LightGray;
-  border-radius: 5px;
-}
-</style>
 {% endblock %}
-
 {% block content %}
-
-<form id="state_holder">
-<input type="hidden" id="state_eid"/>
-<input type="hidden" id="state_date"/>
-<input type="hidden" id="state_title"/>
-<input type="hidden" id="state_price"/>
-<input type="hidden" id="state_outside_payment" value="False"/>
-<input type="hidden" id="state_variable_time_slot" value=""/>
-</form>
-
-<script>
-geust_cost = {};
-</script>
-
 <center id="upcoming_events">
 <h1>Upcoming Events</h1>
 </center>
-
 {% for event in events %}
   <div class="row event_row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
-
     <div class="col-sm-1">
     </div>
-
     <div class="col-md-2">
       <a href="/event/{{ event.eid }}.html">
         <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
       </a>
     </div>
     <div class="col-lg-8">
-      <h4>
+      <h2>
         {{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ') }} 
         <span class="duration" id="duration_{{ event.eid }}">({{ event.duration }} hrs)</span>
-      </h4>
-      <a href="/event/{{ event.eid }}.html">
-        <h3>{{ event.title }}</h3>
-      </a>
-
-     
-      <!--
-      {% if event.price_text and "," in event.price_text %}
-      {% else %}
-        {% if event.price|int > 0 %}
-          <div>${{ event.price }}</div>
-        {% endif %}
-      {% endif %}
-
-        <div>
-          Max: {{ event.elimit }} people.
-          <mark>
-            <span id="seats_remaining_{{ event.eid }}"> 
-              {{ event.elimit }}
-            </span> seats remaining
-          </mark>
-        </div>
-
-      <div>{{ event.location }}</div>
-
-      <div id="book_now_{{ event.eid }}">
-        {% if event.title.lower() != "closed" %}
-          <a href="/event/{{ event.eid }}.html">Book Now</a>
-        {% endif %}
-      </div>
-      -->
-
+      </h2>
+      <h1>
+        <a href="/event/{{ event.eid }}.html">
+          <h3>{{ event.title }}</h3>
+        </a>
+      </h1>
       <div>
       {% set event_desc = event.description.split('. ') %}
       {% for sentence in event_desc -%}
@@ -107,166 +33,12 @@ geust_cost = {};
         {% endif %}
       {%- endfor %}
       </div>
-
-
-      {# IDENTIFY EVENT SERIES OR NOT #}
-      {% if parent[event.eid] == "" %}
-      {#    #}
-
-
-      <form class="quantity_form" id="quantity_form_{{ event.eid }}">
-
-      {# TEMPORARY #}
-      {% if event.title == "Resin Charcuterie Board 2 Part Couples Event" %}
-        <p style="background-color: #EEE;">Registration for this event has been closed.</p>
-      {% endif %}
-
-      {# title reference is just TEMPORARY #}
-      {% if event.price_text and event.title != "Resin Charcuterie Board 2 Part Couples Event" %}
-        {% if "," in event.price_text %}
-          <div class="form-group">
-          <select name="price_variation" id="event_variation" onchange="eventVariation({{ event.eid }}, this.options[this.selectedIndex].value);" class="form-control">
-          <option value="">Select options</option>
-
-          {% set prc = event.price_text.split(',') %}
-          {% for p in prc %}
-
-            {% if "am" in event.price_text or "pm" in event.price_text %}
-
-              {% set this_inventory = event.extra_data|get_inventory(p|trim)|int %}
-
-              {% if this_inventory >= 1 %}
-                <option value="{{ event.price }},{{ p }}">{{ p }} ... {{ this_inventory }} spot{% if this_inventory > 1 %}s{% endif %} left</option>
-              {% endif %}
-
-            {% else %}
-
-              {% set variation_name = p.split('@')[0] %}
-              {% set variation_price = p.split('@')[1] %}
-              <option value="{{ variation_price }}">{{ variation_name }} {{ variation_price }}</option>
-
-            {% endif %}
-
-          {% endfor %}
-          </select>
-          </div>
-        {% endif %}
-      {% endif %}
-
-      {% if event.elimit and event.elimit >= 1 %}
-
-        <div class="form-group">
-
-        {% if "am" in event.price_text or "pm" in event.price_text %}
-          <input type="hidden" name="quantity" id="quantity_{{ event.eid }}" value="1"/>
-        {% else %}
-
-          {% if "scarf" in event.title.lower() %}
-            <select name="quantity" id="quantity_{{ event.eid }}" onchange="geust_change({{ event.eid }}, 
-              this.options[this.selectedIndex].value);" class="form-control">
-          {% else %}
-            <select name="quantity" id="quantity_{{ event.eid }}" onchange="quant({{ event.eid }});" class="form-control">
-          {% endif %}
-
-          <option value="">Select number of {% if "splash box" in event.title.lower() %}canvases{% else %}guests{% endif %}</option>
-          {% if orders_count[event.eid] %}
-            {% set x=event.elimit|int - orders_count[event.eid] %}
-          {% else %}
-            {% set x=event.elimit|int %}
-          {% endif %}
-          {% for n in range(1, x+1) -%}
-            <option value="{{ n }}">{{ n }}</option>
-          {%- endfor %}
-
-          </select>
-
-        {% endif %}
-
-        </div>
-
-      {% else %}
-        <input type="hidden" name="quantity" value="1" id="quantity_{{ event.eid }}"/>
-      {% endif %}
-
-      <!-- Optional: Guests: <input type="text" name="guest_list" id="guest_list" /> -->
-
-      </form>
-
-
-      {# IDENTIFY EVENT SERIES OR NOT #}
-      {% else %}
-        This event is part of a series.<br>
-        See <a href="/event/{{ parent[event.eid] }}.html">the first event of this series</a> for purchase options.
-      {% endif %}
-      {#    #}
-
-
-      <div class="cost_container" id="cost_container_{{ event.eid }}">
-        Total: $<span class="cost" id="cost_{{ event.eid }}">0</span>. 
-        <!-- <span id="cost_container_text">Click Paypal link below to complete process.</span> -->
-        <div id="extra_data_{{ event.eid }}"></div>
-      </div>
-
-      {% if "scarf" in event.title.lower() %}
-        <button class="special" id="subtract_scraf_{{ event.eid }}" type="button" 
-          class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'subtract')">Subtract scarf</button>
-        <button class="special" id="special_{{ event.eid }}" type="button" 
-          class="btn btn-info" onclick="scraf_change({{ event.eid }}, 'add')">Add additional scarf for $28</button>
-        <script>
-          geust_cost[{{ event.eid }}] = {{ event.price }};
-        </script>
-      {% endif %}
-
-      <div id="scraf_detail_{{ event.eid }}"></div>
-      <button class="special2" id="special2_{{ event.eid }}" type="button" class="btn btn-info" onclick="camp({{ event.eid }})">Add a 2nd guest for $165</button>
-      <div id="check_time_{{ event.eid }}" class="check_time alert alert-danger"></div>
-
     </div>
-
     <div class="col-sm-1">
     </div>
-
   </div>
-
 {% endfor %}
-
-{% if test and test == "true" %}
-<h1>SANDBOX</h1>
-<script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
-// SANDBOX
-</script>
-{% else %}
-<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
-// PRODUCTION
-</script>
-{% endif %}
-
-<div id="pay-with" class="text-center">Pay with:</div>
-<div id="paypal-button-container" class="text-center"></div>
-
 <script>
-events_object = {{ events_object|safe }}
-
-function eventVariation(eid, val) {
-  val = val.replace('\$', '');
-  console.log(eid + " " +  val);
-  document.getElementById("state_price").value = val;
-  console.log(document.getElementById("state_price").value);
-  quant(eid);
-}
-
-function setEventMeta(eid) {
-  document.getElementById("state_eid").value = eid;
-  document.getElementById("state_date").value = events_object[eid]["date"];
-  document.getElementById("state_title").value = events_object[eid]["title"];
-  document.getElementById("state_price").value = events_object[eid]["price"];
-}
-
-function getEventMeta(field) {
-  //console.log(field+': '+document.getElementById("state_"+field).value);
-  return document.getElementById("state_"+field).value;
-}
-
 function hideRows() {
   var x = document.getElementsByClassName("event_row");
   for (var i = 0; i < x.length; i++) {
@@ -286,271 +58,11 @@ if (window.location.hash) {
     hideRows();
     document.getElementById("eid_"+hash).style.display = "flex";
     setEventMeta(hash);
-
     if (document.getElementById("state_outside_payment").value == "False") {
       document.getElementById("quantity_form_"+hash).style.display = "block";
     }
-
-    checkTime(getEventMeta("date"));
-    document.getElementById("book_now_"+eid).style.display = "none";
-    document.getElementById("upcoming_events").style.display = "none";
-    document.getElementById("duration_"+hash).style.display = "inline";
   }
   document.getElementById("top").focus();
 }
-
-/*
-var orders_count = {{ orders_count|safe }}
-for (var key in orders_count) {
-  if (orders_count.hasOwnProperty(key)) {
-    sr = document.getElementById("seats_remaining_"+key);
-    new_value = sr.innerHTML-orders_count[key];
-    //console.log(key + " -> " + orders_count[key] + " old-val: " + sr.innerHTML + " new-val: " + new_value);
-    sr.innerHTML = new_value;
-  }
-}
-*/
-
-function dhm(t){
-    var cd = 24 * 60 * 60 * 1000,
-        ch = 60 * 60 * 1000,
-        d = Math.floor(t / cd),
-        h = Math.floor( (t - d * cd) / ch),
-        m = Math.round( (t - d * cd - h * ch) / 60000),
-        pad = function(n){ return n < 10 ? '0' + n : n; };
-  if( m === 60 ){
-    h++;
-    m = 0;
-  }
-  if( h === 24 ){
-    d++;
-    h = 0;
-  }
-  return d + " days, " + h  + " hours, " + m + " minutes";
-}
-
-function checkTime(event_date_time) {
-  eid = getEventMeta("eid");
-  // milliseconds
-  var d = event_date_time * 1000;
-  var n = Date.now();
-  var dd = new Date(d);
-  var nn = new Date(n);
-  //console.log('d: ' + d + ' dd: ' + dd);
-  //console.log('n: ' + n + ' nn: ' + nn);
-  //console.log('time until event: ' + (d - n));
-  //console.log('time until event: ' + dhm(d - n));
-  var event_start_padding = 10; // hours
-  //if (d - n > 60*60* event_start_padding *1000) {
-  // TEMPORARY:
-  if ((d - n > 60*60* event_start_padding *1000)||(eid == 207)) {
-    //console.log("Not within xh window. OK to book.");
-  } else {
-    //console.log("IS within xh window. HIDE booking option.");
-    document.getElementById("quantity_form_"+eid).style.display = "none";
-    var check_time_msg = "Event occurs within " + event_start_padding + " hours. Call to see if this event is still available.";
-    document.getElementById("check_time_"+eid).innerHTML = check_time_msg;
-    document.getElementById("check_time_"+eid).style.display = "block";
-    document.getElementById("book_now_"+eid).style.display = "none";
-  }
-}
-
-function getTotal(eid) {
-  var total = document.getElementById("cost_"+eid).innerHTML;
-  //total = total.substring(1);
-  console.log('getTotal: ' + total);
-  return total;
-}
-
-var scarf_count = 0;
-var scarf_total_price = 0;
-function scarf(eid) {
-  var price = getEventMeta("price");
-  var new_cost = subtotal(quant(eid), price) + 28;
-  document.getElementById("cost_"+eid).innerHTML = new_cost;
-  scarf_count += 1;
-  console.log('_scarf_count: ' + scarf_count);
-  scarf_total_price = scarf_count * 28;
-  console.log('_scarf_total_price: ' + scarf_total_price);
-  return new_cost;
-}
-
-
-// START THINGS
-
-var scraf_cost = 28;
-var scraf_count = 0;
-var scraf_total = 0;
-function scraf_change(eid, operator) {
-  if (operator == "add") {
-    scraf_count += 1;
-  } else if (operator == "subtract") {
-    scraf_count -= 1;
-  }
-  scraf_total = scraf_count * scraf_cost;
-  do_things(eid);
-  if (scraf_count == 0) {
-    document.getElementById("subtract_scraf_"+eid).style.display = "none";
-  } else {
-    document.getElementById("subtract_scraf_"+eid).style.display = "inline";
-  }
-  return true;
-}
-
-//var geust_cost = 43;
-var geust_count = 0;
-var geust_total = 0;
-function geust_change(eid, num) {
-  geust_count = num;
-  geust_total = geust_count * geust_cost[eid];
-  do_things(eid);
-  return true;
-}
-
-function do_things(eid) {
-  console.log("i am doing things");
-  geust_plus_scraf_total = geust_total + scraf_total;
-  var scraf_detail = '';
-  scraf_detail += ' guest count: ' + geust_count + '; guest total: ' + geust_total + '<br>\n';
-  scraf_detail += ' extra scarf count: ' + scraf_count + '; extra scarf total: ' + scraf_total + '<br>\n';
-  scraf_detail += ' guests plus extra scarf total: ' + geust_plus_scraf_total + '<br>\n';
-  document.getElementById("scraf_detail_"+eid).innerHTML = scraf_detail;
-  document.getElementById("cost_container_"+eid).style.display = "block";
-  document.getElementById("paypal-button-container").style.display = "block";
-  document.getElementById("pay-with").style.display = "block";
-  document.getElementById("special_"+eid).style.display = "inline";
-  document.getElementById("cost_"+eid).style.display = "inline";
-  document.getElementById("cost_"+eid).innerHTML = geust_plus_scraf_total;
-}
-
-// STOP THINGS
-
-
-var cost_subtotal = 0;
-function subtotal(quantity, price) {
-  cost_subtotal = quantity * price;
-  //console.log('cost_subtotal: ' + cost_subtotal);
-  return cost_subtotal;
-}
-
-function quant(eid) {
-  var quantity = 1;
-  var price = getEventMeta("price");
-  var q = document.getElementById("quantity_"+eid);
-
-  if ( (events_object[eid]["price_text"]) && (events_object[eid]["price_text"].match(/,/)) ) {
-    quantity = q.value;
-  } else {
-    quantity = q.options[q.selectedIndex].value;
-  }
-
-  console.log('guest_quantity: ' + quantity);
-
-  document.getElementById("paypal-button-container").style.display = "block";
-  document.getElementById("pay-with").style.display = "block";
-
-  if (getEventMeta("title").match(/scarf/gi)) {
-    document.getElementById("special_"+eid).style.display = "block";
-
-    //console.log('price: ' + price);
-    console.log('scarf_total_price: ' + scarf_total_price);
-    var subtotal_plus_scarves = subtotal(quantity, price) + scarf_total_price;
-    console.log('subtotal plus scarf_total_price: ' + subtotal_plus_scarves);
-
-  }
-
-  console.log("is she hulk a woman");
-
-  // HERE IS WHERE I NEED TO FIX PRICE
-
-  var variable_time_slot = ""
-
-  if (price.match(/,/g) && ( price.match(/am/g) || price.match(/pm/g) ) ) {
-    variable_time_slot = price.split(",")[1]
-    price = price.split(",")[0]
-    console.log(price, variable_time_slot);
-    // Bypass setEventMeta()
-    document.getElementById("state_variable_time_slot").value = variable_time_slot.trim();
-  }
-
-  document.getElementById("cost_"+eid).innerHTML = subtotal(quantity, price);
-
-  // NOW APPEND THE variable_time_slot FOR BUYER TO SEE
-  if ( (price) && ( variable_time_slot.match(/am/g) || variable_time_slot.match(/pm/g) ) ) {
-    document.getElementById("extra_data_"+eid).innerHTML = variable_time_slot;
-  }
-
-  //document.getElementById("cost_"+eid).innerHTML += ". To complete order, click Paypal button below.";
-  document.getElementById("cost_"+eid).style.display = "inline";
-  document.getElementById("cost_container_"+eid).style.display = "block";
-  if (quantity == "") { 
-    document.getElementById("paypal-button-container").style.display = "none";
-    document.getElementById("pay-with").style.display = "none";
-    document.getElementById("special_"+eid).style.display = "none";
-  }
-  //console.log('quant: ' + quantity);
-
-  return quantity;
-}
-</script>
-
-<script>
-
-
-// https://developer.paypal.com/docs/checkout/integrate/
-// View orders at PayPal here: https://developer.paypal.com/developer/dashboard/sandbox/
-// Verify the transaction
-// mmarum-buyer@gmail.com
-
-//console.log('total: ' + getTotal(getEventMeta("eid")));
-//console.log('event_id: ' + getEventMeta("eid"));
-//console.log('quantitiy: ' + quant(getEventMeta("eid")));
-
-  paypal.Buttons({
-    createOrder: function(data, actions) {
-      return actions.order.create({
-        purchase_units: [{
-          amount: {
-            value: getTotal(getEventMeta("eid"))
-          }
-        }]
-      });
-    },
-    onApprove: function(data, actions) {
-      return actions.order.capture().then(function(details) {
-        //alert('Transaction completed by ' + details.payer.name.given_name);
-        var transaction_completed_text = "Transaction complete. Thank you " + details.payer.name.given_name;
-        transaction_completed_text += " - Order ID: " + details.id;
-        console.log(transaction_completed_text);
-        document.getElementById("cost_container_"+getEventMeta("eid")).innerHTML += transaction_completed_text;
-        document.getElementById("cost_container_"+getEventMeta("eid")).style.backgroundColor = "#00C851";
-        //document.getElementById("cost_container_text").innerHTML = "";
-        document.getElementById("paypal-button-container").style.display = "none";
-        document.getElementById("pay-with").style.display = "none";
-
-        console.log(details);
-
-        console.log(getEventMeta("variable_time_slot"));
-
-        // Call your server to save the transaction
-        //return fetch('/app/paypal-transaction-complete', {
-        return fetch('/order/submit', {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            orderID: data.orderID,
-            event_id: getEventMeta("eid"),
-            quantity: quant(getEventMeta("eid")),
-            variable_time_slot: getEventMeta("variable_time_slot"),
-            details: details
-          })
-        });
-      });
-    }
-  }).render('#paypal-button-container');
-
-// https://developer.paypal.com/docs/api/orders/v2/#orders_get
 </script>
 {% endblock %}
