@@ -13,6 +13,12 @@ domain = "https://www.catalystcreativearts.com"
 
 # TODO: the lists below need to be de-duped or automated
 
+f = open("data/upcoming_event_ids.json", "r")
+upcoming_event_ids = json.loads(f.read())
+f.close()
+
+upcoming = [f"event/{x}" for x in upcoming_event_ids]
+
 groups = {
 "pages": [
     "home",
@@ -20,6 +26,8 @@ groups = {
     "private-events", 
     #"about-contact", 
     "about-us", 
+    "media",
+    "reviews",
     #"custom-built",
     "after-school",
     "summer-camp",
@@ -47,21 +55,7 @@ groups = {
     "string-art",
     "pottery-lessons"
   ],
-"events": [
-    "event/344",
-    "event/345",
-    "event/352",
-    "event/362",
-    "event/365",
-    "event/369",
-    "event/371",
-    "event/372",
-    "event/374",
-    "event/376",
-    "event/384",
-    "event/388",
-    "event/389"
-  ]
+"events": upcoming
 }
 
 sitemap_pages = groups["pages"]

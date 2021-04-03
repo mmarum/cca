@@ -43,6 +43,12 @@ var browser_size = {
 </script>
 
 <style>
+@font-face {
+  font-family: BebasNeue-Bold;
+  src: url('/fonts/BebasNeue-Bold.otf');
+  src: url('/fonts/BebasNeue-Bold.otf') format('embedded-opentype'),
+  url('/fonts/BebasNeue-Bold.ttf') format('truetype');
+}
 .top-buffer { 
   padding: 10px 0 10px 0;
   margin: 10px 0 10px 0;
@@ -61,6 +67,10 @@ td {
   padding: 5px;
   padding: 5px;
 }
+.event_image {
+  width: 100%;
+  padding: 5px;
+}
 @media only screen and (max-width: 600px) {
   #nav_container {
     display: none;
@@ -70,37 +80,24 @@ td {
     margin: 15px 0 15px 0;
     border-bottom: 3px dashed Gray;
   }
-  .event_image {
-    width: 100%;
-    padding: 5px;
-  }
-  h1 {
-    font-size: 1.0rem;
-    padding: 10px;
-  }
-  h4 {
-    font-size: 1rem;
-    margin-top: 10px;
-  }
   .logo {
     padding: 10px 0 10px 0;
-  }
-  h3 {
-    font-size: 1.25rem;
   }
   img {
     width: 100%;
   }
+  .tagline_parts {
+    display: block;
+    line-height: 80%;
+  }
 }
 #tagline {
-  font-size: 20px;
+  font-size: 30px;
+  font-family: 'BebasNeue-Bold', Arial, Verdana, Sans-serif;
 }
 @media only screen and (min-width: 601px) {
   div#burger div {
     display: none;
-  }
-  #tagline {
-    font-size: 30px;
   }
 }
 .logo {
@@ -137,14 +134,6 @@ div#burger div {
 
 <body>
 
-<!--
-0) Home & After School
-1) After School Pottery Course
-2) After School Art Club
-3) Home School Art Club
-4) # Summer Camp
--->
-
 <div id="top"></div>
 
 <div id="content">
@@ -176,7 +165,11 @@ div#burger div {
 <div class="row">
   <div class="col-sm-12">
     <center>
-    <div id="tagline">Art, Craft and DIY Studio and Event Venue, Arlington Texas</div>
+    <div id="tagline">
+      <span class="tagline_parts">Art Craft DIY</span>
+      <span class="tagline_parts">Studio and Event Venue</span>
+      <span class="tagline_parts">Arlington Texas</span>
+    </div>
     </center>
   </div>
 </div>
@@ -194,7 +187,7 @@ if (browser_size["width"] > 600) {
 
 <nav class="navbar navbar-expand-sm bg-light navbar-light d-flex">
   <ul class="navbar-nav list-inline mx-auto justify-content-center">
-  {% for i in ["Calendar", "Crafts & Services", "Private Events", "About Us", "After School", "Summer Camp", "Wheel Wars", "3 Wednesdays Workshop"] -%}
+  {% for i in ["Calendar", "Crafts & Services", "Private Events", "About Us", "Media", "Reviews", "After School", "Summer Camp", "3 Wednesdays Workshop"] -%}
   {% if i == "Crafts & Services" %}
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="navbardrop" onclick="navbardrop('dropdown-menu'); return false;" data-toggle="dropdown">Crafts & Services</a>
@@ -226,7 +219,8 @@ if (browser_size["width"] > 600) {
 <a href="/about-us.html" alt="Contact Us">Contact Us</a> | 
 <a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a> |
 <a href="https://www.facebook.com/catalystcreativeart/" alt="Facebook">Facebook</a> | 
-<a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a> | 
+<!-- <a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a> | -->
+<a href="https://www.tiktok.com/@catalystcreativearts" alt="TikTok">TikTok</a> | 
 <a href="https://www.instagram.com/catalystcreativearts/" alt="Instagram">Instagram</a>
 {% endblock %}
 </div>
@@ -259,9 +253,15 @@ function make_request_get_total(session_id) {
   })
   .then(response=>response.json())
   .then(data=>{
-    console.log(data); 
+    console.log("get_total_cost: " + data); 
     document.getElementById("top_right_cart_container").style.display = "block";
     document.getElementById("top_right_cart_total").innerHTML = data;
+
+    // wrap in logic: of page is cart/ and data > 0
+    if (window.location.pathname == "/cart/" && Number(data) > 0) {
+        document.getElementById("subtotal_num_items").innerHTML = data;
+    }
+
   })
 }
 

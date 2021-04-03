@@ -73,7 +73,7 @@ def app(environ, start_response):
 
     #today = date.today() #today.year, today.month, today.day
 
-    pages = ["private-events", "about-us", "custom-built", "after-school", "summer-camp", "wheel-wars", "3-wednesdays-workshop"]
+    pages = ["private-events", "about-us", "media", "reviews", "custom-built", "after-school", "summer-camp", "3-wednesdays-workshop"]
 
     #galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18, "string-art": 19, "pottery-lessons": 20}
 
@@ -162,10 +162,13 @@ def app(environ, start_response):
             e = db.store_result()
             allrows = e.fetch_row(maxrows=100, how=1)
             template = env.get_template("event.html")
+            upcoming_event_ids = []
             for event in allrows:
                 eid = event["eid"]
+                upcoming_event_ids.append(eid)
                 content = template.render(event=event)
                 write_file(f"../www/event/{eid}.html", content)
+            write_file(f"data/upcoming_event_ids.json", json.dumps(upcoming_event_ids, indent=4))
             response = "build-individual-event"
         #### ####
         #### ####

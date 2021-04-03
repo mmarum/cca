@@ -7,7 +7,7 @@
 <h1>Upcoming Events</h1>
 </center>
 {% for event in events %}
-  <div class="row event_row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
+  <div class="row event_row {% if loop.index != 1 %}top-buffer {%endif%}date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
     <div class="col-sm-1">
     </div>
     <div class="col-md-2">
@@ -16,15 +16,8 @@
       </a>
     </div>
     <div class="col-lg-8">
-      <h2>
-        {{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ') }} 
-        <span class="duration" id="duration_{{ event.eid }}">({{ event.duration }} hrs)</span>
-      </h2>
-      <h1>
-        <a href="/event/{{ event.eid }}.html">
-          <h3>{{ event.title }}</h3>
-        </a>
-      </h1>
+      <h2>{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ') }}</h2>
+      <h3><a href="/event/{{ event.eid }}.html">{{ event.title }}</a></h3>
       <div>
       {% set event_desc = event.description.split('. ') %}
       {% for sentence in event_desc -%}
