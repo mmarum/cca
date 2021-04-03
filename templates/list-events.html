@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
 <center id="upcoming_events">
-<h1>Upcoming Events</h1>
+<h1 class="art-brew">Upcoming Events</h1>
 </center>
 {% for event in events %}
   <div class="row event_row {% if loop.index != 1 %}top-buffer {%endif%}date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
