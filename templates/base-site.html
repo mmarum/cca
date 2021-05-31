@@ -44,12 +44,14 @@ var browser_size = {
   url('/fonts/BebasNeue-Bold.ttf') format('truetype');
 }
 
+/*
 @font-face {
   font-family: ArtBrewery;
   src: url('/fonts/ArtBrewery.otf');
   src: url('/fonts/ArtBrewery.otf') format('embedded-opentype'),
   url('/fonts/ArtBrewery.ttf') format('truetype');
 }
+*/
 
 #logo-box {
   text-transform: uppercase;
@@ -69,16 +71,17 @@ var browser_size = {
 .art-brew {
   font-weight: normal;
   letter-spacing: 1px;
-  color: #101010;
-  line-height: 80%;
-  padding-top: 5px;
-  font-family: 'ArtBrewery', Arial, Verdana, Sans-serif;
+  color: #A0A0A0;
+  line-height: 90%;
+  padding-top: 10px;
+  /* font-family: 'ArtBrewery', Arial, Verdana, Sans-serif; */
+  font-family: 'BebasNeue-Bold', Arial, Verdana, Sans-serif;
 }
 
 @media only screen and (max-width: 600px) {
 
   .art-brew {
-    font-size: 400%;
+    font-size: 300%;
   }
   .logo-circle {
     width: 150px;
@@ -119,7 +122,7 @@ var browser_size = {
 @media only screen and (min-width: 601px) {
 
   .art-brew {
-    font-size: 500%;
+    font-size: 400%;
   }
   #logo-box {
     width: 850px;
@@ -296,7 +299,8 @@ td {
   <div class="col-sm-12 nav-scroll">
     <center>
 
-  {% for i in ["Calendar", "Crafts & Services", "Private Events", "About Us", "Media", "Reviews", "After School", "Summer Camp", "3 Wednesdays Workshop"] -%}
+  {% for i in ["Calendar", "Crafts & Services", "Private Events", "About Us", "After School", "Summer Camp", "3 Wednesdays Workshop"] -%}
+    {# "Media", "Reviews", #}
     {% if i == "Crafts & Services" %}
       <a href="#" onclick="navbardrop('dropdown-menu'); return false;">Crafts & Services</a>
     {% else %}
@@ -344,50 +348,6 @@ function navbardrop(div_id_name) {
   }
   document.getElementById(div_id_name).style.display = navbardrop_state;
 }
-</script>
-
-<script>
-
-/*
-function make_request_get_total(session_id) {
-  fetch('/cart-api/total', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify({
-      session_id: session_id
-    })
-  })
-  .then(response=>response.json())
-  .then(data=>{
-    console.log("get_total_cost: " + data); 
-    document.getElementById("top_right_cart_container").style.display = "block";
-    document.getElementById("top_right_cart_total").innerHTML = data;
-
-    // wrap in logic: of page is cart/ and data > 0
-    if (window.location.pathname == "/cart/" && Number(data) > 0) {
-        document.getElementById("subtotal_num_items").innerHTML = data;
-    }
-
-  })
-}
-
-function checkCartTotal() {
-  // FIRST CHECK IF USER HAS SESSION COOKIE
-  var session_id = document.cookie.split("=")[1];
-  if (session_id) {
-    console.log(session_id)
-    // MAKE A REQUEST TO THE NEW CART API
-    console.log("request to cart api for total");
-    make_request_get_total(session_id);
-  } else {
-    console.log("No session_id");
-  }
-}
-
-checkCartTotal();
-*/
 </script>
 
 </body>

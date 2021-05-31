@@ -11,6 +11,10 @@
   border-bottom: 1px solid #FFF;
   border-right: 1px solid #FFF;
 }
+.orange {
+  background-color: orange;
+  padding: 5px;
+}
 </style>
 <center>
 <h1 class="art-brew">Summer Camp Programs</h1>
@@ -22,7 +26,8 @@
 <div class="col-sm-4 camp-choice">
 <button type="button" class="btn btn-success" onclick="labelSubmit('art_camp_1');">Art Camp 1: Ages 7 & Up</button>
 <div class="camp-date">June 21-25, 2021 - 9am-12pm</div>
-$200, $180 for siblings
+<!-- $200, $180 for siblings -->
+<b class="orange">FULL</b>
 <!--
 Mon - Resin over collage, pottery wheel work<br>
 Tue - Fluid Art, pottery painting<br>
@@ -49,6 +54,7 @@ Fri - Watercolor technique practice, watercolor painting
 <button type="button" class="btn btn-success" onclick="labelSubmit('art_camp_3');">Art Camp 3: Ages 7 & Up</button>
 <div class="camp-date">July 12-16, 2021 - 9am-12pm</div>
 $200, $180 for siblings
+<!-- <b class="orange">FULL</b> -->
 <!--
 Mon - Resin over collage, pottery wheel work<br>
 Tue - Fluid art, pottery painting<br>
@@ -63,7 +69,7 @@ Fri - Abstract acrylic paint self portrait
 
 <div class="col-sm-4 camp-choice">
 <button type="button" class="btn btn-success" onclick="labelSubmit('art_camp_4');">Art Camp 4: Ages 12 & Up</button>
-<div class="camp-date">July 12-16, 2021 - 9am-12pm</div>
+<div class="camp-date">July 12-16, 2021 - 2pm-5pm</div>
 $200, $180 for siblings
 <!--
 Mon - Resin over collage, pottery wheel work<br>
@@ -100,6 +106,10 @@ Fri - Glaze pottery
 
 <script>
 function labelSubmit(id) {
-  window.location.href = "/registration/summer-camp/"+id;
+  if(id == "art_camp_1") {
+    alert("CLASS FULL");
+  } else {
+    window.location.href = "/registration/summer-camp/"+id;
+  }
 }
 </script>

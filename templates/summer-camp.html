@@ -8,7 +8,7 @@ h5 {
   padding-top: 20px;
 }
 #session_detail_box {
-  background-color: LightGray;
+  background-color: #EEE;
   padding: 10px;
   margin: 10px;
   border-radius: 10px;
@@ -33,6 +33,7 @@ h5 {
   text-align: center;
 }
 </style>
+<script>var class_full = false;</script>
 {% endblock %}
 
 {% block content %}
@@ -61,51 +62,85 @@ h5 {
 
 <div id="session_detail_box">
 
-{% if camper_count %}
-
-{{ camper_count }}
-
-{% endif %}
-
 {% if session_name == "art_camp_1" %}
+
+{% if camper_count and camper_count >= 14 %}
+CLASS IF FULL
+<script>var class_full = true;</script>
+{% else %}
 <h5>Art Camp 1: Ages 7 &amp; Up - June 21-25, 2021 - 9am-12pm</h5>
 Mon - Resin over collage, pottery wheel work<br>
 Tue - Fluid Art, pottery painting<br>
 Wed - Printmaking<br>
 Thu - Water marbling, glaze pottery wheel item<br>
 Fri - Abstract acrylic paint self portrait<br>
+{% endif %}
 
 {% elif session_name == "art_camp_2" %}
+{% if camper_count and camper_count >= 15 %}
+CLASS IF FULL
+<script>var class_full = true;</script>
+{% else %}
+  {% if camper_count %}
+    {{ 15 - camper_count }} spots left
+  {% else %}
+    15 spots left
+  {% endif %}
 <h5>Art Camp 2: Ages 12 &amp; Up - June 21-25, 2021 - 2pm-5pm</h5>
 Mon - Resin over collage, pottery wheel work<br>
 Tue - Macrame key chain, resin over collage<br>
 Wed - Relief block printmaking<br>
 Thu - Printmaking, water marbling, glaze pottery wheel item<br>
 Fri - Watercolor technique practice, watercolor painting<br>
+{% endif %}
 
 {% elif session_name == "art_camp_3" %}
+{% if camper_count and camper_count >= 15 %}
+CLASS IF FULL
+<script>var class_full = true;</script>
+{% else %}
+  {% if camper_count %}
+    {{ 15 - camper_count }} spots left
+  {% endif %}
 <h5>Art Camp 3: Ages 7 &amp; Up - July 12-16, 2021 - 9am-12pm</h5>
 Mon - Resin over collage, pottery wheel work<br>
 Tue - Fluid art, pottery painting<br>
 Wed - Printmaking<br>
 Thu - Water marbling, glaze pottery wheel item<br>
 Fri - Abstract acrylic paint self portrait<br>
+{% endif %}
 
 {% elif session_name == "art_camp_4" %}
-<h5>Art Camp 4: Ages 12 &amp; Up - July 12-16, 2021 - 9am-12pm</h5>
+{% if camper_count and camper_count >= 15 %}
+CLASS IF FULL
+<script>var class_full = true;</script>
+{% else %}
+  {% if camper_count %}
+    {{ 15 - camper_count }} spots left
+  {% endif %}
+<h5>Art Camp 4: Ages 12 &amp; Up - July 12-16, 2021 - 2pm-5pm</h5>
 Mon - Resin over collage, pottery wheel work<br>
 Tue - Macrame key chain, resin over collage<br>
 We - Relief block printmaking<br>
 Thu - Printmaking, water marbling, glaze pottery wheel item<br>
 Fri - Watercolor technique practice, watercolor painting<br>
+{% endif %}
 
 {% elif session_name == "pottery_camp_1" %}
+{% if camper_count and camper_count >= 15 %}
+CLASS IF FULL
+<script>var class_full = true;</script>
+{% else %}
+  {% if camper_count %}
+    {{ 15 - camper_count }} spots left
+  {% endif %}
 <h5>Pottery Camp - 8 &amp; Up - July 19-23, 2021 - 9am-12pm</h5>
 Mon - Introduction and handbuilding techniques practice<br>
 Tue - Slab formed bowl<br>
 Wed - Slab formed box or planter<br>
 Thu - Pinch pot, pottery wheel work<br>
 Fri - Glaze pottery<br>
+{% endif %}
 
 {% elif session_name == "After School Pottery Program 2020" %}
 <h5>After School Pottery Program 2020</h5>
@@ -364,6 +399,10 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
 <div id="paypal-button-container" class="text-center top-buffer"></div>
 
 <script>
+
+if (class_full && class_full == true) {
+  document.getElementById("registration_form").style.display = "none";
+}
 
 function calculate() {
   var camperNameLen = {};

@@ -126,15 +126,25 @@ def cart_api(environ, start_response):
     ####
     elif environ['PATH_INFO'] == "/total":
         #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/total
+        sub_query = f"SELECT cid FROM cart WHERE session_id = '{session_id}'"
         try:
-            sub_query = f"SELECT cid FROM cart WHERE session_id = '{session_id}'"
             db.query(f"SELECT SUM(quantity) AS sum FROM cart_products WHERE cid = ({sub_query})")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
-            sum = row["sum"]
+            number_of_items = int(row["sum"])
         except:
-            sum = 0
-        response = str(sum)
+            number_of_items = 0
+        try:
+            db.query(f"SELECT sum(a.quantity * b.price) as subtotal from cart_products a, products b where a.pid = b.pid and a.cid = ({sub_query})")
+            r = db.store_result()
+            row = r.fetch_row(maxrows=1, how=1)[0]
+            subtotal = int(row["subtotal"])
+        except:
+            subtotal = 0
+
+        snapshot = { "number_of_items": number_of_items, "subtotal": subtotal }
+        snapshot = json.dumps(snapshot)
+        response = str(snapshot)
  
 
     ####

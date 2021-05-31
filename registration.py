@@ -28,7 +28,7 @@ def write_file(file_name, content):
     return True
 
 env = Environment(
-    loader=PackageLoader('registration', 'templates'),
+    loader=PackageLoader('registration', '../app/templates'),
     autoescape=select_autoescape(['html'])
 )
 
@@ -339,11 +339,34 @@ def registration(environ, start_response):
         if registration_name == "wheel-wars":
             form = RegFormWheelWars()
             template = env.get_template("wheel-wars.html")
+            camper_count = "" # only for summer-school
         else:
             form = RegistrationForm()
             template = env.get_template("summer-camp.html")
 
-        response = template.render(form=form, registration_name=registration_name, session_detail=session_detail)
+            # CAMPER COUNT:
+            query = f"select camper1_name, camper2_name, camper3_name from registration where session_detail = '{session_detail}' and order_id is not NULL"
+            print("query", query)
+            c = db.cursor()
+            c.execute(query)
+            allrows = c.fetchall()
+            c.close()
+            print("allrows", allrows)
+
+            a = []
+            for i in allrows:
+                print(i)
+                for j in i:
+                    if j != '':
+                        print(j)
+                        a.append(j)
+
+            print("a", a)
+            print("len a", len(a))
+            camper_count = int(len(a))
+            print("camper_count", camper_count)
+
+        response = template.render(form=form, registration_name=registration_name, session_detail=session_detail, camper_count=camper_count)
 
     #response += f"<hr>{str(environ)}"
 

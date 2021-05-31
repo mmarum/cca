@@ -3,6 +3,7 @@ import sys
 import json
 import requests
 sys.path.insert(0, os.path.dirname(__file__))
+from random import *
 
 from update_extra import UpdateExtra
 
@@ -35,13 +36,18 @@ def order(environ, start_response):
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
         form_orders = json.loads(post_input)
         event_id = str(form_orders['event_id'])
+        cca_order_id = str(form_orders['cca_order_id'])
 
         try:
             orders = json.loads(read_file(f"../app/orders/{event_id}.json"))
         except:
-            orders = []
+            orders = {}
 
-        orders.append(form_orders)
+        try:
+            orders[cca_order_id]["paypal"] = form_orders
+        except:
+            rand_num = randint(1, 10000)
+            orders[rand_num] = form_orders
 
         write_file(f"../app/orders/{event_id}.json", json.dumps(orders, indent=4))
 
@@ -97,6 +103,29 @@ def order(environ, start_response):
             print('NO LUCK-- payer_info type is not dict')
 
         response = f"sendgrid response: {str(r.status_code)}"
+
+
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/prep":
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+        form_prep = json.loads(post_input)
+        event_id = str(form_prep['event_id'])
+        cca_order_id = str(form_prep['cca_order_id'])
+        cca_buyer_name = str(form_prep['cca_buyer_name'])
+        cca_buyer_phone= str(form_prep['cca_buyer_phone'])
+
+        try:
+            orders = json.loads(read_file(f"../app/orders/{event_id}.json"))
+        except:
+            orders = {}
+
+        orders[cca_order_id] = {}
+        orders[cca_order_id]["cca_buyer_name"] = cca_buyer_name
+        orders[cca_order_id]["cca_buyer_phone"] = cca_buyer_phone
+
+        write_file(f"../app/orders/{event_id}.json", json.dumps(orders, indent=4))
+
+        response = ""
 
     else:
         response = "200"

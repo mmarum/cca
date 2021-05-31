@@ -310,49 +310,66 @@ def app(environ, start_response):
                     eid = f.replace(".json", "").strip()
                     event_orders_data = json.loads(read_file(f"orders/{f}"))
 
-                    for order in event_orders_data:
-                        data_array = []
-                        # We don't necessarily want all data from orders/event_eid_value.json
-                        # So let's pick and choose what data we want to keep:
-                        data_array.append(order['orderID'])
-                        data_array.append(eid)
-                        data_array.append(order['details']['create_time'])
-                        data_array.append(order['details']['payer']['email_address'])
-                        data_array.append(order['details']['payer']['name']['given_name'])
-                        data_array.append(order['details']['payer']['name']['surname'])
-                        data_array.append(order['quantity'])
-                        # Notice zero after purchase_units:
-                        data_array.append(order['details']['purchase_units'][0]['amount']['value'])
-                        data_array.append(order['details']['purchase_units'][0]['payments']['captures'][0]['amount']['value'])
+                    for cca_order_id, cca_order in event_orders_data.items():
 
-                        # FOR VARIABLE_TIME FIELD
                         try:
-                            data_array.append(order['variable_time_slot'])
+                            order = cca_order["paypal"]
+
+                            print("____cca_order_id", cca_order_id)
+                            print("____order", order)
+                            data_array = []
+                            # We don't necessarily want all data from orders/event_eid_value.json
+                            # So let's pick and choose what data we want to keep:
+                            data_array.append(order['orderID'])
+                            data_array.append(eid)
+                            data_array.append(order['details']['create_time'])
+                            data_array.append(order['details']['payer']['email_address'])
+                            data_array.append(order['details']['payer']['name']['given_name'])
+                            data_array.append(order['details']['payer']['name']['surname'])
+                            data_array.append(order['quantity'])
+                            # Notice zero after purchase_units:
+                            data_array.append(order['details']['purchase_units'][0]['amount']['value'])
+                            data_array.append(order['details']['purchase_units'][0]['payments']['captures'][0]['amount']['value'])
+
+                            # FOR VARIABLE_TIME FIELD
+                            try:
+                                data_array.append(order['variable_time_slot'])
+                            except:
+                                data_array.append('no variable time slot')
+
+                            # FOR EXTRA_DATA FIELD
+                            try:
+                                total_number_scarf = json.dumps({ "total_number_scarf": int(order['total_number_scarf']) })
+                                data_array.append(total_number_scarf)
+                            except:
+                                data_array.append('not an event with scarf')
+
+                            # Load database:
+                            fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time, extra_data"
+                            #vals = str(data_array).lstrip('[').rstrip(']')
+                            vals = data_array
+                            #sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
+                            sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+                            c = db.cursor()
+                            #c.execute(sql)
+                            c.execute(sql, vals)
+                            c.close()
+
                         except:
-                            data_array.append('no variable time slot')
+                            pass
 
-                        # FOR EXTRA_DATA FIELD
-                        try:
-                            total_number_scarf = json.dumps({ "total_number_scarf": int(order['total_number_scarf']) })
-                            data_array.append(total_number_scarf)
-                        except:
-                            data_array.append('not an event with scarf')
-
-                        # Load database:
-                        fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time, extra_data"
-                        #vals = str(data_array).lstrip('[').rstrip(']')
-                        vals = data_array
-                        #sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
-                        sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-                        c = db.cursor()
-                        #c.execute(sql)
-                        c.execute(sql, vals)
-                        c.close()
-
-                    # Now move the file to /orders/loaded/event_eid_value.json
-                    # So that it doesn't get processed again
-                    os.rename(f"orders/{f}", f"orders/loaded/{f}")
+                    # So that this event json doesn't get processed again:
+                    try:
+                        # If existing json for this event exists, add new json to it:
+                        event_dict = json.loads(read_file(f"orders/loaded/{f}"))
+                        event_dict.update(event_orders_data)
+                        write_file(f"orders/loaded/{f}", json.dumps(event_dict, indent=4))
+                        # REMOVE the file
+                        os.remove(f"orders/{f}")
+                    except:
+                        # MOVE the file to /orders/loaded/event_eid_value.json
+                        os.rename(f"orders/{f}", f"orders/loaded/{f}")
 
             # PART-2: Select future-event-date orders from database for admin view
             c = db.cursor()
@@ -414,14 +431,25 @@ def app(environ, start_response):
             #allrows = c.fetchall()
             #c.close()
 
-            db.query("SELECT * FROM registration ORDER BY session_detail")
+            view = ""
+            if environ['QUERY_STRING'] and "view" in environ['QUERY_STRING']:
+                view = environ['QUERY_STRING'].split("=")[1]
+
+            if view == "all":
+                special = ""
+                orderby = "order_id, session_detail"
+            else:
+                special = "where order_id is not NULL"
+                orderby = "session_detail"
+
+            db.query(f"SELECT * FROM registration {special} ORDER BY {orderby}")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
-            data = json.loads(read_file("../registration/data/wheel-wars.json"))
+            #data = json.loads(read_file("../registration/data/wheel-wars.json"))
 
             template = env.get_template("admin-registration.html")
-            response = template.render(allrows=allrows, data=data)
+            response = template.render(allrows=allrows) #, data=data)
 
 
         #elif environ['PATH_INFO'] == '/admin/registration2':
@@ -463,6 +491,22 @@ def app(environ, start_response):
                 form = ProductsForm()
             template = env.get_template("admin-products-add-edit.html")
             response = template.render(form=form)
+
+
+        elif environ['PATH_INFO'] == '/admin/products/delete':
+            if len(environ['QUERY_STRING']) > 1:
+                pid = int(environ['QUERY_STRING'].split("=")[1])
+                sql = f"DELETE FROM products WHERE pid = {pid}"
+                c = db.cursor()
+                c.execute(sql)
+                c.close()
+                sql = f"DELETE FROM cart_products WHERE pid = {pid}"
+                c = db.cursor()
+                c.execute(sql)
+                c.close()
+                response = '<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
+            else:
+                response = ""
 
 
         else:
@@ -515,6 +559,7 @@ def app(environ, start_response):
 
         if eid == 0:
             image_pid = post_input.split(b'Content-Disposition: form-data')[4]
+            print("image_pid", image_pid)
             if 'name="pid"' in image_pid.decode('UTF-8'):
                 pid = re.sub(b'^.*name="pid"(.*?)------.*$', r"\1", image_pid, flags=re.DOTALL).strip()
                 pid = int(pid.decode('UTF-8'))
@@ -690,7 +735,7 @@ def app(environ, start_response):
             d = db.cursor()
             d.execute(sql2)
             results = d.fetchone()
-            pid = int(results = results[0])
+            pid = int(results[0])
             d.close()
         else:
             sql2 = "just an update"

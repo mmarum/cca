@@ -13,17 +13,6 @@ form, input {
 #cart {
   width: 50px;
 }
-#add_to_cart {
-  margin: 10px;
-  padding: 10px;
-  width: 220px;
-  border: 1px dashed LightGray;
-  border-radius: 15px;
-  background-color: HoneyDew;
-}
-#add_to_cart a {
-  text-decoration: none;
-}
 #product_quantity_select {
   margin-top: 10px;
   max-width: 60px;
@@ -37,10 +26,6 @@ img.check {
 }
 .plus_minus {
   font-size: 20px;
-}
-#add_to_cart_text {
-  margin-left: 3px;
-  padding-left: 3px;
 }
 </style>
 {% endblock %}
@@ -73,7 +58,7 @@ img.check {
 
   <div class="col-sm-3">
 
-    <div style="padding-left: 10px;">
+    <div style="padding-bottom: 10px;">
       <!-- <a href="#" onclick="plusMinus(-1); return false;" class="plus_minus">-</a> -->
       <form action="" id="product_quantity_form">
         <!-- <input type="text" name="quantity" id="product_quantity_select" class="form-control" value="1" onblur="newQuant(this.value);"/> -->
@@ -93,13 +78,8 @@ img.check {
       </form>
       <!-- <a href="#" onclick="plusMinus(1); return false;" class="plus_minus">+</a> -->
     </div>
-    <div id="add_to_cart">
-      <a href="#" onclick="addToCart({{ row.pid }}); return false;">
-        <img src="/img/cart.png" class="cart_icon">
-        <span id="add_to_cart_text">Add to cart</span>
-        <span id="check_container"></span>
-      </a>
-    </div>
+    <button onclick="addToCart({{ row.pid }}); return false;" type="button" class="btn btn-info">Add to cart</button>
+    <span id="check_container"></span>
     <!-- <div>{{ row.inventory }}</div> -->
 
   </div>
@@ -155,7 +135,6 @@ function make_request(session_id, product_id, quantity) {
   fetchPromise.then(response => {
     var check_tag = '<img src="/img/check.png" class="check"/>';
     document.getElementById("check_container").innerHTML = check_tag;
-    document.getElementById("add_to_cart_text").innerHTML = "Added to cart";
     //document.getElementById("top_right_cart_container").style.display = "block";
     make_request_get_total(session_id);
     console.log("response from promise");

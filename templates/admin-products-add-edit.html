@@ -36,9 +36,7 @@ span.help-block {
 <button type="button" class="btn btn-warning" onClick="onclick=location.reload();location.href='/app/admin/products/list'">Cancel</button>
 
 {% if form.pid.data %}
-  <button type="button" class="btn btn-danger">
-    <a href="/app/admin/products/delete?pid={{ form.pid.data }}" onclick="return confirm('Are you sure?');">Delete</a>
-  </button>
+  <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure?')) location.href='/app/admin/products/delete?pid={{ form.pid.data }}';">Delete</button>
 {% endif %}
 
 {% if not form.pid.data %}

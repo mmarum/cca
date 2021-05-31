@@ -9,7 +9,10 @@
 #thanks {
   color: Green;
 }
-select {
+#additional_scarf_quantity {
+  display: none;
+}
+select, input {
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -158,7 +161,7 @@ select {
     {% else %}
     {% if event.elimit and event.elimit >= 1 and "series" not in event.tags %}
       <select id="guest_quantity" class="form-control" onchange="getSubtotal();">
-      <option value="">Select number of guests</option>
+      <option value="0">Select number of guests</option>
       {% for n in range(1, event.elimit) %}
         <option value={{ n }}>{{ n }} guest{% if n > 1 %}s{% endif %}</option>
       {% endfor %}
@@ -167,6 +170,8 @@ select {
     {% endif %}
     {# REGULAR EVENT END #}
 
+    <input type="text" id="cca_buyer_name" name="cca_buyer_name" placeholder="Your name" required class="form-control">
+    <input type="tel" id="cca_buyer_phone" name="cca_buyer_phone" placeholder="Your phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required class="form-control">
 
     {# SCARF SPECIALS #}
     {% if "scarf" in event.title.lower() %}
@@ -234,6 +239,11 @@ function getOptionValue(id) {
 }
 
 
+function getTextValue(id) {
+  return document.getElementById(id).value;
+}
+
+
 function getScarfSubtotal() {
   additional_scarf_quantity = getOptionValue("additional_scarf_quantity");
   scarf_subtotal = additional_scarf_quantity * additional_scarf_cost;
@@ -262,7 +272,13 @@ function getSubtotal() {
   }
   console.log("subtotal: " + subtotal);
   {% if "scarf" in event.title.lower() %}
-    subtotal += getScarfSubtotal();
+    if (subtotal > 0) {
+      subtotal += getScarfSubtotal();
+      style_display = "block";
+    } else {
+      style_display = "none";
+    }
+    document.getElementById("additional_scarf_quantity").style.display = style_display;
   {% endif %}
   document.getElementById("subtotal").innerHTML = subtotal;
   return subtotal;
@@ -288,6 +304,13 @@ function checkTime(edatetime) {
 
 
 checkTime("{{ event.edatetime.timestamp() }}");
+
+
+function getCcaOrderId() {
+  epoch_time = new Date().getTime();
+  random_num = Math.floor((Math.random() * 100000) + 10000);
+  return String(epoch_time) + "_" + String(random_num);
+}
 
 
 function hidePurchase() {
@@ -335,9 +358,25 @@ function getVariableTimeSlot() {
   {% endif %}
 }
 
+var cca_order_id = getCcaOrderId();
 
 paypal.Buttons({
   createOrder: function(data, actions) {
+    console.log(cca_order_id);
+
+    fetch('/order/prep', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        event_id: event_id,
+        cca_order_id: cca_order_id,
+        cca_buyer_name: getTextValue("cca_buyer_name"),
+        cca_buyer_phone: getTextValue("cca_buyer_phone")
+      })
+    });
+
     return actions.order.create({
       purchase_units: [{
         amount: {
@@ -362,6 +401,7 @@ paypal.Buttons({
         body: JSON.stringify({
           orderID: data.orderID,
           event_id: event_id,
+          cca_order_id: cca_order_id,
           quantity: getGuestQuantity(),
           variable_time_slot: getVariableTimeSlot(),
           {% if "scarf" in event.title.lower() -%}
