@@ -72,25 +72,17 @@ price VARCHAR (20),
 keywords_array VARCHAR (500)
 );
 
-CREATE TABLE cart_products (
-id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-cid INT NOT NULL,
-pid INT NOT NULL,
-quantity INT NOT NULL,
-price_override VARCHAR (20)
-);
-
-# CART ID (cid) should always be a 1-to-1 to user cookie session_id
-
-# This version is strictly a GUEST (no-login) shopping cart
-
-CREATE TABLE cart (
-cid INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+CREATE TABLE cart_order (
+cart_order_id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 session_id VARCHAR (20) NOT NULL,
-create_time datetime,
-payment_time datetime,
-order_id VARCHAR (20)
+create_date datetime,
+checkout_date datetime,
+ship_date datetime,
+status VARCHAR (50)
 );
 
-# payment_time represents time user session cookie is deleted because they paid.
-
+CREATE TABLE cart_order_product (
+cart_order_id INT NOT NULL,
+product_id INT NOT NULL,
+quantity INT NOT NULL
+);

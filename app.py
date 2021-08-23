@@ -320,7 +320,9 @@ def app(environ, start_response):
                             data_array = []
                             # We don't necessarily want all data from orders/event_eid_value.json
                             # So let's pick and choose what data we want to keep:
+
                             data_array.append(order['orderID'])
+
                             data_array.append(eid)
                             data_array.append(order['details']['create_time'])
                             data_array.append(order['details']['payer']['email_address'])
@@ -344,12 +346,20 @@ def app(environ, start_response):
                             except:
                                 data_array.append('not an event with scarf')
 
+                            try:
+                                data_array.append(order["details"]["purchase_units"][0]["payments"]["captures"][0]["id"])
+                            except:
+                                data_array.append("transaction id")
+
+                            data_array.append(cca_order["cca_buyer_name"])
+                            data_array.append(cca_order["cca_buyer_phone"])
+
                             # Load database:
-                            fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time, extra_data"
+                            fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time, extra_data, transaction_id, buyer_name, buyer_phone"
                             #vals = str(data_array).lstrip('[').rstrip(']')
                             vals = data_array
                             #sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
-                            sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                            sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
                             c = db.cursor()
                             #c.execute(sql)

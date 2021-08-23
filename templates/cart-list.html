@@ -3,6 +3,9 @@
 
 {% block html_head %}
 <style>
+#paypal-button-container {
+  display: none;
+}
 .product_price, .product_total {
   /*
   padding-left: 40px;
@@ -57,6 +60,10 @@ img.check {
 
 {% block content %}
 
+<form>
+<input type="hidden" id="temporary" value="">
+</form>
+
 <div class="row">
 
 <div class="col-sm-1">
@@ -67,12 +74,13 @@ img.check {
 </div>
 
 <div class="col-md-4 text-center">
-  <a href="/app/products">back to shopping</a>
+  <!-- <a href="/app/products">back to shopping</a> -->
+  <a href="/shop/">back to shopping</a>
 </div>
 
 <div class="col-md-3 text-center">
   (<span id="subtotal_num_items"></span> items) Subtotal: $<span id="subtotal_value">0</span>
-  <button type="button" class="btn btn-info">Checkout</button>
+  <button type="button" class="btn btn-info" onclick="showPayPal(); return false;">Checkout</button>
 </div>
 
 <div class="col-sm-1">
@@ -97,7 +105,27 @@ img.check {
 
 </div>
 
+
+<div id="paypal-button-container" class="text-center"></div>
+
+<!--
+<script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
+// SANDBOX
+</script>
+-->
+
+<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+// PRODUCTION
+</script>
+
+
 <script>
+
+function showPayPal() {
+  document.getElementById("paypal-button-container").style.display = "block";
+}
+
+
 function getCartList() {
   console.log("function getCartList");
   var session_id = document.cookie.split("=")[1];
@@ -131,12 +159,13 @@ function getCartList() {
 <a href="">${product_image}</a>
 </div>
 <div class="col-lg-8">
-<a href="/app/products/${product_name}/${obj.pid}"><h3>${obj.name}</h3></a>
+<!--<a href="/app/products/${product_name}/${obj.pid}"><h3>${obj.name}</h3></a> -->
+<a href="/shop/product/${obj.pid}"><h3>${obj.name}</h3></a>
 <div class="product_price">$${obj.price}</div>
 <div>
 
-<form action="" id="product_quantity_form">
-<select name="quantity" id="product_quantity_select" class="form-control" onclick="updateQuantity(${obj.pid}, this.options[this.selectedIndex].value);">
+<form action="" id="product_quantity_form_${obj.pid}">
+<select name="quantity" id="product_quantity_select_${obj.pid}" class="form-control" onchange="updateQuantity(${obj.pid}, this.options[this.selectedIndex].value);">
 <option value=${obj.quantity}>${obj.quantity}</option>
 <option value=0>0</option>
 <option value=1>1</option>
@@ -184,7 +213,7 @@ function plusMinus(n) {
 
 function getCartSnapshot(session_id) {
   console.log("function getCartSnapshot");
-  fetch('/cart-api/total', {
+  return fetch('/cart-api/total', {
     method: 'POST',
     headers: {
       'content-type': 'application/json'
@@ -200,8 +229,14 @@ function getCartSnapshot(session_id) {
     }
     if (window.location.pathname == "/cart/" && Number(data.subtotal) > 0) {
         document.getElementById("subtotal_value").innerHTML = data.subtotal;
+        // test temporary:
+        document.getElementById("temporary").value = data.subtotal;
     }
   });
+}
+
+function getTemporary() {
+  return document.getElementById("temporary").value;
 }
 
 function updateCart(session_id, product_id, quantity) {
@@ -246,6 +281,25 @@ function checkCartTotal() {
 }
 
 checkCartTotal();
+
+paypal.Buttons({
+  createOrder: function(data, actions) {
+    console.log("buy stuff");
+    console.log(getCartSnapshot.subtotal);
+    return actions.order.create({
+      purchase_units: [{
+        amount: {
+          value: getTemporary()
+        }
+      }]
+    });
+  },
+  onApprove: function(data, actions) {
+    return actions.order.capture().then(function(details) {
+      console.log(details);
+    });
+  }
+}).render('#paypal-button-container');
 
 </script>
 

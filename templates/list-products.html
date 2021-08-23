@@ -30,7 +30,8 @@
     <div class="col-lg-8">
       <!-- <div>{{ product.pid }}</div> -->
       {% set product_name_slug = product.name|replace(' ', '-')|lower %}
-      <h3><a href="/app/products/{{ product_name_slug }}/{{ product.pid }}">{{ product.name }}</a></h3>
+      <!-- <h3><a href="/app/products/{{ product_name_slug }}/{{ product.pid }}">{{ product.name }}</a></h3> -->
+      <h3><a href="/shop/product/{{ product.pid }}">{{ product.name }}</a></h3>
       {% set desc_array = product.description.split(' ') %}
       <div>
         {% for word in desc_array %}

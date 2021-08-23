@@ -11,10 +11,14 @@ def read_file(file_name):
     f.close()
     return content
 
+def write_log(file_name, content):
+    f = open(file_name, "a")
+    f.write(content)
+    f.close()
+    return True
+
 # curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123", "product_id": 1, "quantity": 1}' https://www.catalystcreativearts.com/cart-api/add
 # Sample response: {session_id: "123", product_id: 1, quantity: 1}
-# cart_products: cid pid quantity price_override
-# cart: cid session_id create_time payment_time order_id
 
 sys.path.insert(0, os.path.dirname(__file__))
 def cart_api(environ, start_response):
@@ -39,103 +43,76 @@ def cart_api(environ, start_response):
 
     ####
     if environ['PATH_INFO'] == "/add":
-
         product_id = int(input_list["product_id"])
         quantity = int(input_list["quantity"])
-
         try:
-            # CHECK to see if there's an existing cart for this session_id
-            db.query(f"SELECT cid FROM cart WHERE session_id = '{session_id}'")
+            db.query(f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
-
+            cart_order_id = row["cart_order_id"]
         except:
-            # SINCE there's not a cart entry already, create one
-            fields = "session_id, create_time"
+            fields = "session_id, create_date"
             vals = [session_id, time_now]
-            sql = f"INSERT INTO cart ({fields}) VALUES (%s, %s)"
+            sql = f"INSERT INTO cart_order ({fields}) VALUES (%s, %s)"
             c = db.cursor()
             c.execute(sql, vals)
             c.close()
-
-            # NOW retrieve its cid
-            db.query(f"SELECT LAST_INSERT_ID() as cid")
+            db.query(f"SELECT LAST_INSERT_ID() as cart_order_id")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
-
-        cid = row["cid"]
-        fields = "cid, pid, quantity"
-        vals = [cid, product_id, quantity]
-
-        try:
-            # CHECK to see if user already added this product
-            db.query(f"SELECT id, quantity FROM cart_products WHERE cid = {cid} AND pid = {product_id}")
-            r = db.store_result()
-            row = r.fetch_row(maxrows=1, how=1)[0]
-            cp_id = row["id"]
-            cp_quantity = row["quantity"]
-            # There should only ever be ONE row returned from above
-
-            new_quantity = quantity + cp_quantity
-
-            # IF pid already exists for this cid then UPDATE
-            sql = f"UPDATE cart_products SET quantity = {new_quantity} WHERE id = {cp_id}"
+            cart_order_id = row["cart_order_id"]
+        db.query(f"SELECT count(quantity) as count from cart_order_product \
+            WHERE cart_order_id = {cart_order_id} and product_id = {product_id}")
+        r = db.store_result()
+        row = r.fetch_row(maxrows=1, how=1)[0]
+        count = int(row["count"])
+        if count > 0:
+            sql = f"UPDATE cart_order_product SET quantity = {quantity} \
+                WHERE cart_order_id = {cart_order_id} and product_id = {product_id}"
             c = db.cursor()
             c.execute(sql)
             c.close()
-
-        except:
-            # IF pid does NOT yet exist for this cid then INSERT
-            # insert into cart_products (cid, pid, quantity) values (1, 1, 1);
-            sql = f"INSERT INTO cart_products ({fields}) VALUES (%s, %s, %s)"
+        else:
+            fields = "cart_order_id, product_id, quantity"
+            vals = [cart_order_id, product_id, quantity]
+            sql = f"INSERT INTO cart_order_product ({fields}) VALUES (%s, %s, %s)"
             c = db.cursor()
             c.execute(sql, vals)
             c.close()
-
-        response = f"{cid} {session_id} {product_id} {quantity} {time_now}"
+        response = f"{cart_order_id} {session_id} {product_id} {quantity} {time_now}"
 
 
     ####
     if environ['PATH_INFO'] == "/update":
-
         product_id = int(input_list["product_id"])
         quantity = int(input_list["quantity"])
-
-        db.query(f"SELECT cid FROM cart WHERE session_id = '{session_id}'")
+        db.query(f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL")
         r = db.store_result()
         row = r.fetch_row(maxrows=1, how=1)[0]
-        cid = row["cid"]
-
-        db.query(f"SELECT id FROM cart_products WHERE cid = {cid} AND pid = {product_id}")
-        r = db.store_result()
-        row = r.fetch_row(maxrows=1, how=1)[0]
-        cp_id = row["id"]
-
+        cart_order_id = row["cart_order_id"]
         if quantity == 0:
-            sql = f"DELETE FROM cart_products WHERE id = {cp_id}"
+            sql = f"DELETE FROM cart_order_product WHERE cart_order_id = {cart_order_id} and product_id = {product_id}"
         else:
-            sql = f"UPDATE cart_products SET quantity = {quantity} WHERE id = {cp_id}"
-
+            sql = f"UPDATE cart_order_product SET quantity = {quantity} WHERE cart_order_id = {cart_order_id} and product_id = {product_id}"
         c = db.cursor()
         c.execute(sql)
         c.close()
-
-        response = f"{cid} {session_id} {product_id} {quantity} {time_now}"
+        response = f"{cart_order_id} {session_id} {product_id} {quantity} {time_now}"
 
 
     ####
     elif environ['PATH_INFO'] == "/total":
         #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/total
-        sub_query = f"SELECT cid FROM cart WHERE session_id = '{session_id}'"
+        sub_query = f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL"
         try:
-            db.query(f"SELECT SUM(quantity) AS sum FROM cart_products WHERE cid = ({sub_query})")
+            db.query(f"SELECT SUM(quantity) AS sum FROM cart_order_product WHERE cart_order_id = ({sub_query})")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             number_of_items = int(row["sum"])
         except:
             number_of_items = 0
         try:
-            db.query(f"SELECT sum(a.quantity * b.price) as subtotal from cart_products a, products b where a.pid = b.pid and a.cid = ({sub_query})")
+            db.query(f"SELECT sum(a.quantity * b.price) as subtotal from cart_order_product a, products b where a.product_id = b.pid and a.cart_order_id = ({sub_query})")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             subtotal = int(row["subtotal"])
@@ -151,9 +128,15 @@ def cart_api(environ, start_response):
     elif environ['PATH_INFO'] == "/list":
         #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/list
         try:
-            sub_query = f"SELECT cid FROM cart WHERE session_id = '{session_id}'"
-            #db.query(f"SELECT a.*, b.* FROM cart_products a, products b WHERE a.pid = b.pid AND a.cid = ({sub_query})")
-            db.query(f"select pid, quantity from cart_products where cid = ({sub_query})")
+            db.query(f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL")
+            r = db.store_result()
+            row = r.fetch_row(maxrows=1, how=1)[0]
+            cart_order_id = int(row["cart_order_id"])
+
+            db.query(f"SELECT b.product_id as pid, b.quantity \
+                FROM cart_order a, cart_order_product b \
+                WHERE a.cart_order_id = b.cart_order_id \
+                AND a.cart_order_id = {cart_order_id}")
             r = db.store_result()
             rows = r.fetch_row(maxrows=100, how=1)
             # ({'pid': 1, 'quantity': 6}, {'pid': 2, 'quantity': 4})
@@ -162,7 +145,7 @@ def cart_api(environ, start_response):
 
         print("rows", rows)
 
-        if not rows:
+        if len(rows) == 0:
             response = "cart empty"
             return [response.encode()]
  

@@ -38,9 +38,10 @@ Fri - Abstract acrylic paint self portrait
 </div>
 
 <div class="col-sm-4 camp-choice">
-<button type="button" class="btn btn-success" onclick="labelSubmit('art_camp_2');">Art Camp 2: Ages 12 & Up</button>
+<button type="button" class="btn btn-secondary" onclick="labelSubmit('art_camp_2');">Art Camp 2: Ages 12 & Up</button>
 <div class="camp-date">June 21-25, 2021 - 2pm-5pm</div>
-$200, $180 for siblings
+<!-- $200, $180 for siblings -->
+<b class="orange">CLOSED</b>
 <!--
 Mon - Resin over collage, pottery wheel work<br>
 Tue - Macrame key chain, resin over collage<br>
@@ -53,7 +54,8 @@ Fri - Watercolor technique practice, watercolor painting
 <div class="col-sm-4 camp-choice">
 <button type="button" class="btn btn-success" onclick="labelSubmit('art_camp_3');">Art Camp 3: Ages 7 & Up</button>
 <div class="camp-date">July 12-16, 2021 - 9am-12pm</div>
-$200, $180 for siblings
+<!-- $200, $180 for siblings -->
+<b class="orange">FULL</b>
 <!-- <b class="orange">FULL</b> -->
 <!--
 Mon - Resin over collage, pottery wheel work<br>
@@ -70,7 +72,8 @@ Fri - Abstract acrylic paint self portrait
 <div class="col-sm-4 camp-choice">
 <button type="button" class="btn btn-success" onclick="labelSubmit('art_camp_4');">Art Camp 4: Ages 12 & Up</button>
 <div class="camp-date">July 12-16, 2021 - 2pm-5pm</div>
-$200, $180 for siblings
+<!-- $200, $180 for siblings -->
+<b class="orange">DONE</b>
 <!--
 Mon - Resin over collage, pottery wheel work<br>
 Tue - Macrame key chain, resin over collage<br>
@@ -83,7 +86,8 @@ Fri - Watercolor technique practice, watercolor painting
 <div class="col-sm-4 camp-choice">
 <button type="button" class="btn btn-success" onclick="labelSubmit('pottery_camp_1');">Pottery Camp: Ages 8 & Up</button>
 <div class="camp-date">July 19-23, 2021 - 9am-12pm</div>
-$200, $180 for siblings
+<!-- $200, $180 for siblings -->
+<b class="orange">FULL</b>
 <!--
 Mon - Introduction and handbuilding techniques practice<br>
 Tue - Slab formed bowl<br>
@@ -106,8 +110,12 @@ Fri - Glaze pottery
 
 <script>
 function labelSubmit(id) {
-  if(id == "art_camp_1") {
+  if(id == "art_camp_1" || id == "art_camp_3" || id == "pottery_camp_1") {
     alert("CLASS FULL");
+  } else if(id == "art_camp_2") {
+    alert("CLASS CLOSED");
+  } else if(id == "art_camp_4") {
+    alert("CLASS PASSED");
   } else {
     window.location.href = "/registration/summer-camp/"+id;
   }

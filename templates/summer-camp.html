@@ -65,7 +65,7 @@ h5 {
 {% if session_name == "art_camp_1" %}
 
 {% if camper_count and camper_count >= 14 %}
-CLASS IF FULL
+CLASS IS FULL
 <script>var class_full = true;</script>
 {% else %}
 <h5>Art Camp 1: Ages 7 &amp; Up - June 21-25, 2021 - 9am-12pm</h5>
@@ -77,8 +77,9 @@ Fri - Abstract acrylic paint self portrait<br>
 {% endif %}
 
 {% elif session_name == "art_camp_2" %}
-{% if camper_count and camper_count >= 15 %}
-CLASS IF FULL
+{# if camper_count and camper_count >= 15 #}
+{% if 1 == 1 %}
+CLASS IS CLOSED
 <script>var class_full = true;</script>
 {% else %}
   {% if camper_count %}
@@ -96,7 +97,7 @@ Fri - Watercolor technique practice, watercolor painting<br>
 
 {% elif session_name == "art_camp_3" %}
 {% if camper_count and camper_count >= 15 %}
-CLASS IF FULL
+CLASS IS FULL
 <script>var class_full = true;</script>
 {% else %}
   {% if camper_count %}
@@ -112,7 +113,7 @@ Fri - Abstract acrylic paint self portrait<br>
 
 {% elif session_name == "art_camp_4" %}
 {% if camper_count and camper_count >= 15 %}
-CLASS IF FULL
+CLASS IS FULL
 <script>var class_full = true;</script>
 {% else %}
   {% if camper_count %}
@@ -128,7 +129,7 @@ Fri - Watercolor technique practice, watercolor painting<br>
 
 {% elif session_name == "pottery_camp_1" %}
 {% if camper_count and camper_count >= 15 %}
-CLASS IF FULL
+CLASS IS FULL
 <script>var class_full = true;</script>
 {% else %}
   {% if camper_count %}
