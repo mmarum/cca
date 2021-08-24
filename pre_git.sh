@@ -12,4 +12,5 @@ cp /home/catalystcreative/registration/reg_form.py /home/catalystcreative/app/cc
 cp /home/catalystcreative/registration/templates/*.* /home/catalystcreative/app/cca/registration_templates/
 cp /home/catalystcreative/email/email.py /home/catalystcreative/app/cca/email.py
 cp /home/catalystcreative/cart-api/cart.py /home/catalystcreative/app/cca/cart.py
+cp /home/catalystcreative/shop/shop.py /home/catalystcreative/app/cca/shop.py
 
