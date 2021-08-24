@@ -178,8 +178,37 @@ def cart_api(environ, start_response):
         y = json.dumps(rows_copy)
         response = str(y)
 
-        # Use valuesfrom keywords array to build a "related products" list
+        # Use values from keywords array to build a "related products" list
 
+    ####
+    elif environ['PATH_INFO'] == "/checkout-approved":
+
+        db.query(f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL")
+        r = db.store_result()
+        row = r.fetch_row(maxrows=1, how=1)[0]
+        cart_order_id = int(row["cart_order_id"])
+
+        paypal_order_id = input_list["paypal_order_id"]
+        details = input_list["details"]
+        sql = f"UPDATE cart_order SET status = 'complete' WHERE session_id = '{session_id}' AND status is NULL"
+        c = db.cursor()
+        c.execute(sql)
+        c.close()
+
+        db.query(f"select product_id, quantity from cart_order_product where cart_order_id = {cart_order_id}")
+        r = db.store_result()
+        rows = r.fetch_row(maxrows=100, how=1)
+        # ({'product_id': 1, 'quantity': 6}, {'product_id': 2, 'quantity': 4})
+
+        for row in rows:
+            product_id = row["product_id"]
+            quantity = row["quantity"]
+            sql = f"update products set inventory = inventory - {quantity} where pid = {product_id}"
+            c = db.cursor()
+            c.execute(sql)
+            c.close()
+
+        response = "ok"
 
     else:
         response = "Default error"

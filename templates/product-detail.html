@@ -32,6 +32,29 @@ img.check {
 
 {% block content %}
 
+
+<div class="row">
+
+<div class="col-sm-1">
+</div>
+
+<div class="col-md-3 text-center">
+  <a href="/shop/">Shop</a>
+</div>
+
+<div class="col-md-4 text-center">
+  <a href="/cart/">Cart</a>
+</div>
+
+<div class="col-md-3 text-center">
+  <!-- placeholder -->
+</div>
+
+<div class="col-sm-1">
+</div>
+
+</div>
+
 <div class="row product_row top-buffer-no-line">
 
   <div class="col-sm-1">
@@ -63,24 +86,15 @@ img.check {
       <form action="" id="product_quantity_form">
         <!-- <input type="text" name="quantity" id="product_quantity_select" class="form-control" value="1" onblur="newQuant(this.value);"/> -->
         <select name="quantity" id="product_quantity_select" class="form-control">
-          <!-- <option value=0>Select quantity</option> -->
-          <option value=1>1</option>
-          <option value=2>2</option>
-          <option value=3>3</option>
-          <option value=4>4</option>
-          <option value=5>5</option>
-          <option value=6>6</option>
-          <option value=7>7</option>
-          <option value=8>8</option>
-          <option value=9>9</option>
-          <option value=10>10</option>
+          {% for n in range(1, row.inventory + 1) %}
+          <option value={{ n }}>{{ n }}</option>
+          {% endfor %}
         </select>
       </form>
       <!-- <a href="#" onclick="plusMinus(1); return false;" class="plus_minus">+</a> -->
     </div>
     <button onclick="addToCart({{ row.pid }}); return false;" type="button" class="btn btn-info">Add to cart</button>
     <span id="check_container"></span>
-    <!-- <div>{{ row.inventory }}</div> -->
 
   </div>
 
@@ -91,9 +105,11 @@ img.check {
 
   <div class="col-lg-6">
     <div>
-      <div>Keywords (Related products) {{ row.keywords_array }}</div>
+      <div>Keywords: {{ row.keywords_array }}</div>
+      <!--
       <div><a href="/shop/">More shopping</a></div>
       <div><a href="/cart/">Go to cart</a></div>
+      -->
     </div>
   </div>
 

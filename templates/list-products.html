@@ -11,6 +11,30 @@
 
 {% block content %}
 
+
+<div class="row">
+
+<div class="col-sm-1">
+</div>
+
+<div class="col-md-3 text-center">
+  <h2>Shop</h2>
+</div>
+
+<div class="col-md-4 text-center">
+  <a href="/cart/">Cart</a>
+</div>
+
+<div class="col-md-3 text-center">
+  <!-- placeholder -->
+</div>
+
+<div class="col-sm-1">
+</div>
+
+</div>
+
+
 {% for product in products %}
   <div class="row product_row top-buffer id="pid_{{ product.pid }}">
 
