@@ -112,11 +112,33 @@ def app(environ, start_response):
 
         if environ['PATH_INFO'] == '/admin/events/list':
             c = db.cursor()
-            c.execute("SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime")
+            c.execute(f"SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime")
             allrows = c.fetchall()
             c.close()
             template = env.get_template("admin-events-list.html")
             response = template.render(allrows=allrows)
+
+
+        elif environ['PATH_INFO'] == '/admin/orders/list':
+            db.query(f"select * from cart_order where status = 'complete' and ship_date is NULL")
+            r = db.store_result()
+            allrows = r.fetch_row(maxrows=100, how=1)
+
+            new_allrows = []
+
+            for row in allrows:
+                cart_order_id = row["cart_order_id"]
+                #db.query(f"select product_id, quantity from cart_order_product where cart_order_id = {cart_order_id}")
+                db.query(f"select a.product_id, a.quantity, b.name, b.inventory \
+                    from cart_order_product a, products b \
+                    where a.product_id = b.pid and cart_order_id = {cart_order_id}")
+                r = db.store_result()
+                sub_allrows = r.fetch_row(maxrows=100, how=1)
+                row["products"] = sub_allrows
+                new_allrows.append(row)
+
+            template = env.get_template("admin-orders-list.html")
+            response = template.render(allrows=new_allrows)
 
 
         elif environ['PATH_INFO'] == '/admin/events/add-edit':

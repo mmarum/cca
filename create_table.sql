@@ -78,7 +78,9 @@ session_id VARCHAR (20) NOT NULL,
 create_date datetime,
 checkout_date datetime,
 ship_date datetime,
-status VARCHAR (50)
+status VARCHAR (50),
+paypal_order_id varchar(50),
+total varchar(20)
 );
 
 CREATE TABLE cart_order_product (

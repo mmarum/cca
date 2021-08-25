@@ -307,6 +307,7 @@ paypal.Buttons({
         body: JSON.stringify({
           paypal_order_id: data.orderID,
           session_id: document.cookie.split("=")[1],
+          total: getTemporary(),
           details: details
         })
       });

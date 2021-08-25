@@ -183,6 +183,9 @@ def cart_api(environ, start_response):
     ####
     elif environ['PATH_INFO'] == "/checkout-approved":
 
+        total = int(input_list["total"])
+        paypal_order_id = input_list["paypal_order_id"]
+
         db.query(f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL")
         r = db.store_result()
         row = r.fetch_row(maxrows=1, how=1)[0]
@@ -190,7 +193,10 @@ def cart_api(environ, start_response):
 
         paypal_order_id = input_list["paypal_order_id"]
         details = input_list["details"]
-        sql = f"UPDATE cart_order SET status = 'complete' WHERE session_id = '{session_id}' AND status is NULL"
+        sql = f"UPDATE cart_order SET status = 'complete', checkout_date = '{time_now}', \
+            total = '{total}', paypal_order_id = '{paypal_order_id}' \
+            WHERE session_id = '{session_id}' AND status is NULL"
+        write_log("errors.txt", sql)
         c = db.cursor()
         c.execute(sql)
         c.close()

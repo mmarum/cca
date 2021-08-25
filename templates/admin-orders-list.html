@@ -1,0 +1,70 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin Orders List{% endblock %}
+
+{% block html_head %}
+<style>
+img {
+  max-width: 100px;
+}
+@media only screen and (max-width: 600px) {
+  .extra_column {
+    display: none;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<table border="1" cellpadding="10">
+
+<tr>
+  <td>cart order id</td>
+  <td>create date</td>
+  <td>checkout date</td>
+  <td>ship date</td>
+  <td>status</td>
+  <td>paypal order id</td>
+  <td>total</td>
+</tr>
+
+{% for row in allrows %}
+  <tr>
+  <td>{{ row.cart_order_id }}</td>
+  <td>{{ row.create_date }}</td>
+  <td>{{ row.checkout_date }}</td>
+  <td>{{ row.ship_date }}</td>
+  <td>{{ row.status }}</td>
+  <td>{{ row.paypal_order_id }}</td>
+  <td>{{ row.total }}</td>
+  </tr>
+
+  <tr>
+    <td></td>
+    <td colspan="6">Products:</td>
+  </tr>
+
+  {% for product in row.products %}
+    <tr>
+    <td></td>
+    <td colspan="6">
+      <table>
+      <tr>
+      <td><a href="/app/admin/products/add-edit?pid={{ product.product_id }}">{{ product.name }}</a></td>
+      <td>quantity: {{ product.quantity }}</td>
+      <td>inventory: {{ product.inventory }}</td>
+      </tr>
+      </table>
+    </td>
+    </tr>
+  {% endfor %}
+
+  <tr><td colspan="7"></td></tr>
+  <tr><td colspan="7" bgcolor="#CCC"></td></tr>
+  <tr><td colspan="7"></td></tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}
