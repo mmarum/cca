@@ -120,7 +120,7 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/orders/list':
-            db.query(f"select * from cart_order where status = 'complete' and ship_date is NULL")
+            db.query(f"select * from cart_order where status = 'complete' order by ship_date, checkout_date") # and ship_date is NULL
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
@@ -129,12 +129,28 @@ def app(environ, start_response):
             for row in allrows:
                 cart_order_id = row["cart_order_id"]
                 #db.query(f"select product_id, quantity from cart_order_product where cart_order_id = {cart_order_id}")
+
+                try:
+                    content = read_file(f"../cart-api/details/{cart_order_id}.json")
+                    details = json.loads(content)
+                    email = details["purchase_units"][0]["payee"]["email_address"]
+                    address = details["purchase_units"][0]["shipping"]["address"]
+                except:
+                    pass
+
                 db.query(f"select a.product_id, a.quantity, b.name, b.inventory \
                     from cart_order_product a, products b \
                     where a.product_id = b.pid and cart_order_id = {cart_order_id}")
                 r = db.store_result()
                 sub_allrows = r.fetch_row(maxrows=100, how=1)
                 row["products"] = sub_allrows
+
+                try:
+                    row["email"] = email
+                    row["address"] = address
+                except:
+                    pass
+
                 new_allrows.append(row)
 
             template = env.get_template("admin-orders-list.html")

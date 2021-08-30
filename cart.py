@@ -11,8 +11,8 @@ def read_file(file_name):
     f.close()
     return content
 
-def write_log(file_name, content):
-    f = open(file_name, "a")
+def write_file(file_name, content):
+    f = open(file_name, "w")
     f.write(content)
     f.close()
     return True
@@ -34,7 +34,10 @@ def cart_api(environ, start_response):
     post_input = environ['wsgi.input'].read(length).decode('UTF-8')
     input_list = json.loads(post_input)
 
-    session_id = str(input_list["session_id"])
+    try:
+        session_id = str(input_list["session_id"])
+    except:
+        session_id = None
 
     passwd = json.loads(read_file("../app/data/passwords.json"))["catalystcreative_cca"]
     db = MySQLdb.connect(host="localhost", user="catalystcreative_cca", passwd=passwd, db="catalystcreative_arts")
@@ -185,18 +188,18 @@ def cart_api(environ, start_response):
 
         total = int(input_list["total"])
         paypal_order_id = input_list["paypal_order_id"]
+        details = input_list["details"]
 
         db.query(f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL")
         r = db.store_result()
         row = r.fetch_row(maxrows=1, how=1)[0]
         cart_order_id = int(row["cart_order_id"])
 
-        paypal_order_id = input_list["paypal_order_id"]
-        details = input_list["details"]
+        write_file(f"details/{cart_order_id}.json", json.dumps(details))
+
         sql = f"UPDATE cart_order SET status = 'complete', checkout_date = '{time_now}', \
             total = '{total}', paypal_order_id = '{paypal_order_id}' \
             WHERE session_id = '{session_id}' AND status is NULL"
-        write_log("errors.txt", sql)
         c = db.cursor()
         c.execute(sql)
         c.close()
@@ -215,6 +218,17 @@ def cart_api(environ, start_response):
             c.close()
 
         response = "ok"
+
+
+    ####
+    elif environ['PATH_INFO'] == "/mark-as-shipped":
+        cart_order_id = int(input_list["cart_order_id"])
+        sql = f"UPDATE cart_order SET ship_date = '{time_now}' WHERE cart_order_id = {cart_order_id}"
+        c = db.cursor()
+        c.execute(sql)
+        c.close()
+        response = "ok"
+
 
     else:
         response = "Default error"

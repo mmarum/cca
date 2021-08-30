@@ -19,52 +19,86 @@ img {
 <table border="1" cellpadding="10">
 
 <tr>
-  <td>cart order id</td>
-  <td>create date</td>
-  <td>checkout date</td>
-  <td>ship date</td>
-  <td>status</td>
-  <td>paypal order id</td>
-  <td>total</td>
+  <th>cart order id</th>
+  <th>create date</th>
+  <th>checkout date</th>
+  <!-- <th>ship date</th> -->
+  <!-- <th>status</th> -->
+  <th>paypal order id</th>
+  <th>total</th>
+</tr>
+
+<tr>
+  <td colspan="5" bgcolor="WhiteSmoke"></td>
 </tr>
 
 {% for row in allrows %}
+
   <tr>
   <td>{{ row.cart_order_id }}</td>
   <td>{{ row.create_date }}</td>
   <td>{{ row.checkout_date }}</td>
-  <td>{{ row.ship_date }}</td>
-  <td>{{ row.status }}</td>
+  <!-- <td>{{ row.ship_date }}</td> -->
+  <!-- <td>{{ row.status }}</td> -->
   <td>{{ row.paypal_order_id }}</td>
-  <td>{{ row.total }}</td>
-  </tr>
-
-  <tr>
-    <td></td>
-    <td colspan="6">Products:</td>
+  <td>${{ row.total }}</td>
   </tr>
 
   {% for product in row.products %}
     <tr>
-    <td></td>
-    <td colspan="6">
-      <table>
-      <tr>
-      <td><a href="/app/admin/products/add-edit?pid={{ product.product_id }}">{{ product.name }}</a></td>
-      <td>quantity: {{ product.quantity }}</td>
-      <td>inventory: {{ product.inventory }}</td>
-      </tr>
-      </table>
+    <td>
+      {% if loop.index == 1 %}
+        {% if row.ship_date == None %}
+          <button type="button" class="btn btn-info" onclick="if(confirm('Are you sure?')) markAsShipped({{row.cart_order_id}});">Mark as shipped</button>
+        {% else %}
+          <div style="background-color: YellowGreen; padding: 10px; border-radius: 5px;">
+            Shipped on:<br>
+            {{ row.ship_date }}
+          </div>
+        {% endif %}
+      {% endif %}
+    </td>
+    <td colspan="4">{{ loop.index }}
+      <a href="/app/admin/products/add-edit?pid={{ product.product_id }}">{{ product.name }}</a>
+      quantity: {{ product.quantity }}
+      inventory: {{ product.inventory }}
     </td>
     </tr>
   {% endfor %}
+  
+  <tr>
+    <td colspan="5">
+      {{ row.email }}<br>
+      {{ row.address }}
+    </td>
+  </tr>
 
-  <tr><td colspan="7"></td></tr>
-  <tr><td colspan="7" bgcolor="#CCC"></td></tr>
-  <tr><td colspan="7"></td></tr>
+  <tr><td colspan="5"></td></tr>
+  <tr><td colspan="5" bgcolor="#CCC"></td></tr>
+  <tr><td colspan="5"></td></tr>
 
 {% endfor %}
 
 </table>
 
+<script>
+function markAsShipped(cart_order_id) {
+  console.log("markAsShipped");
+  const fetchPromise = fetch('/cart-api/mark-as-shipped', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      cart_order_id: cart_order_id
+    })
+  });
+  fetchPromise.then(response => {
+    console.log("markAsShipped: response from promise: " + response);
+    window.location.reload(true);
+  });
+}
+</script>
+
 {% endblock %}
+
