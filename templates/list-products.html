@@ -34,6 +34,26 @@
 
 </div>
 
+<div class="row">
+
+<div class="col-sm-1">
+</div>
+
+<div class="col-md-10 text-center">
+  Filter by available product types:
+  <a href="/shop/">All</a> | 
+  {% for word in allowed_filter_words %}
+    <a href="/shop/filter/{{ word }}">{{ word }}</a>
+    {% if not loop.last %}|{% endif %}
+  {% endfor %}
+</div>
+
+<div class="col-sm-1">
+</div>
+
+</div>
+
+
 
 {% for product in products %}
   <div class="row product_row top-buffer id="pid_{{ product.pid }}">

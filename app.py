@@ -133,8 +133,15 @@ def app(environ, start_response):
                 try:
                     content = read_file(f"../cart-api/details/{cart_order_id}.json")
                     details = json.loads(content)
-                    email = details["purchase_units"][0]["payee"]["email_address"]
+                    email = details["payer"]["email_address"]
                     address = details["purchase_units"][0]["shipping"]["address"]
+                    given_name = details["payer"]["name"]["given_name"]
+                    surname = details["payer"]["name"]["surname"]
+                    name = f"{given_name} {surname}"
+                    try:
+                        phone = details["payer"]["phone"]["phone_number"]["national_number"]
+                    except:
+                        phone = ""
                 except:
                     pass
 
@@ -148,6 +155,8 @@ def app(environ, start_response):
                 try:
                     row["email"] = email
                     row["address"] = address
+                    row["name"] = name
+                    row["phone"] = phone
                 except:
                     pass
 
@@ -548,7 +557,7 @@ def app(environ, start_response):
                 c = db.cursor()
                 c.execute(sql)
                 c.close()
-                sql = f"DELETE FROM cart_products WHERE pid = {pid}"
+                sql = f"DELETE FROM cart_order_product WHERE product_id = {pid}"
                 c = db.cursor()
                 c.execute(sql)
                 c.close()

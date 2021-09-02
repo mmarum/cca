@@ -62,12 +62,12 @@ img.check {
 
   <div class="col-md-2">
     {% set image_array = row.image_path_array.split(',') %}
-    <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/>
+    <a href="/img/orig/{{ image_array[1] }}"><img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/></a>
 
     {% set image_array = row.image_path_array.split(',') %}
     {% for i in image_array %}
       {% if loop.index > 2 %}
-         <img src="/img/small/{{ i }}" alt="" class="product_image"/>
+         <a href="/img/orig/{{ i }}"><img src="/img/small/{{ i }}" alt="" class="product_image"/></a>
       {% endif %}
     {% endfor %}
 

@@ -38,6 +38,13 @@ def shop(environ, start_response):
     method = environ['REQUEST_METHOD']
     path = environ['PATH_INFO']
 
+    allowed_filter_words = []
+    db.query("select distinct(lower(keywords_array)) as keyword from products where keywords_array != '' and active = 1")
+    r = db.store_result()
+    allrows = r.fetch_row(maxrows=100, how=1)
+    for row in allrows:
+        allowed_filter_words.append(row["keyword"])
+
     if path.startswith("/product"):
         pid = int(path.replace("/product/", ""))
         if not isinstance(pid, int):
@@ -49,18 +56,22 @@ def shop(environ, start_response):
         response = template.render(row=row)
 
     elif path.startswith("/filter"):
-        allowed_filter_words = ["bowls", "cups", "mugs"]
         filter_word = path.replace("/filter/", "")
         if filter_word not in allowed_filter_words:
             raise ValueError(f"Attempted filter_word not in allowed_filter_words list: {filter_word}")
-        response = f"shop filtered index: filter_word={filter_word}"
+
+        db.query(f"SELECT * FROM products WHERE active = 1 and inventory >= 1 and keywords_array LIKE '%{filter_word}%'")
+        r = db.store_result()
+        allrows = r.fetch_row(maxrows=100, how=1)
+        template = env.get_template("list-products.html")
+        response = template.render(products=allrows, allowed_filter_words=allowed_filter_words)
 
     else:
         db.query("SELECT * FROM products WHERE active = 1 and inventory >= 1")
         r = db.store_result()
         allrows = r.fetch_row(maxrows=100, how=1)
         template = env.get_template("list-products.html")
-        response = template.render(products=allrows)
+        response = template.render(products=allrows, allowed_filter_words=allowed_filter_words)
 
     return [response.encode()]
 

@@ -68,8 +68,16 @@ img {
   
   <tr>
     <td colspan="5">
+      {{ row.name }}<br>
+      {% if row.phone %}
+        {{ row.phone }}<br>
+      {% endif %}
       {{ row.email }}<br>
-      {{ row.address }}
+      {% set address = row.address %}
+      {% for k, v in address.items() %}
+        <!-- {{ k }} -->
+        {{ v }}
+      {% endfor %}
     </td>
   </tr>
 

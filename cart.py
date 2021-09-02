@@ -195,7 +195,7 @@ def cart_api(environ, start_response):
         row = r.fetch_row(maxrows=1, how=1)[0]
         cart_order_id = int(row["cart_order_id"])
 
-        write_file(f"details/{cart_order_id}.json", json.dumps(details))
+        write_file(f"details/{cart_order_id}.json", json.dumps(details, indent=4))
 
         sql = f"UPDATE cart_order SET status = 'complete', checkout_date = '{time_now}', \
             total = '{total}', paypal_order_id = '{paypal_order_id}' \
