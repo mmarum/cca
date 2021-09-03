@@ -67,7 +67,7 @@ def shop(environ, start_response):
         response = template.render(products=allrows, allowed_filter_words=allowed_filter_words)
 
     else:
-        db.query("SELECT * FROM products WHERE active = 1 and inventory >= 1")
+        db.query("SELECT * FROM products WHERE active = 1 and inventory >= 1 order by pid asc")
         r = db.store_result()
         allrows = r.fetch_row(maxrows=100, how=1)
         template = env.get_template("list-products.html")

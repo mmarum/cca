@@ -44,15 +44,11 @@ $( function() {
 
 <p>OR add/edit the event image here:</p>
 
+<h2><label for="image">Upload File</label></h2>
 <form action="/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
-{% for field in image_form %}
-  {% if field.name != "eid" and field.name != "submit" %}
-    {{ field.label }}
-  {% endif %}
-  <div class="field">{{ field(class="image_upload") }}</div>
-{% endfor %}
+<input class="image_upload" id="eid" name="eid" type="hidden" value="{{ eid.eid }}">
+<div class="field"><input class="image_upload" id="image" name="image" type="file"></div>
+<div class="field"><input class="image_upload" id="submit" name="submit" type="submit" value="Submit"></div>
 </form>
-<script>
-document.getElementById("eid").value = "{{ eid.eid }}";
-</script>
+
 {% endblock %}

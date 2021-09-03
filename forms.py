@@ -23,7 +23,7 @@ class EventsForm(Form):
     #abc = StringField('abc', [InputRequired()], render_kw={"placeholder": "test"})
 
 class ImageForm(Form):
-    eid = HiddenField("eid", description="eid")
+    related_id = HiddenField("related_id", description="related_id")
     image = FileField("Upload File")
     submit = SubmitField("Submit", description="Submit")
 

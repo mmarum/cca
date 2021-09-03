@@ -530,7 +530,7 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/admin/products/list':
             c = db.cursor()
-            c.execute("SELECT * FROM products")
+            c.execute("SELECT * FROM products order by pid asc")
             allrows = c.fetchall()
             c.close()
             template = env.get_template("admin-products-list.html")
@@ -594,79 +594,58 @@ def app(environ, start_response):
 
     ####
     ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/image/upload":
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/product-image/upload":
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        # NOTICE: NOT DECODING post_input below FOR IMAGES
+        post_input = environ['wsgi.input'].read(length)
+        # NOTICE: BYTES STRING below FOR IMAGES
+        image_pid = post_input.split(b'Content-Disposition: form-data')[1]
+        pid = re.sub(b'^.*name="pid"(.*?)------.*$', r"\1", image_pid, flags=re.DOTALL).strip()
+        pid = int(pid.decode('UTF-8'))
+        image_data = post_input.split(b'Content-Disposition: form-data')[2]
+        image_filename = re.sub(b'^.*filename="(.*?)".*$', r"\1", image_data, flags=re.DOTALL).strip()
+        image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
+        img_name = image_filename.decode('UTF-8')
+        open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
+        size = 350, 350
+        image = Image.open(f"../www/img/orig/{img_name}")
+        image.thumbnail(size)
+        image.save(f"../www/img/small/{img_name}", 'JPEG')
+        sql = f"UPDATE products SET image_path_array = concat(ifnull(image_path_array,''), ',{img_name}') WHERE pid = {pid}"
+        c = db.cursor()
+        c.execute(sql)
+        c.close()
+        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
 
+
+    ####
+    ####
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/image/upload":
         length = int(environ.get('CONTENT_LENGTH', '0'))
         # NOTICE: NOT DECODING post_input below FOR IMAGES
         post_input = environ['wsgi.input'].read(length)
 
+        print(post_input)
+
         # NOTICE BYTES STRING below FOR IMAGES
-        #image_eid = post_input.split(b'------')[1]
         image_eid = post_input.split(b'Content-Disposition: form-data')[1]
-
-        print(f"image_eid: {image_eid}")
-
         eid = re.sub(b'^.*name="eid"(.*?)------.*$', r"\1", image_eid, flags=re.DOTALL).strip()
-
-        print(f"eid: {eid}")
-
         eid = int(eid.decode('UTF-8'))
-
-        print(f"eid: {eid}")
-
-        if eid == 0:
-            image_pid = post_input.split(b'Content-Disposition: form-data')[4]
-            print("image_pid", image_pid)
-            if 'name="pid"' in image_pid.decode('UTF-8'):
-                pid = re.sub(b'^.*name="pid"(.*?)------.*$', r"\1", image_pid, flags=re.DOTALL).strip()
-                pid = int(pid.decode('UTF-8'))
-            else:
-                pid = 0
-        else:
-            pid = 0
-
-        #with open("stderr.log", "a") as logfile:
-        #    logfile.write(str(f"post_input: {post_input}++++\nimage_eid: {image_eid}++++\neid: {eid}++++\n"))
-
-        #image_data = post_input.split(b'------')[2]
         image_data = post_input.split(b'Content-Disposition: form-data')[2]
         image_filename = re.sub(b'^.*filename="(.*?)".*$', r"\1", image_data, flags=re.DOTALL).strip()
         image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
-
         img_name = image_filename.decode('UTF-8')
-
-        print(f"img_name: {img_name}")
-
         if img_name and image_contents:
             open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
-
-            # Now create a thumbnail of the original
             size = 350, 350
             image = Image.open(f"../www/img/orig/{img_name}")
             image.thumbnail(size)
             image.save(f"../www/img/small/{img_name}", 'JPEG')
-
-            if pid > 0:
-                #sql = f"UPDATE products SET image_path_array = '{img_name}' WHERE eid = {eid}"
-                # Because image_path_array is a list containgin multiple values:
-                print(f"img_name: {img_name}")
-                print(f"pid: {pid}")
-                sql = f"UPDATE products SET image_path_array = concat(ifnull(image_path_array,''), ',{img_name}') WHERE pid = {pid}"
-                print(f"sql is: {sql}")
-                redirect_path = "products"
-            else:
-                sql = f"UPDATE events SET image = '{img_name}' WHERE eid = {eid}"
-                redirect_path = "events"
-
+            sql = f"UPDATE events SET image = '{img_name}' WHERE eid = {eid}"
             c = db.cursor()
             c.execute(sql)
             c.close()
-
-        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/{redirect_path}/list" />'
-
-        #scrape_and_write("calendar")
-        #time.sleep(2)
-        #scrape_and_write("home")
+        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
 
     ####
