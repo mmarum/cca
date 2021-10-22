@@ -78,6 +78,19 @@ var browser_size = {
   font-family: 'BebasNeue-Bold', Arial, Verdana, Sans-serif;
 }
 
+.nav-item {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.nav-item:nth-child(odd) {
+  color: #404040;
+}
+
+.nav-item:nth-child(even) {
+  color: #707070;
+}
+
 @media only screen and (max-width: 600px) {
 
   .art-brew {
@@ -150,7 +163,7 @@ var browser_size = {
     border: 1px solid Gray;
     cursor: pointer;
     position: absolute;
-    margin-left: 100px;
+    margin-left: 350px;
     z-index: 2;
   }
 
@@ -201,7 +214,7 @@ td {
     white-space: nowrap;
   }
   .nav-item {
-      display: inline-block;
+    display: inline-block;
   }
 }
 
@@ -299,14 +312,16 @@ td {
   <div class="col-sm-12 nav-scroll">
     <center>
 
-  {% for i in ["Calendar", "Crafts & Services", "Private Events", "About Us", "After School", "Summer Camp", "3 Wednesdays Workshop"] -%}
-    {# "Media", "Reviews", #}
-    {% if i == "Crafts & Services" %}
-      <a href="#" onclick="navbardrop('dropdown-menu'); return false;">Crafts & Services</a>
-    {% else %}
-      <a class="nav-item" href="/{{ i|replace(' / ', '-')|replace(' ', '-')|replace('/', '-')|lower }}.html">{{ i }}</a>
-    {% endif %}
-  {%- endfor%}
+	<a class="nav-item" href="/">Home</a>
+	<a class="nav-item" href="/shop">Shop</a>
+	<a class="nav-item" href="/calendar.html">Events Calendar</a>
+	<a class="nav-item" href="/private-events.html">Private Events</a>
+	<a class="nav-item" href="#" onclick="navbardrop('dropdown-menu'); return false;">Crafts Gallery</a>
+	<!-- <a class="nav-item" href="/3-wednesdays-workshop.html">3 Wednesdays Workshop</a> -->
+	<!-- <a class="nav-item" href="/after-school.html">After School</a> -->
+	<!-- <a class="nav-item" href="/summer-camp.html">Summer Camp</a> -->
+	<a class="nav-item" href="/media.html">Media</a>
+	<a class="nav-item" href="/about-us.html">About Us</a>
 
   <div id="dropdown-menu">
   {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling", "Pottery Painting", "String Art", "Pottery Lessons"] -%}

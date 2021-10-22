@@ -6,6 +6,13 @@
 .product_image {
   max-width: 100%;
 }
+.sold_out{
+  color: red;
+}
+#cart_link_container {
+  margin-top: 5px;
+  padding-top: 5px;
+}
 </style>
 {% endblock %}
 
@@ -22,7 +29,9 @@
 </div>
 
 <div class="col-md-4 text-center">
-  <a href="/cart/">Cart</a>
+  <div id="cart_link_container">
+    <a href="/cart/">Cart</a>
+  </div>
 </div>
 
 <div class="col-md-3 text-center">
@@ -67,7 +76,7 @@
       {# for i in image_array #}
         <!-- <img src="/img/small/{# i.strip() #}" alt="" class="product_image"/><br/> -->
       {# endfor #}
-      <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/>
+      <a href="/shop/product/{{ product.pid }}"><img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/></a>
 
     </div>
 
@@ -75,7 +84,12 @@
       <!-- <div>{{ product.pid }}</div> -->
       {% set product_name_slug = product.name|replace(' ', '-')|lower %}
       <!-- <h3><a href="/app/products/{{ product_name_slug }}/{{ product.pid }}">{{ product.name }}</a></h3> -->
-      <h3><a href="/shop/product/{{ product.pid }}">{{ product.name }}</a></h3>
+      {% if product.inventory > 0 %}
+        <h3><a href="/shop/product/{{ product.pid }}">{{ product.name }}</a></h3>
+      {% else %}
+        <div class="sold_out">Sold out</div>
+        <h3>{{ product.name }}</h3>
+      {% endif %}
       {% set desc_array = product.description.split(' ') %}
       <div>
         {% for word in desc_array %}
@@ -84,6 +98,7 @@
           {% endif %}
         {% endfor %}
       </div>
+      <!-- <div>{{ product.invt }}</div> -->
       <!-- <div>{{ product.inventory }}</div> -->
       <div>${{ product.price }}</div>
       <!-- <div>{{ product.keywords_array }}</div> -->

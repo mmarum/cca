@@ -7,7 +7,7 @@ input, textarea, label, button {
   margin: 10px;
 }
 textarea.form-control {
- height: 100px;
+  height: 100px;
 }
 #series_all, #series_2, #series_3, #series_4, #series_5,
 #series_2_box, #series_3_box, #series_4_box, #series_5_box {
@@ -20,10 +20,7 @@ textarea.form-control {
   margin: 10px;
   border-radius: 5px;
 }
-label {
-  padding: 0px;
-  margin: 0px;
-}
+
 </style>
 <!-- https://jqueryui.com/datepicker/ -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -56,6 +53,8 @@ function appendTime() {
 
 {% block content %}
 
+<h1>Add or Edit Events</h1>
+
 <form action="/app/" method="POST" enctype="multipart/form-data" name="add_edit_form" id="this_form">
 
 {% if form.eid.data and "series" in form.tags.data %}
@@ -80,9 +79,14 @@ function appendTime() {
 {% endif %}
 
 {% for field in form %}
+
+  <!-- <div style="width: 100%; overflow: hidden;"> -->
+
   {% if field.name != "eid" and field.name != "submit" and field.name != "image" %}
     {% if form.eid.data %}
+      <!-- <div style="width: 80px; float: left;"> -->
       {{ field.label(class="form-text text-muted") }}
+      <!-- </div> -->
     {% endif %}
   {% endif %}
   {% if field.name == "edatetime" %}
@@ -95,8 +99,12 @@ function appendTime() {
     {# field(autocomplete="off", class="form-control btn btn-success") #}
     <input autocomplete="off" class="form-control btn btn-success" id="btn_submit" name="btn_submit" type="submit" value="Next">
   {% else %}
-    {{ field(autocomplete="off", class="form-control") }}
+    <!-- <div style="margin-left: 100px;"> -->
+    {{ field(autocomplete="off", class="form-control", placeholder="") }}
+    <!-- </div> -->
   {% endif %}
+
+  <!-- </div> -->
 
   {#
   {% if field.name == "duration" %}
@@ -124,8 +132,7 @@ function appendTime() {
 <button type="button" class="btn btn-info" onclick="eventDupe();">Duplicate</button>
 {% endif %}
 
-
-{% if not form.eid.data %}
+{# if not form.eid.data #}
   <script>
   {% for field in form %}
     {% if field.name == "price_text" or field.name == "tags" %}
@@ -135,7 +142,7 @@ function appendTime() {
     {% endif %}
   {% endfor %}
   </script>
-{% endif %}
+{# endif #}
 
 <script>
 function eventDupe() {

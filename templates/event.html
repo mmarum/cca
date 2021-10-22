@@ -156,13 +156,16 @@ select, input {
     {# VARIABLE PRICE END #}
 
 
+    <!-- elimit: {{ event.elimit }} -->
+    <!-- quantity_sum: {{ event.quantity_sum }} -->
+    <!-- remaining_spots: {{ event.remaining_spots }} -->
     {# REGULAR EVENT #}
     {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
     {% else %}
     {% if event.elimit and event.elimit >= 1 and "series" not in event.tags %}
       <select id="guest_quantity" class="form-control" onchange="getSubtotal();">
       <option value="0">Select number of guests</option>
-      {% for n in range(1, event.elimit + 1) %}
+      {% for n in range(1, event.remaining_spots + 1) %}
         <option value={{ n }}>{{ n }} guest{% if n > 1 %}s{% endif %}</option>
       {% endfor %}
       </select>
@@ -291,7 +294,8 @@ function checkTime(edatetime) {
   var n = Date.now();
   var dd = new Date(d);
   var nn = new Date(n);
-  var time_window = 10; // hours
+  //var time_window = 10; // hours
+  var time_window = 7; // hours
   if (d - n > 60*60* time_window *1000) {
     //console.log("NOT within xh window. OK to book.");
   } else {

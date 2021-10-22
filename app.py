@@ -5,7 +5,7 @@ import re
 import base64
 
 #import calendar
-from paper_calendar import make_cal
+from paper_calendar import make_cal, make_list
 
 import datetime
 import random
@@ -27,7 +27,7 @@ env.filters["get_inventory"] = get_inventory
 # TODO: Prevent SQL_injection
 
 # https://wtforms.readthedocs.io/en/stable/index.html
-from forms import ProductsForm, EventsForm, ImageForm, RegistrationForm
+from forms import ProductsForm, EventsForm, ImageForm, RegistrationForm, BookingForm
 
 from os import listdir
 from os.path import isfile, join
@@ -120,11 +120,15 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/orders/list':
-            db.query(f"select * from cart_order where status = 'complete' order by ship_date, checkout_date") # and ship_date is NULL
+            db.query(f"select *, ceiling(ship_date / 10000000000000) as ship_group from cart_order where status = 'complete' order by ship_group, ship_date desc, checkout_date desc")
+            #db.query(f"select * from cart_order where status = 'complete' order by ship_date desc, checkout_date desc") # and ship_date is NULL
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
             new_allrows = []
+
+            overall_total = 0
+            per_month_totals = {}
 
             for row in allrows:
                 cart_order_id = row["cart_order_id"]
@@ -162,8 +166,18 @@ def app(environ, start_response):
 
                 new_allrows.append(row)
 
+                overall_total += int(row["total"])
+
+                checkout_month = str(row["checkout_date"]).split("-")[1]
+
+                try:
+                    per_month_totals[checkout_month] += int(row["total"])
+                except:
+                    per_month_totals[checkout_month] = int(row["total"])
+
             template = env.get_template("admin-orders-list.html")
-            response = template.render(allrows=new_allrows)
+            response = template.render(allrows=new_allrows, 
+                overall_total=overall_total, per_month_totals=per_month_totals)
 
 
         elif environ['PATH_INFO'] == '/admin/events/add-edit':
@@ -208,10 +222,24 @@ def app(environ, start_response):
                     and (tags <> 'invisible' or tags is null) ORDER BY edatetime")
             e = db.store_result()
             allrows = e.fetch_row(maxrows=100, how=1)
+
             template = env.get_template("event.html")
             upcoming_event_ids = []
             for event in allrows:
                 eid = event["eid"]
+                elimit = event["elimit"]
+
+                db.query(f"select sum(quantity) as quantity_sum from orders where eid = {eid}")
+                q = db.store_result()
+                quantity_sum = q.fetch_row(maxrows=1, how=1)[0]["quantity_sum"]
+
+                try:
+                    event["quantity_sum"] = int(quantity_sum)
+                    event["remaining_spots"] = int(elimit) - int(quantity_sum)
+                except:
+                    event["quantity_sum"] = 0
+                    event["remaining_spots"] = int(elimit)
+
                 upcoming_event_ids.append(eid)
                 content = template.render(event=event)
                 write_file(f"../www/event/{eid}.html", content)
@@ -362,8 +390,8 @@ def app(environ, start_response):
                         try:
                             order = cca_order["paypal"]
 
-                            print("____cca_order_id", cca_order_id)
-                            print("____order", order)
+                            #print("____cca_order_id", cca_order_id)
+                            #print("____order", order)
                             data_array = []
                             # We don't necessarily want all data from orders/event_eid_value.json
                             # So let's pick and choose what data we want to keep:
@@ -429,13 +457,42 @@ def app(environ, start_response):
                         os.rename(f"orders/{f}", f"orders/loaded/{f}")
 
             # PART-2: Select future-event-date orders from database for admin view
-            c = db.cursor()
-            c.execute(f"SELECT e.title, e.edatetime, e.elimit, o.* FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime {gtlt} CURDATE() ORDER BY e.edatetime")
-            allrows = c.fetchall()
-            c.close()
+            #c = db.cursor()
+            query = f"SELECT e.title, e.edatetime, e.elimit, o.* \
+                FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime {gtlt} CURDATE() ORDER BY e.edatetime"
+            #c.execute(query)
+            #allrows = c.fetchall()
+            #c.close()
+
+            # NOTE: changing from db.cursor / c.execute to db.query / db.store_result for use of dict in template
+
+            db.query(query)
+            r = db.store_result()
+            allrows = r.fetch_row(maxrows=100, how=1)
 
             template = env.get_template("admin-booking.html")
             response = template.render(orders=allrows)
+
+
+        ####
+        elif environ['PATH_INFO'] == '/admin/booking/add-edit':
+
+            c = db.cursor()
+            c.execute(f"SELECT * FROM events WHERE edatetime > CURTIME() order by edatetime asc")
+            allevents = c.fetchall()
+            c.close()
+
+            if len(environ['QUERY_STRING']) > 1:
+                order_id = environ['QUERY_STRING'].split("=")[1]
+                db.query(f"SELECT * FROM orders WHERE id = {order_id}")
+                r = db.store_result()
+                row = r.fetch_row(maxrows=1, how=1)[0]
+                form = BookingForm(**row)
+            else:
+                form = BookingForm()
+
+            template = env.get_template("admin-booking-add-edit.html")
+            response = template.render(form=form, allevents=allevents, this_now=this_now)
 
 
         elif environ['PATH_INFO'] == '/home':
@@ -446,7 +503,10 @@ def app(environ, start_response):
 
             #print(html_cal)
 
-            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and (tags <> 'invisible' or tags is null) ORDER BY edatetime limit 1")
+            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() \
+                and (tags <> 'invisible' or tags is null) \
+                and title != 'Private Event' \
+                ORDER BY edatetime limit 1")
             r = db.store_result()
             next_event = r.fetch_row(maxrows=1, how=1)[0]
             #html_cal = ""
@@ -464,9 +524,13 @@ def app(environ, start_response):
             gallery = g.get_gallery()
             images = g.get_images()
 
+            # Event List:
+            event_list_html = make_list(db)
+
             template = env.get_template("home.html")
             response = template.render(next_event=next_event, calendar={"html": html_cal}, 
-                events_tagged_home=events_tagged_home, gallery=gallery, images=images)
+                events_tagged_home=events_tagged_home, gallery=gallery, images=images, 
+                event_list_html=event_list_html)
 
 
         elif environ['PATH_INFO'] == '/admin/pages':
@@ -530,7 +594,7 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/admin/products/list':
             c = db.cursor()
-            c.execute("SELECT * FROM products order by pid asc")
+            c.execute("SELECT * FROM products order by pid desc")
             allrows = c.fetchall()
             c.close()
             template = env.get_template("admin-products-list.html")
@@ -625,7 +689,7 @@ def app(environ, start_response):
         # NOTICE: NOT DECODING post_input below FOR IMAGES
         post_input = environ['wsgi.input'].read(length)
 
-        print(post_input)
+        #print(post_input)
 
         # NOTICE BYTES STRING below FOR IMAGES
         image_eid = post_input.split(b'Content-Disposition: form-data')[1]
@@ -787,12 +851,12 @@ def app(environ, start_response):
     ####
     elif environ['REQUEST_METHOD'] == "POST":
 
-        print("HERE AAA")
+        #print("HERE AAA")
 
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
-        print("post_input", post_input)
+        #print("post_input", post_input)
 
         data_object = {}
         data_array = []
@@ -809,8 +873,8 @@ def app(environ, start_response):
                 data_object[post_data_key] = post_data_val
                 data_array.append(post_data_val)
 
-        print("data_object", data_object)
-        print("data_array", data_array)
+        #print("data_object", data_object)
+        #print("data_array", data_array)
 
 
         # TEMPORARILY removing series input data
@@ -883,12 +947,12 @@ def app(environ, start_response):
             e = data_object['edatetime']
             t = data_object['title'].replace("'", "''")
             sql2 = f"SELECT eid, price_text, elimit FROM events WHERE edatetime = '{e}' AND title = '{t}'"
-            print("____", sql2)
+            #print("____", sql2)
             d = db.cursor()
             d.execute(sql2)
             results = d.fetchone()
-            print("____results", results)
-            print("____type of results", type(results))
+            #print("____results", results)
+            #print("____type of results", type(results))
             eid = int(results[0])
             try:
                 price_text = results[1]

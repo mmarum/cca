@@ -17,6 +17,8 @@ span.help-block {
 
 {% block content %}
 
+<h1>Add or Edit Products</h1>
+
 <form action="/app/admin/products/add-edit" 
     method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
@@ -24,8 +26,8 @@ span.help-block {
     {{ field(autocomplete="off", class="form-control btn btn-success") }}
   {% elif field.name == "active" %}
     <div>
-      <label name="active"><input type="radio" name="active" id="active" value=1 checked="checked"/>Visible</label>
-      <label name="hideit"><input type="radio" name="active" id="hideit" value=0/>Hide it</label>
+      <label name="active"><input type="radio" name="active" id="active" value=1{% if "1" in field|safe %} checked="checked"{% endif %}/>Visible</label>
+      <label name="hideit"><input type="radio" name="active" id="hideit" value=0{% if "0" in field|safe %} checked="checked"{% endif %}/>Hidden</label>
     </div>
   {% else %}
     {{ field(autocomplete="off", class="form-control") }}
@@ -33,7 +35,7 @@ span.help-block {
 {% endfor %}
 </form>
 
-<button type="button" class="btn btn-warning" onClick="onclick=location.reload();location.href='/app/admin/products/list'">Cancel</button>
+<button type="button" class="btn btn-warning" onclick="location.reload();location.href='/app/admin/products/list'">Cancel</button>
 
 {% if form.pid.data %}
   <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure?')) location.href='/app/admin/products/delete?pid={{ form.pid.data }}';">Delete</button>

@@ -19,12 +19,7 @@
       <h2>{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ') }}</h2>
       <h3><a href="/event/{{ event.eid }}.html">{{ event.title }}</a></h3>
       <div>
-      {% set event_desc = event.description.split('. ') %}
-      {% for sentence in event_desc -%}
-        {% if loop.index <= 5 %}
-          {{ sentence|safe }}{% else %}.
-        {% endif %}
-      {%- endfor %}
+        {{ event.description|safe }}
       </div>
     </div>
     <div class="col-sm-1">

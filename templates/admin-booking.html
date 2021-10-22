@@ -12,41 +12,47 @@
 {% endblock %}
 
 {% block content %}
-<h1>Summary of Orders</h1>
-<p>(Where event dates are in the future) <a href="/app/admin/booking?view=past-events">Click here to see orders for events in the past</a></p>
-<table class="table table-striped">
-<tr class="p-3 mb-2 bg-light text-dark">
-{% for i in ["title", "event date", 
-  "event id", "email", 
-  "first name", "last name", "quantity", "total", 
-  "variable time", "extra data",
-  "transaction id", "buyer name", "buyer phone"] %}
 
+<h1>Booking</h1>
+
+<table class="table table-striped">
+
+<tr class="p-3 mb-2 bg-light text-dark">
+<td><a href="/app/admin/booking/add-edit">+</a></td>
+{% for i in ["title", "event date", "email", 
+  "first name", "last name", "quantity", "total", 
+  "variable time", "extra data", "transaction id", 
+  "buyer name", "buyer phone"] %}
   <td>{{ i }}</td>
 {% endfor %}
 </tr>
+
 {% for order in orders %}
   <tr>
-    {% for o in order %}
-      {% if loop.index not in [3, 4, 5, 7, 13, 14] %}
-        {% if loop.index == 8 %}
-          <td>{{ o|replace("@", " @") }}</td>
-        {% elif loop.index == 2 %}
-          <td>{{ o.strftime('%b %-d %Y') }} </td>
-        {% elif loop.index == 16 %}
-          <td>
-          {% if o == "not an event with scarf" %}
-            None
-          {% else %}
-            {{ o|replace("_", " ") }}
-          {% endif %}
-          </td>
-        {% else %}
-          <td>{{ o }}</td>
-        {% endif %}
-      {% endif %}
-    {% endfor %}
+  <td><a href="/app/admin/booking/add-edit?id={{ order.id }}">{{ order.id }}</a></td>
+  <td><a href="/app/admin/events/add-edit?eid={{ order.eid }}">{{ order.title }}</a></td>
+  <!-- <td>{{ order.edatetime.strftime('%b %-d %Y %H:%M') }}</td> -->
+  <td>{{ order.edatetime.strftime('%a %b %d %I:%M %p')|replace(' 0', ' ') }}</td>
+  <td>{{ order.email|replace("@", " @") }}</td>
+  <td>{{ order.first_name }}</td>
+  <td>{{ order.last_name }}</td>
+  <td>{{ order.quantity }}</td>
+  <td>{{ order.paid }}</td>
+  <td>{{ order.variable_time }}</td>
+  <td>
+    {% if order.extra_data  == "not an event with scarf" %}
+      None
+    {% else %}
+      {{ order.extra_data|replace("_", " ") }}
+    {% endif %}
+  </td>
+  <td>{{ order.transaction_id }}</td>
+  <td>{{ order.buyer_name }}</td>
+  <td>{{ order.buyer_phone }}</td>
   </tr>
 {% endfor %}
+
 </table>
+
+<p><a href="/app/admin/booking?view=past-events">Click here to see orders for events in the past</a></p>
 {% endblock %}

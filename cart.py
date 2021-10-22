@@ -107,15 +107,24 @@ def cart_api(environ, start_response):
     elif environ['PATH_INFO'] == "/total":
         #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/total
         sub_query = f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL"
+
         try:
-            db.query(f"SELECT SUM(quantity) AS sum FROM cart_order_product WHERE cart_order_id = ({sub_query})")
+            db.query(f"SELECT SUM(b.quantity) AS sum FROM cart_order_product b, products c \
+                WHERE b.product_id = c.pid \
+                AND c.inventory > 0 \
+                AND b.cart_order_id = ({sub_query})")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             number_of_items = int(row["sum"])
         except:
             number_of_items = 0
+
         try:
-            db.query(f"SELECT sum(a.quantity * b.price) as subtotal from cart_order_product a, products b where a.product_id = b.pid and a.cart_order_id = ({sub_query})")
+            db.query(f"SELECT sum(a.quantity * b.price) as subtotal \
+                from cart_order_product a, products b \
+                where a.product_id = b.pid \
+                and b.inventory > 0 \
+                and a.cart_order_id = ({sub_query})")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             subtotal = int(row["subtotal"])
@@ -136,9 +145,10 @@ def cart_api(environ, start_response):
             row = r.fetch_row(maxrows=1, how=1)[0]
             cart_order_id = int(row["cart_order_id"])
 
-            db.query(f"SELECT b.product_id as pid, b.quantity \
-                FROM cart_order a, cart_order_product b \
+            db.query(f"SELECT b.product_id as pid, b.quantity, c.inventory \
+                FROM cart_order a, cart_order_product b, products c \
                 WHERE a.cart_order_id = b.cart_order_id \
+                AND b.product_id = c.pid \
                 AND a.cart_order_id = {cart_order_id}")
             r = db.store_result()
             rows = r.fetch_row(maxrows=100, how=1)

@@ -13,6 +13,9 @@
 #submit{
   margin-top: 10px;
 }
+#upload_file {
+  display: none;
+}
 </style>
 <!-- https://jqueryui.com/datepicker/ -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -26,29 +29,30 @@ $( function() {
 {% endblock %}
 
 {% block content %}
-<div class="green">Your data has been successfully added/updated</div>
+<!--
 {% if event_data %}
   {% for k, v in event_data.items() %}
     <div>{{ k }}: {{ v }}</div>
   {% endfor %}
 {% endif %}
+-->
 
 <p style="padding-top: 10px;">
-<button type="button" class="btn btn-primary" onclick="javascript:location.href='/app/admin/events/list'">Finished adding/editing event. Go back to list</button>
+<button type="button" class="btn btn-success" onclick="javascript:location.href='/app/admin/events/list'">Done</button>
 {% if eid.eid %}
-<button type="button" class="btn btn-secondary" onclick="javascript:location.href='/app/admin/events/add-edit?eid={{ eid.eid }}'">Or continue editing</button>
+<button type="button" class="btn btn-primary" onclick="javascript:location.href='/app/admin/events/add-edit?eid={{ eid.eid }}'">Re-edit</button>
+<button type="button" class="btn btn-secondary" onclick="document.getElementById('upload_file').style.display='block';">Upload Image for event {{ eid.eid }}</button>
 {% endif %}
 </p>
 
+<div id="upload_file">
 <hr>
-
-<p>OR add/edit the event image here:</p>
-
 <h2><label for="image">Upload File</label></h2>
 <form action="/app/image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 <input class="image_upload" id="eid" name="eid" type="hidden" value="{{ eid.eid }}">
 <div class="field"><input class="image_upload" id="image" name="image" type="file"></div>
 <div class="field"><input class="image_upload" id="submit" name="submit" type="submit" value="Submit"></div>
 </form>
+</div>
 
 {% endblock %}

@@ -7,23 +7,37 @@
   padding-top: 10px;
   padding-bottom: 10px;
 }
+#upload_file {
+  display: none;
+}
 </style>
 {% endblock %}
 
 {% block content %}
+
+<!--
 {% if product_data %}
   {% for k, v in product_data.items() %}
     <div>{{ k }}: {{ v }}</div>
   {% endfor %}
 {% endif %}
+-->
 
+<p style="padding-top: 10px;">
+<button type="button" class="btn btn-success" onclick="javascript:location.href='/app/admin/products/list'">Done</button>
+{% if pid.pid %}
+<button type="button" class="btn btn-primary" onclick="javascript:location.href='/app/admin/products/add-edit?eid={{ pid.pid }}'">Re-edit</button>
+<button type="button" class="btn btn-secondary" onclick="document.getElementById('upload_file').style.display='block';">Upload Image for product {{ pid.pid }}</button>
+{% endif %}
+</p>
+
+<div id="upload_file">
 <h2><label for="image">Upload File</label></h2>
 <form action="/app/product-image/upload" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 <input class="image_upload" id="pid" name="pid" type="hidden" value="{{ pid.pid }}">
 <div class="field"><input class="image_upload" id="image" name="image" type="file"></div>
 <div class="field"><input class="image_upload" id="submit" name="submit" type="submit" value="Submit"></div>
 </form>
-
-<button type="button" class="btn btn-warning" onClick="onclick=location.reload();location.href='/app/admin/products/list'">Skip</button>
+</div>
 
 {% endblock %}

@@ -61,3 +61,18 @@ def make_cal(db, month, year):
 
     return combined_cals
 
+
+def make_list(db):
+    c = db.cursor()
+    c.execute(f"select eid, edatetime, title from events where edatetime > now() and (tags <> 'invisible' or tags is null) limit 7")
+    allrows = c.fetchall()
+    c.close()
+    event_list_string = ""
+    for d in allrows:
+        eid = d[0]
+        edatetime = d[1]
+        date_string = edatetime.strftime("%b %d %Y")
+        title = d[2]
+        event_list_string += f'<div class="event_item">{date_string} <a href="/event/{eid}.html">{title}</a></div>\n'
+    return event_list_string
+

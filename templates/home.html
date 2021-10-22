@@ -6,9 +6,20 @@
 .event_image {
   max-width: 100%;
 }
+.event_item {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.event_item:nth-child(odd) {
+  background-color: WhiteSmoke;
+  border-top: 1px dashed LightGray;
+  border-bottom: 1px dashed LightGray;
+}
 .youtube_embed {
-  width: 340px;
-  height: 191px;
+  /* width: 340px; */
+  width: 247px;
+  /* height: 191px; */
+  height: 139px;
 }
 h1, h2 {
   font-size: 20px;
@@ -166,19 +177,21 @@ mark {
     </div>
     -->
 
-    <a href="/shop"><img src="/img/scarves-shop.jpg" class="event_image"></a>
-    <h2><a href="/shop/">Visit our online store</a></h2>
+    <h2><center><a href="/shop/">Visit our online store</a></center></h2>
+    <a href="/shop"><img src="/img/scarves-shop-ig.jpg" class="event_image"></a>
     <hr>
 
+    <!--
     <a href="/event/548.html"><img src="/img/small/Adobe_Post_20210730_1739320.84685698145039421.jpg" class="event_image"></a>
     <h2><a href="/event/548.html">Candlelight Jazz</a></h2>
     <div>Sat Sep 25, 2021 at 8:30 PM</div>
     <div>Join us for an intimate evening of jazz music at The Listening Room @ Catalyst Creative Arts Arlington's Sky Jazz Quartet will present classic jazz hits and jazz arrangements of pop music to the soft glow of a candle lit stage. This event is for ages 10 and up. Seating is first come, first served Pre-sale ticket price of $30 ends August 31 Regular ticket price is $35 and $40 at the door. BYOB</div>
 
     <hr>
+    -->
 
     {% if next_event %}
-    <h2>Next Event</h2>
+    <h2>Next Event:</h2>
     <h2>{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h2>
     <a href="/event/{{ next_event.eid }}.html">
       <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
@@ -187,6 +200,14 @@ mark {
     <hr>
     {% endif %}
 
+    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s"><img src="/img/gift-card.png" class="event_image gift_card_border"></a>
+
+    <h2><a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s">Gift cards now available</a></h2>
+
+    <p>Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through PayPal, 
+       over the phone and in person at our studio and may be redeemed for any of our services.</p>
+
+    <hr>
 
     <!-- first column end -->
 
@@ -195,6 +216,7 @@ mark {
 
     <!-- second column start -->
 
+    <!--
     <a href="/3-wednesdays-workshop.html"><img src="/img/small/20210313_171112-01.jpeg" class="event_image"></a>
 
     <h2><a href="/3-wednesdays-workshop.html">3 Wednesdays Workshop</a></h2>
@@ -205,24 +227,36 @@ mark {
     </div>
 
     <hr>
+    -->
 
-    <!-- width="315" height="177" -->
-    <iframe class="youtube_embed" src="https://www.youtube.com/embed/i7kPoG8JVrU" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <img src="/img/pumpkins-2021.jpg" class="event_image">
 
-    <h2><a href="https://www.youtube.com/watch?v=i7kPoG8JVrU">The Arlington Experience with Jim Ross: Episode Seventeen</a></h2>
+    <h2>Fluid Art Over Artificial Pumpkin</h2>
 
-    <p>In the latest episode of The Arlington Experience, Jim visits with the owners of a newer business in Arlington - but also one of its most unique - Catalyst Creative Arts!</p>
-
-    <hr>
-
-    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s"><img src="/img/gift-card.png" class="event_image gift_card_border"></a>
-
-    <h2><a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s">Gift Cards</a></h2>
-
-    <p>Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through PayPal, 
-       over the phone and in person at our studio and may be redeemed for any of our services.</p>
+    <a href="/event/584.html">Sat Oct 9</a>,
+    <a href="/event/580.html">Sat Oct 16</a>,
+    <a href="/event/581.html">Sat Oct 23</a>,
+    <a href="/event/531.html">Sat Nov 20</a>
 
     <hr>
+
+  {% if events_tagged_home %}
+
+  {% for event in events_tagged_home %}
+    <a href="/event/{{ event.eid }}.html" class="event_link">
+      <img alt="{{ event.image }}" src="/img/small/{{ event.image }}"/>
+    </a>
+    <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h4>
+    <a href="/event/{{ event.eid }}.html" class="event_link">
+      <h3>{{ event.title }}</h3>
+    </a>
+    <hr>
+  {% endfor %}
+
+  {% endif %}
+
+    <!-- <div id="paper_calendar"></div> -->
+    {# calendar.html|safe #}
 
     <!-- second column end -->
 
@@ -231,19 +265,17 @@ mark {
 
     <!-- third column start -->
 
-    <div id="paper_calendar"></div>
-    {{ calendar.html|safe }}
+    <div id="event_list">
+    <div><h2>Next 7 events:</h2></div>
+    {{ event_list_html|safe }}
+    <div><a href="/calendar.html">See full list of events</a></div>
+    </div>
 
     <hr>
 
-    <a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/"><img src="/img/art-market-2-dmn.jpg" class="event_image"></a>
-    <h2><a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/">Catalyst Creative Arts hosts second annual Arlington Art Market</a></h2><hr>
-    <a href="https://www.arlingtonnetwork.com/2020/10/28/2nd-annual-art-market-returns-to-arlington/"><img src="/img/art-market-2-an.jpg" class="event_image"></a>
-    <h2><a href="https://www.arlingtonnetwork.com/2020/10/28/2nd-annual-art-market-returns-to-arlington/">More about CCA and the second annual Arlington Art Market</a></h2><hr>
-    <a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&feature=youtu.be"><img src="/img/art-market-2-yt.jpg" class="event_image"></a>
-    <h2><a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&feature=youtu.be">Watch Culture Buzz: Catalyst Creative Arts</a></h2>
-
-    <hr>
+    <div><img src="/img/holiday-parties-2021.jpg" class="event_image"></div>
+    <h2>Holiday Parties</h2>
+    <div>We are booking Holiday Parties! Call or email us. We have wonderful neighbors that can help you with catering it!</div>
 
     <!-- third column end -->
 
@@ -253,52 +285,6 @@ mark {
   </div>
 
 </div>
-
-{% if events_tagged_home %}
-
-  {% for event in events_tagged_home %}
-
-  <div class="row top-buffer">
-
-  <div class="col-sm-1">
-  </div>
-
-  <div class="col-sm-1 text_align_right">
-  {% if loop.index == 1 %}
-    <span class="vertical_text">
-      FEATURED
-    </span>
-  {% endif %}
-  </div>
-
-  <div class="col-md-3">
-    <a href="/event/{{ event.eid }}.html" class="event_link">
-      <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="logo"/>
-    </a>
-  </div>
-
-  <div class="col-md-5">
-    {% if event.eid != 95 %}
-      <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h4>
-    {% endif %}
-    <a href="/event/{{ event.eid }}.html" class="event_link">
-      <h3>{{ event.title }}</h3>
-    </a>
-    <div>
-    {% set event_desc = event.description.split(' ') %}
-    {% for e in event_desc -%}{% if loop.index < 30 %}{{ e }} {% endif %}{%- endfor %}
-    ... <a href="/event/{{ event.eid }}.html" class="event_link">Read More</a>
-    </div>
-  </div>
-
-  <div class="col-sm-2">
-  </div>
-
-  </div>
-
-  {% endfor %}
-
-{% endif %}
 
 <!--
 <div class="row top-buffer">

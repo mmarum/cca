@@ -16,6 +16,8 @@ img {
 
 {% block content %}
 
+<h1>Orders</h1>
+
 <table border="1" cellpadding="10">
 
 <tr>
@@ -87,7 +89,24 @@ img {
 
 {% endfor %}
 
+{% for month, total in per_month_totals.items() %}
+  <tr>
+  <td colspan=3>
+  </td>
+  <td>{{ month }}</td>
+  <td>${{ total }}</td>
+  </tr>
+{% endfor %}
+
+<tr>
+<td colspan=3></td>
+<td align="right">Overall total:</td>
+<td>${{ overall_total }}</td>
+</tr>
+
 </table>
+
+<br>
 
 <script>
 function markAsShipped(cart_order_id) {

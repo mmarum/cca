@@ -14,7 +14,7 @@ class EventsForm(Form):
     location = StringField("Location", description="Location", default="400 E. Division St. Ste 100 Arlington, TX 76011")
     image = HiddenField("Image Path", description="Image Path")
     description = TextAreaField("Description", description="Description")
-    price_text = StringField("Variable time or price", description="Variable time or price")
+    price_text = StringField("Variable", description="Variable time or price")
     # (time) Feb 6 3-5pm, Feb 6 6-8pm, Feb 7 1-3pm, Feb 7 4-6pm, test
     # (price) one red @ $10, two blue @ $5, a bird @ $20
     tags = StringField("Tags", description="Tags: home, cart, fluid-art, alcohol-ink OR invisible")
@@ -60,7 +60,7 @@ class RegistrationForm(Form):
     submit = SubmitField("Submit", description="Submit")
 
 
-class ProductsForm (Form):
+class ProductsForm(Form):
     pid = HiddenField("pid", description="")
     name = StringField("Name", description="")
     description = TextAreaField("Description", description="")
@@ -69,5 +69,19 @@ class ProductsForm (Form):
     price = StringField("Price", description="Product price before discounts. This can be overridden")
     keywords_array = StringField("Keywords Array", description="Comma-separated list of descriptive one-word keywords")
     active = StringField("Active", description="")
+    submit = SubmitField("Next", description="Next")
+
+
+class BookingForm(Form):
+    order_id = HiddenField("order_id", description="order_id")
+    eid = HiddenField("eid", description="event_id")
+    create_time = HiddenField("create_time", description="create_time")
+    email = StringField("email", description="email")
+    first_name = StringField("first_name", description="first_name")
+    last_name = StringField("last_name", description="last_name")
+    quantity = StringField("quantity", description="Total number of guests in this order")
+    cost = StringField("cost", description="optional field")
+    paid = StringField("paid", description="optional field")
+    guest_list = StringField("guest_list", description="Guest list optional")
     submit = SubmitField("Next", description="Next")
 

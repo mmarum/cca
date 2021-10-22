@@ -34,6 +34,9 @@ def order(environ, start_response):
     if environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/submit": #and environ['HTTP_REFERER'].endswith('calendar.html'):
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+
+        print("order.py post_input", post_input)
+
         form_orders = json.loads(post_input)
         event_id = str(form_orders['event_id'])
         cca_order_id = str(form_orders['cca_order_id'])

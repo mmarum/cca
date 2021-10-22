@@ -3,15 +3,16 @@
 
 {% block html_head %}
 <style>
+#continue_shopping {
+  margin-top: 10px;
+  display: none;
+}
 form, input {
   display: inline;
 }
 .product_image {
   max-width: 100%;
   padding: 5px;
-}
-#cart {
-  width: 50px;
 }
 #product_quantity_select {
   margin-top: 10px;
@@ -20,6 +21,17 @@ form, input {
 img.check {
   width: 35px;
   padding-left: 10px;
+}
+#check_mark, #proceed_to_checkout {
+  display: none;
+}
+#proceed_to_checkout {
+  margin-top: 10px;
+}
+#check_mark img {
+    width: 25px;
+    height: 25px;
+    margin-left: 10px;
 }
 .form-control {
   display: inline;
@@ -81,6 +93,8 @@ img.check {
 
   <div class="col-sm-3">
 
+    {% if row.inventory > 0 %}
+
     <div style="padding-bottom: 10px;">
       <!-- <a href="#" onclick="plusMinus(-1); return false;" class="plus_minus">-</a> -->
       <form action="" id="product_quantity_form">
@@ -94,7 +108,13 @@ img.check {
       <!-- <a href="#" onclick="plusMinus(1); return false;" class="plus_minus">+</a> -->
     </div>
     <button onclick="addToCart({{ row.pid }}); return false;" type="button" class="btn btn-info">Add to cart</button>
-    <span id="check_container"></span>
+    <span id="check_mark"><a href="/cart/"><img src="/img/check.png"></a></span><br>
+    <button id="proceed_to_checkout" type="button" class="btn btn-success" onclick="javascript:location.href='/cart/'">Proceed to checkout</button>
+    <div id="continue_shopping"><a href="/shop/">Continue shopping</a></div>
+
+    {% else %}
+      This item is out of stock
+    {% endif %}
 
   </div>
 
@@ -104,13 +124,9 @@ img.check {
   </div>
 
   <div class="col-lg-6">
-    <div>
+    {% if row.keywords %}
       <div>Keywords: {{ row.keywords_array }}</div>
-      <!--
-      <div><a href="/shop/">More shopping</a></div>
-      <div><a href="/cart/">Go to cart</a></div>
-      -->
-    </div>
+    {% endif %}
   </div>
 
   <div class="col-sm-3">
@@ -149,9 +165,9 @@ function make_request(session_id, product_id, quantity) {
     })
   });
   fetchPromise.then(response => {
-    var check_tag = '<img src="/img/check.png" class="check"/>';
-    document.getElementById("check_container").innerHTML = check_tag;
-    //document.getElementById("top_right_cart_container").style.display = "block";
+    document.getElementById("check_mark").style.display = "inline";
+    document.getElementById("proceed_to_checkout").style.display = "block";
+    document.getElementById("continue_shopping").style.display = "block";
     make_request_get_total(session_id);
     console.log("response from promise");
     //console.log(response);
