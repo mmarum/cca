@@ -18,7 +18,7 @@
 <table class="table table-striped">
 
 <tr class="p-3 mb-2 bg-light text-dark">
-<td><a href="/app/admin/booking/add-edit">+</a></td>
+<td><div id="add_new_link"><a href="/app/admin/booking/add-edit">+</a></div></td>
 {% for i in ["title", "event date", "email", 
   "first name", "last name", "quantity", "total", 
   "variable time", "extra data", "transaction id", 
@@ -32,7 +32,7 @@
   <td><a href="/app/admin/booking/add-edit?id={{ order.id }}">{{ order.id }}</a></td>
   <td><a href="/app/admin/events/add-edit?eid={{ order.eid }}">{{ order.title }}</a></td>
   <!-- <td>{{ order.edatetime.strftime('%b %-d %Y %H:%M') }}</td> -->
-  <td>{{ order.edatetime.strftime('%a %b %d %I:%M %p')|replace(' 0', ' ') }}</td>
+  <td>{{ order.edatetime.strftime('%a %b %d %Y %I:%M %p')|replace(' 0', ' ') }}</td>
   <td>{{ order.email|replace("@", " @") }}</td>
   <td>{{ order.first_name }}</td>
   <td>{{ order.last_name }}</td>
@@ -54,5 +54,5 @@
 
 </table>
 
-<p><a href="/app/admin/booking?view=past-events">Click here to see orders for events in the past</a></p>
+<p><a href="/app/admin/booking/list?view=past-events">Click here to see orders for events in the past</a></p>
 {% endblock %}

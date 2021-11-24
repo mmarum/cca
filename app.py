@@ -357,7 +357,7 @@ def app(environ, start_response):
 
 
         ####
-        elif environ['PATH_INFO'] == '/admin/booking':
+        elif environ['PATH_INFO'] == '/admin/booking/list':
 
             view = ""
             gtlt = ">=" # default
@@ -468,9 +468,9 @@ def app(environ, start_response):
 
             db.query(query)
             r = db.store_result()
-            allrows = r.fetch_row(maxrows=100, how=1)
+            allrows = r.fetch_row(maxrows=1000, how=1)
 
-            template = env.get_template("admin-booking.html")
+            template = env.get_template("admin-booking-list.html")
             response = template.render(orders=allrows)
 
 
@@ -506,6 +506,7 @@ def app(environ, start_response):
             db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() \
                 and (tags <> 'invisible' or tags is null) \
                 and title != 'Private Event' \
+                and title != 'Studio Closed' \
                 ORDER BY edatetime limit 1")
             r = db.store_result()
             next_event = r.fetch_row(maxrows=1, how=1)[0]
@@ -981,7 +982,7 @@ def app(environ, start_response):
 
         image_form = ImageForm()
 
-        template = env.get_template("admin-image.html")
+        template = env.get_template("admin-events-image.html")
         response = template.render(event_data=data_object, image_form=image_form,
             sql={"sql":sql}, eid={"eid":eid}, sql2={"sql2":sql2})
 

@@ -73,6 +73,7 @@ class ProductsForm(Form):
 
 
 class BookingForm(Form):
+    id = HiddenField("id", description="id")
     order_id = HiddenField("order_id", description="order_id")
     eid = HiddenField("eid", description="event_id")
     create_time = HiddenField("create_time", description="create_time")
@@ -83,5 +84,10 @@ class BookingForm(Form):
     cost = StringField("cost", description="optional field")
     paid = StringField("paid", description="optional field")
     guest_list = StringField("guest_list", description="Guest list optional")
+    variable_time = StringField("variable_time", description="Variable time optional")
+    extra_data = StringField("extra_data", description="Extra data optional")
+    transaction_id = StringField("transation_id", description="transaction id")
+    buyer_name = StringField("buyer_name", description="Buyer name optional")
+    buyer_phone = StringField("buyer_phone", description="Buyer phone optional")
     submit = SubmitField("Next", description="Next")
 

@@ -1,0 +1,135 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Summer Camp Registration{% endblock %}
+
+{% block html_head %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+
+<center>
+<h1>Catalyst Creative Arts Summer Art Camp 2020</h1>
+<h3>Registration & Release Form</h3>
+</center>
+
+<form action="/contact/registration/" method="POST" enctype="multipart/form-data" onSubmit="check_validate()">
+
+<h5>CAMPER(S) INFORMATION</h5>
+
+{% for field in form %}
+
+  {% if field.name == "rid" or field.name == "order_id" %}
+    {{ field }}
+
+  {% elif field.name == "submit" %}
+    {{ field(class="form-control") }}
+
+  {% elif field.name.startswith("session") %}
+
+    {% if field.name == "session1" %}
+      <h5>Check Sessions You Are Registering For</h5>
+    {% endif %}
+    <p>{{ field }}
+    {{ field.label }}</p>
+
+  {% elif field.name == "treatment_permission" or field.name == "photo_release" %}
+
+    <p>{{ field }}
+    {{ field.label }}</p>
+
+    {% if field.name == "treatment_permission" %}
+      <p>In case of emergency and in the event that none of the emergency contacts can be reached, CATALYST CREATIVE ARTS will need signed authorization (below) to seek medical assistance for your child. I give permission to the CATALYST CREATIVE ARTS, its employees and designated representatives, to use whatever emergency (e.g., first aid, disaster evacuation) measures are judged necessary by them for the care and protection of my child while under supervision of the CATALYST CREATIVE ARTS. In case of medical emergency, I understand that my child will be transported to appropriate medical facilities by a local emergency unit for treatment if the local emergency resource (police or paramedics) deems it necessary. It is understood that in some medical situations, the staff will need to contact the local emergency resource before the parent, child's physician and/ or other emergency contacts acting on the parents' behalf.</p>
+    {% elif field.name == "photo_release" %}
+      <p>I, the undersigned, grant Catalyst Creative, LLC d/b/a CATALYST CREATIVE ARTS, permission to use any pictures taken in public view of myself individually, my child (camper(s) listed above), or any in which I (or the camper(s)) appear in whole or in part during Summer Art Camp. I understand that these pictures may be reproduced in print and electronic media specifically to promote CATALYST CREATIVE ARTS. I waive any right to inspect or approve said pictures, or any captions or accompanying texts that may be used in connection with them, or to approve the use to which said materials may be applied.</p>
+    {% endif %}
+
+  {% else %}
+    {% if field.name == "camper2_name" %}
+      <p><a href="#" onclick="showMore(2); return false;">Add a second camper</a></p>
+    {% elif field.name == "camper3_name" %}
+      <p id="add_third_camper"><a href="#" onclick="showMore(3); return false;">Add a third camper</a></p>
+    {% endif %}
+
+    {% if field.name == "parent_name" %}
+      <h5>PARENT/GUARDIAN INFORMATION</h5>
+
+    {% elif field.name == "pickup1_name" %}
+      <h5>PERSON(S) AUTHORIZED TO PICK UP CAMPER</h5>
+    {% endif %}
+
+    {{ field.label(class="form-text text-muted", id=field.name.replace('_', '__')) }}
+    {{ field(autocomplete="off", class="form-control") }}
+  {% endif %}
+{% endfor %}
+
+</form>
+
+<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+</script>
+
+<div id="paypal-button-container" class="text-center top-buffer"></div>
+
+<script>
+function validate(id_name) {
+  if (document.getElementById(id_name).checked) {
+    console.log(id_name+" checked");
+  } else {
+    console.log(id_name+" unchecked");
+  }
+}
+
+function check_validate() {
+  validate("session1");
+  validate("session2");
+  validate("treatment_permission");
+  validate("photo_release");
+}
+
+function showMore(n) {
+  document.getElementById("camper"+n+"_name").style.display = "block";
+  document.getElementById("camper"+n+"_age").style.display = "block";
+  document.getElementById("camper"+n+"_grade").style.display = "block";
+  document.getElementById("camper"+n+"__name").style.display = "block";
+  document.getElementById("camper"+n+"__age").style.display = "block";
+  document.getElementById("camper"+n+"__grade").style.display = "block";
+  if (n == 2) {
+    document.getElementById("add_third_camper").style.display = "block";
+  }
+}
+
+  paypal.Buttons({
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            value: getTotal(getEventMeta("eid"))
+          }
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        alert('Transaction completed by ' + details.payer.name.given_name);
+        //console.log(details);
+        // Call your server to save the transaction
+        //return fetch('/app/paypal-transaction-complete', {
+        return fetch('/order/submit', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            orderID: data.orderID,
+            event_id: getEventMeta("eid"),
+            quantity: quant(getEventMeta("eid")),
+            details: details
+          })
+        });
+      });
+    }
+  }).render('#paypal-button-container');
+
+</script>
+
+{% endblock %}

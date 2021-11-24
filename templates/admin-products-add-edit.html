@@ -17,7 +17,7 @@ span.help-block {
 
 {% block content %}
 
-<h1>Add or Edit Products</h1>
+<h1>{% if 'value=""' in form["pid"]|safe %}Add{% else %}Edit{% endif %} Product</h1>
 
 <form action="/app/admin/products/add-edit" 
     method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
@@ -30,6 +30,7 @@ span.help-block {
       <label name="hideit"><input type="radio" name="active" id="hideit" value=0{% if "0" in field|safe %} checked="checked"{% endif %}/>Hidden</label>
     </div>
   {% else %}
+    <!-- <div class="field_label">{{ field.name }}</div> -->
     {{ field(autocomplete="off", class="form-control") }}
   {% endif %}
 {% endfor %}

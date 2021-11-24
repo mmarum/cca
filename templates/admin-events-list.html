@@ -7,9 +7,6 @@ img {
   max-width: 100px;
 }
 @media only screen and (max-width: 600px) {
-  .extra_column {
-    display: none;
-  }
 }
 </style>
 {% endblock %}
@@ -21,12 +18,11 @@ img {
   <td><div id="add_new_link"><a href="/app/admin/events/add-edit">+</a></div></td>
   <td>Date</td>
   <td>Title</td>
-  <td class="extra_column">Duration</td>
-  <td class="extra_column">Price</td>
-  <td class="extra_column">Limit</td>
-  <td class="extra_column">Location</td>
-  <td class="extra_column">Image</td>
-  <!-- <td class="extra_column">Description</td> -->
+  <td>Duration</td>
+  <td>Price</td>
+  <td>Limit</td>
+  <td>Location</td>
+  <td>Image</td>
 </tr>
 {% for row in allrows %}
   {% set rowloop = loop %}
@@ -37,9 +33,9 @@ img {
     {% elif loop.index == 2 %}
       <td>{{ item.strftime('%a %b %d %I:%M %p')|replace(' 0', ' ') }}</td>
     {% elif loop.index == 8 %}
-      <td class="extra_column"><img src="/img/small/{{ item }}"/></td>
+      <td><img src="/img/small/{{ item }}"/></td>
     {% elif loop.index < 9 %}
-      <td{% if loop.index > 3 %} class="extra_column"{% endif %}>{{ item }}</td>
+      <td{% if loop.index > 3 %}{% endif %}>{{ item }}</td>
     {% endif %}
   {% endfor %}
   </tr>

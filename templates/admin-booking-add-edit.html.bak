@@ -1,0 +1,127 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin Add/Edit Bookings{% endblock %}
+
+{% block html_head %}
+<style>
+input, textarea, label, button, select {
+  margin: 10px;
+}
+textarea.form-control {
+  height: 100px;
+}
+label {
+  padding: 0px;
+  margin: 0px;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<h1>Add or Edit Booking</h1>
+
+<form action="#" method="POST" enctype="multipart/form-data" name="add_edit_form" id="booking_form" onSubmit="submitBooking(); return false;">
+
+<select id="eid" name="eid" class="form-control browser-default custom-select">
+<option value="0" selected>Select event</option>
+{% for event in allevents %}
+  <option value="{{ event[0] }}" id="select_event_{{ event[0] }}"> {{ event[1] }} {{ event[2] }}</option>
+{% endfor %}
+</select>
+
+<input type="hidden" id="order_id" name="order_id" value="manually entered {{ this_now }}">
+
+{% for field in form %}
+  {% if field.name == "submit" %}
+    {{ field(class="form-control btn btn-success") }}
+  {% elif field.name not in ["eid", "order_id"] %}
+    {{ field(autocomplete="off", class="form-control") }}
+  {% endif %}
+{% endfor %}
+
+</form>
+
+<button type="button" class="btn btn-warning" onclick="location.href='/app/admin/booking'">Cancel</button>
+
+<script>
+{% for field in form %}
+  {% if field.name not in ["eid", "order_id"] %}
+    document.getElementById("{{ field.name }}").placeholder = "{{ field.name }}";
+  {% endif %}
+  {% if field.name == "eid" %}
+    var eid_field = '{{ field }}';
+    var regex = /^.+value="/;
+    var eid_part = eid_field.replace(regex, "");
+    regex = /">$/;
+    var eid = eid_part.replace(regex, "");
+    if (eid) {
+      console.log("eid: " + eid);
+      document.getElementById("select_event_"+eid).selected=true;
+    }
+  {% endif %}
+{% endfor %}
+
+function sendRequest(endpoint, data) {
+  var request = new XMLHttpRequest();
+  request.onreadystatechange = function() {
+    if(request.readyState === 4) {
+      if(request.status === 200) { 
+        console.log(200);
+      } else {
+        console.log('Error: '+request.status+' '+request.statusText);
+      } 
+    }
+  }
+  console.log(endpoint);
+  request.open('GET', endpoint);
+  request.send();
+};
+
+function submitBooking() {
+  cca_order_id = document.getElementById("order_id").value;
+  event_id = document.getElementById("eid").value;
+  quantity = document.getElementById("quantity").value;
+  console.log("event_id: " + event_id);
+
+  var details = {};
+  /*
+  "payer_email": form_orders['details']['payer']['email_address'],
+  "payer_name": form_orders['details']['payer']['name']['given_name'],
+  "amount": form_orders['details']['purchase_units'][0]['amount']['value']
+  */
+  // PURPOSE: to partially match response from PayPal:
+  details['payer'] = {};
+  details['payer']['email_address'] = document.getElementById("email").value;
+  var given_name = document.getElementById("first_name").value + " " + document.getElementById("last_name").value;
+  details['payer']['name'] = {};
+  details['payer']['name']['given_name'] = given_name;
+  details['purchase_units'] = [];
+  details['purchase_units'][0] = {};
+  details['purchase_units'][0]['amount'] = {};
+  details['purchase_units'][0]['amount']['value'] = document.getElementById("paid").value;
+
+  if (Number(event_id) > 0) {
+    console.log("make fetch");
+    fetch("/order/manual-add", {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        orderID: cca_order_id,
+        event_id: event_id,
+        cca_order_id: cca_order_id,
+        quantity: quantity,
+        variable_time_slot: "",
+        details: details 
+      })
+    });
+    //window.location = "/app/admin/booking/list";
+  } else {
+    alert("Please choose an event");
+  }
+}
+</script>
+
+{% endblock %}

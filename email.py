@@ -1,11 +1,16 @@
+from __future__ import print_function
 import os
 import sys
 import json
 # using SendGrid's Python Library
 # https://github.com/sendgrid/sendgrid-python
 # https://app.sendgrid.com/
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+
+#from sendgrid import SendGridAPIClient
+#from sendgrid.helpers.mail import Mail
+
+import sendgrid
+from sendgrid.helpers.mail import *
 
 #import urllib
 
@@ -35,28 +40,28 @@ def write_file(file_name, content):
 def email(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/plain')])
 
-    SENDGRID_API_KEY = json.loads(read_file("../app/data/passwords.json"))["SENDGRID_API_KEY"]
-    #print SENDGRID_API_KEY
+    passwd = json.loads(read_file("../app/data/passwords.json"))
+
+    SENDGRID_API_KEY = passwd["SENDGRID_API_KEY"]
+    print('SENDGRID_API_KEY', SENDGRID_API_KEY)
 
     if environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/submit":
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-        #print('post_input')
-        #print str(post_input)
+        #print('post_input', str(post_input))
         form_data = json.loads(post_input)
-        #print('form_data')
-        #print 'form_data: ' + str(form_data)
+        #print('form_data', str(form_data))
 
         # TODO: email pattern verification
 
         subject = str(form_data['subject'])
-        #print 'subject: ' + subject
+        #print('subject', subject)
         content = str(form_data['content'])
-        #print 'content: ' + content
+        #print('content', content)
 
         content = content.replace('%20', ' ')
         #content = urllib.unquote(content).decode('utf8')
-        #print content
+        #print('content', content)
 
         if "Contact form inquiry" in subject and ("http" in content or "www" in content):
             raise ValueError('Link found in contact form submission. Stopping process.')
@@ -66,34 +71,14 @@ def email(environ, start_response):
 
         # form_data: {u'content': u'_hey_ _content_', u'payer_info': u'{\n    "order_id": "8AP73850LP3806125",\n    "event_id": "146",\n    "payer_email": "mmarum@gmail.com",\n    "payer_name": "Matthew",\n    "amount": "1.00"\n}', u'subject': u'Thank you for your CCA Event purchase'}
 
-        """
-form_data: {u'content': u'_hey_ _content_', u'payer_info': u'{\n    "order_id": "41T612531F6532025",\n    "event_id": "152",\n    "payer_email": "mmarum-buyer@gmail.com",\n    "payer_name": "test",\n    "amount": "38.00"\n}', u'subject': u'Thank you for your CCA Event purchase'}
-subject: Thank you for your CCA Event purchase
-content: _hey_ _content_
-____payer_info
-['order_id', 'event_id', 'amount', 'payer_name', 'payer_email']
-Traceback (most recent call last):
-  File "email.py", line 78, in email
-    to_emails = payer_info['payer_email']
-TypeError: list indices must be integers, not str
-        """
-
         try:
-            payer_info_u = json.loads(form_data['payer_info'])
-            print(payer_info_u)
+            payer_info = json.loads(form_data['payer_info'])
+            print('payer_info', payer_info)
 
-            #payer_info = [x.encode('utf-8') for x in payer_info_u]
-            payer_info = payer_info_u
-            print(payer_info)
+            to_email = payer_info['payer_email']
 
-            print('____payer_info')
-            print(payer_info)
-
-            to_emails = payer_info['payer_email']
-
-            if to_emails == "mmarum-buyer@gmail.com":
-                #to_emails = "mmarum@gmail.com"
-                to_emails = "mmarum@advance.net"
+            if to_email == "mmarum-buyer@gmail.com":
+                to_email = "mmarum@gmail.com"
 
             content = str(payer_info["payer_name"]) + ",\n"
             content += "Thank you for your event purchase at CCA.\n" 
@@ -103,36 +88,22 @@ TypeError: list indices must be integers, not str
 
         except:
             payer_info = ''
-            to_emails = "mmarum@gmail.com"
-            #to_emails = "j.marumusa@gmail.com"
-            #to_emails = "mmarum@advance.net"
-
-        print 'to_emails: ' + to_emails
-
-        message = Mail(
-            from_email="cca-robot@catalystcreativearts.com",
-            to_emails=to_emails,
-            subject=subject,
-            html_content=content)
-
-        print 'print message ____'
-        print message
+            to_email = "mmarum@gmail.com"
 
         try:
-            #sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-            sg = SendGridAPIClient(SENDGRID_API_KEY)
-            print sg
+            sg = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
+            from_email = Email("order@catalystcreativearts.com")
+            to_email = To(to_email)
+            subject = subject
+            content = Content("text/plain", content)
+            mail = Mail(from_email, to_email, subject, content)
+            response = sg.client.mail.send.post(request_body=mail.get())
+            print('sendgrid resp status code', response.status_code)
+            print('sendgrid resp body', response.body)
+            print('sendgrid resp headers', response.headers)
 
-            try:
-                response = sg.send(message)
-                print response.status_code
-                print response.body
-                print response.headers
-            except:
-                print "FAILED TO SEND"
-                
         except Exception as e:
-            print e.message
+            print('err message', e.message)
 
         response = "200"
 

@@ -7,9 +7,6 @@ img {
   max-width: 100px;
 }
 @media only screen and (max-width: 600px) {
-  .extra_column {
-    display: none;
-  }
 }
 </style>
 {% endblock %}
@@ -22,13 +19,12 @@ img {
 <tr class="p-3 mb-2 bg-light text-dark">
   <td><div id="add_new_link"><a href="/app/admin/products/add-edit">+</a></div></td>
   <td>Name</td>
-  <td class="extra_column">Description</td>
-  <td class="extra_column">Images</td>
-  <td class="extra_column">Inventory</td>
-  <td class="extra_column">Active</td>
-  <td class="extra_column">Price</td>
-  <td class="extra_column">Keywords</td>
-  <!-- <td class="extra_column">Description</td> -->
+  <td>Description</td>
+  <td>Images</td>
+  <td>Inventory</td>
+  <td>Active</td>
+  <td>Price</td>
+  <td>Keywords</td>
 </tr>
 
 {% for row in allrows %}
@@ -37,8 +33,17 @@ img {
   {% for item in row %}
     {% if loop.index == 1 %}
       <td><a class="bg-light" href="/app/admin/products/add-edit?pid={{ item }}">{{ item }}</a></td>
+    {% elif loop.index == 3 %}
+      {% set desc_array = item.split(' ') %}
+      <td>
+        {%- for word in desc_array %}
+          {%- if loop.index <= 10 %}
+            {{ word }}
+          {% endif -%}
+        {% endfor -%} ...
+      </td>
     {% elif loop.index == 4 %}
-      <td class="extra_column">
+      <td>
         {% set image_array = item.split(',') %}
         <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/>
         {% set image_array = item.split(',') %}
@@ -47,14 +52,14 @@ img {
         {% endfor %}
       </td>
     {% elif loop.index == 8 %}
-      <td class="extra_column">
+      <td>
         {% set keyword_array = item.split(',') %}
         {% for i in keyword_array %}
           {{ i }} <br/>
         {% endfor %}
       </td>
     {% elif loop.index < 9 %}
-      <td{% if loop.index > 3 %} class="extra_column"{% endif %}>{{ item }}</td>
+      <td{% if loop.index > 3 %}{% endif %}>{{ item }}</td>
     {% endif %}
   {% endfor %}
   </tr>

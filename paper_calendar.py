@@ -64,7 +64,10 @@ def make_cal(db, month, year):
 
 def make_list(db):
     c = db.cursor()
-    c.execute(f"select eid, edatetime, title from events where edatetime > now() and (tags <> 'invisible' or tags is null) limit 7")
+    c.execute(f"select eid, edatetime, title from events where edatetime > now() and (tags <> 'invisible' or tags is null) \
+        and title != 'Private Event' \
+        and title != 'Studio Closed' \
+        limit 7")
     allrows = c.fetchall()
     c.close()
     event_list_string = ""

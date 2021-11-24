@@ -53,7 +53,7 @@ function appendTime() {
 
 {% block content %}
 
-<h1>Add or Edit Events</h1>
+<h1>{% if 'value=""' in form["eid"]|safe %}Add{% else %}Edit{% endif %} Events</h1>
 
 <form action="/app/" method="POST" enctype="multipart/form-data" name="add_edit_form" id="this_form">
 
@@ -97,7 +97,7 @@ function appendTime() {
     <input id="append_time" name="append_time" autocomplete="off" type="text" placeholder="00:00:00" onblur="appendTime()" class="form-control"/>
   {% elif field.name == "submit" %}
     {# field(autocomplete="off", class="form-control btn btn-success") #}
-    <input autocomplete="off" class="form-control btn btn-success" id="btn_submit" name="btn_submit" type="submit" value="Next">
+    <input autocomplete="off" class="form-control btn btn-success" id="submit" name="submit" type="submit" value="Next">
   {% else %}
     <!-- <div style="margin-left: 100px;"> -->
     {{ field(autocomplete="off", class="form-control", placeholder="") }}

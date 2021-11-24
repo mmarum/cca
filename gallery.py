@@ -25,9 +25,12 @@ class Gallery:
 
         db.query(f"SELECT name, comment FROM piwigz_categories WHERE id = {self.category}")
         r = db.store_result()
-        row = r.fetch_row(maxrows=1, how=1)[0]
-        db.close()
-        return row
+        try:
+            row = r.fetch_row(maxrows=1, how=1)[0]
+            db.close()
+            return row
+        except:
+            return ""
 
     def get_images(self):
 

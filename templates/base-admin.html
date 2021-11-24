@@ -22,8 +22,18 @@ if (location.protocol !== 'https:') {
 {% block html_head %}{% endblock %}
 
 <style>
+#add_new_link a {
+  font-size: 150%;
+}
+.field_label {
+}
 .form-control {
   width: 90%;
+}
+@media only screen and (max-width: 600px) {
+  body {
+    font-size: 130%;
+  }
 }
 </style>
 
@@ -35,7 +45,7 @@ if (location.protocol !== 'https:') {
   <a href="/app/admin/products/list">Products</a> |
   <a href="/app/admin/orders/list">Orders</a> |
   <a href="/app/admin/events/list">Events</a> |
-  <a href="/app/admin/booking">Booking</a> |
+  <a href="/app/admin/booking/list">Booking</a> |
   <a href="/app/admin/registration">Registration</a> |
   <a href="/app/admin/pages">Pages</a> |
   <a href="/gallery/admin.php" target="gallery">Gallery</a> |
