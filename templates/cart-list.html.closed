@@ -1,0 +1,98 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Cart{% endblock %}
+
+{% block html_head %}
+<style>
+#price_includes_shipping {
+  font-size: small;
+  line-height: 90%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+#checkout_button_right_col {
+  margin-top: 10px;
+}
+#with_tax_container {
+  font-weight: bold;
+}
+#paypal-button-container, #show-total-container {
+  display: none;
+}
+#show-total {
+  margin: 10px;
+  padding: 10px;
+  border: 1px dashed LightGray;
+  border-radius: 10px;
+}
+#show-total-container {
+  font-weight: bold;
+}
+.product_price, .product_total {
+  /*
+  padding-left: 40px;
+  padding-right: 40px;
+  */
+}
+form, input {
+  display: inline;
+}
+.product_image {
+  max-width: 100%;
+}
+#cart {
+  width: 50px;
+}
+#add_to_cart {
+  margin: 10px;
+  padding: 10px;
+  width: 220px;
+  border: 1px dashed LightGray;
+  border-radius: 15px;
+  background-color: HoneyDew;
+}
+#add_to_cart a {
+  text-decoration: none;
+}
+#product_quantity_select {
+  margin-top: 10px;
+  max-width: 60px;
+}
+img.check {
+  width: 35px;
+  padding-left: 10px;
+}
+.form-control {
+  display: inline;
+}
+.plus_minus {
+  font-size: 20px;
+}
+#add_to_cart_text {
+  margin-left: 3px;
+  padding-left: 3px;
+}
+.top-buffer {
+  padding: 10px 0 10px 0;
+  margin: 10px 0 10px 0;
+  /* border-bottom: 1px dashed LightGray; */
+}
+#shop_link_container {
+  margin-top: 5px;
+  padding-top: 5px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<p>
+<div class="alert alert-info">
+<p style="text-align: center">
+<strong>
+Shop will be closed for an hour or two. Please check back then. Thanks!
+</strong>
+</p>
+</div>
+</p>
+
+{% endblock %}

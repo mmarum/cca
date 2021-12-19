@@ -100,23 +100,31 @@ passw = json.loads(read_file("data/passwords.json"))[user]
 def get_page_contents(path):
     r = requests.get(f'{domain}/app/{path}', auth=(f'{user}', f'{passw}'))
     print(r.url)
-    if r.status_code == 200:
-        print(r.status_code)
+    print(r.status_code)
+    if r.status_code == 200 and len(r.text) > 10:
         return r.text
     else:
-        raise ValueError(f'get_page_contents fail: {path} {r.status_code}')
+        print(f'get_page_contents fail: {domain}/app/{path} {r.status_code}')
+        raise ValueError(f'get_page_contents fail: {domain}/app/{path} {r.status_code}')
 
 
 def scrape_and_write(path):
+    page_contents = "x"
     try:
+
+        #try:
+        #    page_contents = str(get_page_contents(path).encode())
+        #except:
+        #    page_contents = get_page_contents(path)
         page_contents = get_page_contents(path)
+
         if len(page_contents) > 10:
             if path in ["cart", "some-other"]:
                 write_file(f"../www/{path}/index.html", page_contents)
             else:
                 write_file(f"../www/{path}.html", page_contents)
         else:
-            print(f'____ page_contents failure: {path}')
+            print(f'page_contents failure: {path}')
     except:
         print(f'page_contents OR write_file failure: {path}')
 

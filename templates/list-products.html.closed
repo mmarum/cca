@@ -1,0 +1,31 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Products List{% endblock %}
+
+{% block html_head %}
+<style>
+.product_image {
+  max-width: 100%;
+}
+.sold_out{
+  color: red;
+}
+#cart_link_container {
+  margin-top: 5px;
+  padding-top: 5px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<p>
+<div class="alert alert-info">
+<p style="text-align: center">
+<strong>
+Shop will be closed for an hour or two. Please check back then. Thanks!
+</strong>
+</p>
+</div>
+</p>
+
+{% endblock %}

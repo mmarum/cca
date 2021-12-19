@@ -1,0 +1,400 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Cart{% endblock %}
+
+{% block html_head %}
+<style>
+#price_includes_shipping {
+  font-size: small;
+  line-height: 90%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+#checkout_button_right_col {
+  margin-top: 10px;
+}
+#with_tax_container {
+  font-weight: bold;
+}
+#paypal-button-container, #show-total-container {
+  display: none;
+}
+#show-total {
+  margin: 10px;
+  padding: 10px;
+  border: 1px dashed LightGray;
+  border-radius: 10px;
+}
+#show-total-container {
+  font-weight: bold;
+}
+.product_price, .product_total {
+  /*
+  padding-left: 40px;
+  padding-right: 40px;
+  */
+}
+form, input {
+  display: inline;
+}
+.product_image {
+  max-width: 100%;
+}
+#cart {
+  width: 50px;
+}
+#add_to_cart {
+  margin: 10px;
+  padding: 10px;
+  width: 220px;
+  border: 1px dashed LightGray;
+  border-radius: 15px;
+  background-color: HoneyDew;
+}
+#add_to_cart a {
+  text-decoration: none;
+}
+#product_quantity_select {
+  margin-top: 10px;
+  max-width: 60px;
+}
+img.check {
+  width: 35px;
+  padding-left: 10px;
+}
+.form-control {
+  display: inline;
+}
+.plus_minus {
+  font-size: 20px;
+}
+#add_to_cart_text {
+  margin-left: 3px;
+  padding-left: 3px;
+}
+.top-buffer {
+  padding: 10px 0 10px 0;
+  margin: 10px 0 10px 0;
+  /* border-bottom: 1px dashed LightGray; */
+}
+#shop_link_container {
+  margin-top: 5px;
+  padding-top: 5px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<form>
+<input type="hidden" id="temporary" value="">
+</form>
+
+<div class="row">
+
+<div class="col-sm-1">
+</div>
+
+<div class="col-md-3 text-center">
+  <h2>Your cart</h2>
+</div>
+
+<div class="col-md-4 text-center">
+  <div id="shop_link_container">
+    <a href="/shop/" id="shop_link">Shop</a>
+  </div>
+</div>
+
+<div class="col-md-3 text-center" id="totals_box">
+  (<span id="subtotal_num_items"></span> items) Subtotal: $<span id="subtotal_value">0</span>
+  <div id="with_tax_container">Total with tax: $<span id="total_with_tax">0</span></div>
+</div>
+
+<div class="col-sm-1">
+</div>
+
+</div>
+
+<!-- -->
+
+<div class="row">
+
+<div class="col-sm-1">
+</div>
+
+<div class="col-md-8">
+  <div id="cart_contents">
+  </div>
+</div>
+
+<div class="col-sm-3">
+  <div id="checkout_button_right_col">
+    <div id="price_includes_shipping">Price includes shipping<br>to contiguous US</div>
+    <button type="button" class="btn btn-info" onclick="showPayPal(); return false;">Checkout</button>
+  </div>
+</div>
+
+</div>
+
+
+<div id="show-total-container" class="text-center">
+  <div id="show-total"></div>
+</div>
+<div id="paypal-button-container" class="text-center"></div>
+
+<!--
+<script src="https://www.paypal.com/sdk/js?client-id=AXKEaqz681f2qirO35vWWcvYbA2ZqsfY5CmeTi-_UnAjoXVIiJl5VKbuD5KvVNMyrMQm6jbCyFWBlnPj">
+// Dwejidesignsllc SANDBOX
+</script>
+-->
+
+<script src="https://www.paypal.com/sdk/js?client-id=AZ8f_18ukONyew8rbZyDpVw4tl489UXN0HY2ncv9be4MYhXmIe4jiGTZlxfZAxXfIRcEYmdmP4qkOXNv">
+// Dwejidesignsllc LIVE
+</script>
+
+<!--
+<script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
+// SANDBOX
+</script>
+-->
+
+<!--
+<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+// LIVE
+</script>
+-->
+
+
+<script>
+
+function showPayPal() {
+  document.getElementById("paypal-button-container").style.display = "block";
+  total = getTemporary();
+  console.log("Total with sales tax: " + total);
+  document.getElementById("show-total").innerHTML = "Total with sales tax: $" + total;
+  document.getElementById("show-total-container").style.display = "block";
+  location.href='#paypal-button-container';
+}
+
+
+function addSalesTax(subtotal) {
+  total = Number(subtotal) + Number(subtotal) * 6.25 / 100;
+  total = Math.round(100*total)/100;
+  return total;
+}
+
+
+function getCartList() {
+  console.log("function getCartList");
+  var session_id = document.cookie.split("=")[1];
+  if (!session_id) {
+    return false;
+  }
+  fetch('/cart-api/list', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: session_id
+    })
+  })
+  .then(response=>response.json())
+  .then(data=>{
+    var arrLen = data.length;
+    var product_total_sum = 0;
+    var lines = '';
+    for (var i = 0; i < arrLen; i++) {
+      obj = data[i];
+      inventory = obj.inventory;
+      console.log("inventory: "+inventory);
+      product_image = '<img src="/img/small/' + obj.image_path_array.split(',')[1] + '" class="product_image"/>';
+      product_name = obj.name.toLowerCase().replace(/ /g, '-');
+      product_desc = obj.description;
+      product_total = obj.price * obj.quantity;
+      quantity_option_html = "";
+      for (var z = 0; z < obj.inventory + 1; z++) {
+        quantity_option_html += "<option value="+z+">"+z+"</option>\n";
+      }
+      var line = `
+<div class="row top-buffer" id="row_${obj.pid}">
+<div class="col-sm-1"></div>
+<div class="col-md-2">
+<a href="">${product_image}</a>
+</div>
+<div class="col-lg-8">
+<a href="/shop/product/${obj.pid}"><h3>${obj.name}</h3></a>
+<div class="product_price">$${obj.price}</div>
+<div>
+<form action="" id="product_quantity_form_${obj.pid}">
+<select name="quantity" id="product_quantity_select_${obj.pid}" class="form-control" onchange="updateQuantity(${obj.pid}, this.options[this.selectedIndex].value);">
+<option value=${obj.quantity}>${obj.quantity}</option>
+${quantity_option_html}
+</select>
+</form>
+</div>
+</div>
+<div class="col-sm-1"></div>
+</div>
+`;
+
+
+    if (inventory == 0) {
+      product_total = 0;
+      var line = `
+<div class="row top-buffer" id="row_${obj.pid}">
+<div class="col-sm-1"></div>
+<div class="col-md-2">
+<a href="">${product_image}</a>
+</div>
+<div class="col-lg-8">
+<h1>SOLD OUT</h1>
+<a href="/shop/product/${obj.pid}"><h3>${obj.name}</h3></a>
+<div class="product_price">$${obj.price}</div>
+<a href="#" onclick="updateQuantity(${obj.pid}, 0);">Remove from cart</a>
+<div>
+</div>
+</div>
+<div class="col-sm-1"></div>
+</div>
+`;
+    }
+
+
+      lines += line;
+      product_total_sum += product_total;
+    }
+    document.getElementById("subtotal_value").innerHTML = product_total_sum;
+    document.getElementById("cart_contents").innerHTML = lines;
+    //document.getElementById("cart_sum_bottom").innerHTML += product_total_sum;
+  })
+}
+
+getCartList();
+
+function plusMinus(n) {
+  v = document.getElementById("product_quantity_select").value;
+  x = (Number(v) + Number(n));
+  document.getElementById("product_quantity_select").value = x;
+  return false;
+}
+
+function getCartSnapshot(session_id) {
+  console.log("function getCartSnapshot");
+  return fetch('/cart-api/total', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: session_id
+    })
+  })
+  .then(response=>response.json())
+  .then(data=>{
+    if (window.location.pathname == "/cart/" && Number(data.number_of_items) > 0) {
+        document.getElementById("subtotal_num_items").innerHTML = data.number_of_items;
+    }
+    if (window.location.pathname == "/cart/" && Number(data.subtotal) > 0) {
+        document.getElementById("subtotal_value").innerHTML = data.subtotal;
+        // test temporary:
+        document.getElementById("temporary").value = data.subtotal;
+    }
+    //----
+    var total_with_tax = getTemporary();
+    document.getElementById("total_with_tax").innerHTML = total_with_tax;
+    //----
+  });
+}
+
+function getTemporary() {
+  subtotal = document.getElementById("temporary").value;
+  total = addSalesTax(subtotal);
+  console.log("total with tax: "+total);
+  return total;
+}
+
+function updateCart(session_id, product_id, quantity) {
+  console.log("function updateCart");
+  const fetchPromise = fetch('/cart-api/update', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: session_id,
+      product_id: product_id,
+      quantity: quantity
+    })
+  });
+  fetchPromise.then(response => {
+    getCartSnapshot(session_id);
+    console.log("update: response from promise: " + response);
+  });
+}
+
+function updateQuantity(pid, quantity) {
+  console.log("function updateQuantity");
+  var session_id = document.cookie.split("=")[1];
+  if (session_id) {
+    updateCart(session_id, pid, quantity);
+    if (quantity == 0) {
+      document.getElementById("row_"+pid).innerHTML = "";
+      document.getElementById("row_"+pid).style.display = "none";
+    }
+    getCartSnapshot(session_id);
+  }
+  return false;
+}
+
+function checkCartTotal() {
+  console.log("function checkCartTotal");
+  var session_id = document.cookie.split("=")[1];
+  if (session_id) {
+    getCartSnapshot(session_id);
+  }
+}
+
+checkCartTotal();
+
+paypal.Buttons({
+  createOrder: function(data, actions) {
+    console.log("buy stuff");
+    console.log(getCartSnapshot.subtotal);
+    return actions.order.create({
+      purchase_units: [{
+        amount: {
+          value: getTemporary()
+        }
+      }]
+    });
+  },
+  onApprove: function(data, actions) {
+    return actions.order.capture().then(function(details) {
+      console.log(details);
+
+      var thanks_html = "Transaction complete. Thank you " + details.payer.name.given_name;
+      thanks_html += ". Order ID: " + details.id;
+      document.getElementById("cart_contents").innerHTML = thanks_html;
+      document.getElementById("paypal-button-container").style.display = "none";
+      document.getElementById("totals_box").style.display = "none";
+
+      return fetch('/cart-api/checkout-approved', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          paypal_order_id: data.orderID,
+          session_id: document.cookie.split("=")[1],
+          total: getTemporary(),
+          details: details
+        })
+      });
+
+    });
+  }
+}).render('#paypal-button-container');
+
+</script>
+
+{% endblock %}

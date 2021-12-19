@@ -45,95 +45,16 @@ img.check {
 {% block content %}
 
 
-<div class="row">
-
-<div class="col-sm-1">
+<p>
+<div class="alert alert-info">
+<p style="text-align: center">
+<strong>
+Shop will be closed for an hour or two. Please check back then. Thanks!
+</strong>
+</p>
 </div>
+</p>
 
-<div class="col-md-3 text-center">
-  <a href="/shop/">Shop</a>
-</div>
-
-<div class="col-md-4 text-center">
-  <a href="/cart/">Cart</a>
-</div>
-
-<div class="col-md-3 text-center">
-  <!-- placeholder -->
-</div>
-
-<div class="col-sm-1">
-</div>
-
-</div>
-
-<div class="row product_row top-buffer-no-line">
-
-  <div class="col-sm-1">
-  </div>
-
-  <div class="col-md-2">
-    <small style="padding-left: 10px">click to enlarge</small>
-    {% set image_array = row.image_path_array.split(',') %}
-    <a href="/img/orig/{{ image_array[1] }}"><img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/></a>
-
-    {% set image_array = row.image_path_array.split(',') %}
-    {% for i in image_array %}
-      {% if loop.index > 2 %}
-         <a href="/img/orig/{{ i }}"><img src="/img/small/{{ i }}" alt="" class="product_image"/></a>
-      {% endif %}
-    {% endfor %}
-
-  </div>
-
-  <div class="col-lg-6">
-    <h3>{{ row.name }}</h3>
-    <div>${{ row.price }}</div>
-    <div>{{ row.description }}</div>
-  </div>
-
-  <div class="col-sm-3">
-
-    {% if row.inventory > 0 %}
-
-    <div style="padding-bottom: 10px;">
-      <!-- <a href="#" onclick="plusMinus(-1); return false;" class="plus_minus">-</a> -->
-      <form action="" id="product_quantity_form">
-        <!-- <input type="text" name="quantity" id="product_quantity_select" class="form-control" value="1" onblur="newQuant(this.value);"/> -->
-        <select name="quantity" id="product_quantity_select" class="form-control">
-          {% for n in range(1, row.inventory + 1) %}
-          <option value={{ n }}>{{ n }}</option>
-          {% endfor %}
-        </select>
-      </form>
-      <!-- <a href="#" onclick="plusMinus(1); return false;" class="plus_minus">+</a> -->
-    </div>
-    <button onclick="addToCart({{ row.pid }}); return false;" type="button" class="btn btn-info">Add to cart</button>
-    <span id="check_mark"><a href="/cart/"><img src="/img/check.png"></a></span><br>
-    <button id="proceed_to_checkout" type="button" class="btn btn-success" onclick="javascript:location.href='/cart/'">Proceed to checkout</button>
-    <div id="continue_shopping"><a href="/shop/">Continue shopping</a></div>
-
-    {% else %}
-      This item is out of stock
-    {% endif %}
-
-  </div>
-
-  <!-- NEW ROW BELOW -->
-
-  <div class="col-sm-3">
-  </div>
-
-  <div class="col-lg-6">
-    {% if row.keywords %}
-      <div>Keywords: {{ row.keywords_array }}</div>
-    {% endif %}
-  </div>
-
-  <div class="col-sm-3">
-  </div>
-
-</div>
 
 <script>
 //function newQuant(val) {

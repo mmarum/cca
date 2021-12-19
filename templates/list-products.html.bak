@@ -1,0 +1,113 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Products List{% endblock %}
+
+{% block html_head %}
+<style>
+.product_image {
+  max-width: 100%;
+}
+.sold_out{
+  color: red;
+}
+#cart_link_container {
+  margin-top: 5px;
+  padding-top: 5px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="row">
+
+<div class="col-sm-1">
+</div>
+
+<div class="col-md-3 text-center">
+  <h2>Shop</h2>
+</div>
+
+<div class="col-md-4 text-center">
+  <div id="cart_link_container">
+    <a href="/cart/">Cart</a>
+  </div>
+</div>
+
+<div class="col-md-3 text-center">
+  <!-- placeholder -->
+</div>
+
+<div class="col-sm-1">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="col-sm-1">
+</div>
+
+<div class="col-md-10 text-center">
+  Filter by available product types:
+  <a href="/shop/">All</a> | 
+  {% for word in allowed_filter_words %}
+    <a href="/shop/filter/{{ word }}">{{ word }}</a>
+    {% if not loop.last %}|{% endif %}
+  {% endfor %}
+</div>
+
+<div class="col-sm-1">
+</div>
+
+</div>
+
+
+
+{% for product in products %}
+  <div class="row product_row top-buffer id="pid_{{ product.pid }}">
+
+    <div class="col-sm-1">
+    </div>
+
+    <div class="col-md-2">
+      <!-- {{ product.image_path_array }} -->
+      {% set image_array = product.image_path_array.split(',') %}
+      {# for i in image_array #}
+        <!-- <img src="/img/small/{# i.strip() #}" alt="" class="product_image"/><br/> -->
+      {# endfor #}
+      <a href="/shop/product/{{ product.pid }}"><img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/></a>
+
+    </div>
+
+    <div class="col-lg-8">
+      <!-- <div>{{ product.pid }}</div> -->
+      {% set product_name_slug = product.name|replace(' ', '-')|lower %}
+      <!-- <h3><a href="/app/products/{{ product_name_slug }}/{{ product.pid }}">{{ product.name }}</a></h3> -->
+      {% if product.inventory > 0 %}
+        <h3><a href="/shop/product/{{ product.pid }}">{{ product.name }}</a></h3>
+      {% else %}
+        <div class="sold_out">Sold out</div>
+        <h3>{{ product.name }}</h3>
+      {% endif %}
+      {% set desc_array = product.description.split(' ') %}
+      <div>
+        {% for word in desc_array %}
+          {% if loop.index <= 35 %}
+            {{ word }}
+          {% endif %}
+        {% endfor %}
+      </div>
+      <!-- <div>{{ product.invt }}</div> -->
+      <!-- <div>{{ product.inventory }}</div> -->
+      <div>${{ product.price }}</div>
+      <!-- <div>{{ product.keywords_array }}</div> -->
+    </div>
+
+    <div class="col-sm-1">
+    </div>
+
+  </div>
+{% endfor %}
+
+{% endblock %}

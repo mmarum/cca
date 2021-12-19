@@ -73,7 +73,6 @@ img.check {
   </div>
 
   <div class="col-md-2">
-    <small style="padding-left: 10px">click to enlarge</small>
     {% set image_array = row.image_path_array.split(',') %}
     <a href="/img/orig/{{ image_array[1] }}"><img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/></a>
 

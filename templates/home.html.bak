@@ -6,6 +6,21 @@
 .event_image {
   max-width: 100%;
 }
+.event_item {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.event_item:nth-child(odd) {
+  background-color: WhiteSmoke;
+  border-top: 1px dashed LightGray;
+  border-bottom: 1px dashed LightGray;
+}
+.youtube_embed {
+  /* width: 340px; */
+  width: 247px;
+  /* height: 191px; */
+  height: 139px;
+}
 h1, h2 {
   font-size: 20px;
   padding 5px;
@@ -113,6 +128,17 @@ mark {
   .dark_orange a {
     font-size: 16px;
   }
+  .youtube_embed {
+    width: 315px;
+    height: 177px;
+  }
+}
+.gift_card_border {
+    /* width: 200px;
+    height: 126px; */
+    border-radius: 8px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgb(155, 155, 155) 2px 3px 6px 0px;
 }
 </style>
 {% endblock %}
@@ -126,153 +152,159 @@ mark {
 
   <div class="col-md-3">
 
-    <!-- first column -->
+    <!-- first column start -->
 
-    <img src="/img/art-market-2-dmn.jpg" class="event_image">
-    <h2><a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/">Catalyst Creative Arts hosts second annual Arlington Art market (Dallas Morning News)</a></h2>
+    <h2><a href="/event/587.html">Holiday Candlelight Jazz Sat Dec 18, 2021 at 7:30 PM</a></h2>
+    <a href="/event/587.html"><img src="/img/jazz-graphic-2021-12.jpg" class="event_image"></a>
 
-    <img src="/img/art-market-2-an.jpg" class="event_image">
-    <h2><a href="https://www.arlingtonnetwork.com/2020/10/28/2nd-annual-art-market-returns-to-arlington/">Read more about CCA and second annual Arlington Art on Arlington Network</a></h2>
+    <hr>
+    <hr>
 
-    <img src="/img/art-market-2-yt.jpg" class="event_image">
-    <h2><a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&feature=youtu.be">Watch Culture Buzz: Catalyst Creative Arts</a></h2>
+    <!--
+    <a href="https://arlingtonlibrary.org/node/4923"><img src="/img/art-for-everyone.jpg" class="event_image"></a>
 
-  </div>
-  <div class="col-sm-4">
+    <h2><a href="https://arlingtonlibrary.org/node/4923">Art is for Everyone: Artist - Jaime Marum</a></h2>
 
-    <!-- second column -->
+    <div>
+      <p>The Arlington Public Library's "Art is for Everyone" series continues into July, 2021 with April's featured artist, Jaime Marum.</p>
+      <p>Marum will be teaching the community all about water marbling and using various techniques with silk.</p>
+      <p>Water marbling classes will be held at the George W. Hawkes Downtown Library, July 27 and July 31.</p>
+    </div>
 
-      <a href="/after-school-summer-camp.html">
-        <!-- <img src="/img/cca-building.jpg" class="event_image"> -->
-        <img src="/img/small/after%20school%20pottery.jpg" class="event_image">
-      </a>
-      <h2><a href="/after-school-summer-camp.html">After School Pottery Program</a></h2>
-      <div>
-        Catalyst Creative Arts is happy to launch our After School Pottery Program. 7 Week Course - Every Wednesday beginning October 7 to November 18, 2020. Recommended for kids 8 years old and up. This comprehensive 7 week program is scheduled weekly on Wednesdays at 3:30 PM and lasts 2 hours. Each week, we will focus on a different pottery technique. <a href="/after-school-summer-camp.html">The course description and registration is here.</a> No prior experience is required.
-      </div>
+    <hr>
 
+    <a href="/summer-camp.html"><img src="/img/summer-camp-2021-1.jpg" class="event_image"></a>
 
+    <h2><a href="/summer-camp.html">Summer Camp Programs</a></h2>
+
+    <div>
+      <p>We are bringing back our popular summer camp and extending our offering by adding 2 extra camps in order to split camps up by different ages.</p>
+      <p>This will allow each camp to be focused on activities better matched to those ages.</p>
+    </div>
+    -->
+
+    <!--
+    <a href="/event/548.html"><img src="/img/small/Adobe_Post_20210730_1739320.84685698145039421.jpg" class="event_image"></a>
+    <h2><a href="/event/548.html">Candlelight Jazz</a></h2>
+    <div>Sat Sep 25, 2021 at 8:30 PM</div>
+    <div>Join us for an intimate evening of jazz music at The Listening Room @ Catalyst Creative Arts Arlington's Sky Jazz Quartet will present classic jazz hits and jazz arrangements of pop music to the soft glow of a candle lit stage. This event is for ages 10 and up. Seating is first come, first served Pre-sale ticket price of $30 ends August 31 Regular ticket price is $35 and $40 at the door. BYOB</div>
+
+    <hr>
+    -->
+
+    {% if next_event %}
+    <h2>
+    <a href="/event/{{ next_event.eid }}.html">
+    Next Event:<br>
+    {{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}<br>
+    {{ next_event.title }}
+    </a>
+    </h2>
+    <a href="/event/{{ next_event.eid }}.html">
+      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
+    </a>
+    <hr>
+    <hr>
+    {% endif %}
+
+    <h2>
+    <a href="/about-us.html">
+    Holiday Parties:
+    We are booking Holiday Parties! Call or email us. We have wonderful neighbors that can help you with catering!
+    </a>
+    </h2>
+    <a href="/about-us.html">
+      <img src="/img/holiday-parties-2021.jpg" class="event_image">
+    </a>
+    <hr>
+    <hr>
+
+    <!-- first column end -->
 
   </div>
   <div class="col-sm-3">
 
-    <!-- third column -->
+    <!-- second column start -->
 
-    <h2><a href="/calendar.html#95">Gift Certificates Available for Purchase</a></h2>
-    <p>Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through our website, over the phone and in person at our studio and may be redeemed for any of our services.<br/>
-    <img src="/img/small/gift-cert-icon.jpg" class="event_image"></p>
+    <!--
+    <a href="/3-wednesdays-workshop.html"><img src="/img/small/20210313_171112-01.jpeg" class="event_image"></a>
 
-  </div>
-
-  <div class="col-sm-1">
-  </div>
-
-</div>
-
-
-
-<div class="row top-buffer">
-
-  <div class="col-sm-1">
-  </div>
-
-  <div class="col-md-10">
-  UP NEXT
-  </div>
-
-  <div class="col-sm-1">
-  </div>
-
-</div>
-
-
-<!--
-<div class="row">
-
-  <div class="col-sm-1">
-  </div>
-
-  <div class="col-md-3">
-
-    <a href="/calendar.html#{{ next_event.eid }}" class="event_link">
-      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="logo"/>
-    </a>
-  </div>
-
-  <div class="col-md-4">
-    <h4>{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h4>
-    <a href="/calendar.html#{{ next_event.eid }}" class="event_link">
-      <h3>{{ next_event.title }}</h3>
-    </a>
-    <div>
-      ${{ next_event.price }}
-    </div>
+    <h2><a href="/3-wednesdays-workshop.html">3 Wednesdays Workshop</a></h2>
 
     <div>
-    {% set event_desc = next_event.description.split(' ') %}
-    {% for e in event_desc -%}{% if loop.index < 30 %}{{ e }} {% endif %}{%- endfor %}
-    ... <a href="/calendar.html#{{ next_event.eid }}" class="event_link">Read More</a>
+      <p>Our 3 Wednesdays Workshop Series continues!</p>
+      <p>Up next: Ceramic Succulent Garden, starts Wed Sep 8.</p>
     </div>
 
-  </div>
+    <hr>
+    -->
 
-  <div class="col-md-3">
-    <div id="paper_calendar"></div>
-    {{ calendar.html|safe }}
-  </div>
+    <h2>
+    <a href="/shop/">
+    Visit our online store:<br>
+    Handmade water marbled silk scarves and hand-knit decorative stockings
+    </a>
+    </h2>
+    <a href='/shop'><img src='/img/scarves-shop-ig.jpg' class='event_image'></a>
 
-  <div class="col-sm-1">
-  </div>
+    <hr>
+    <hr>
 
-</div>
--->
-
-{% if pinned_events %}
-
-  {% for event in pinned_events %}
-
-  <div class="row top-buffer">
-
-  <div class="col-sm-1">
-  </div>
-
-  <div class="col-sm-1 text_align_right">
-  {% if loop.index == 1 %}
-    <span class="vertical_text">
-      FEATURED
-    </span>
+  {% if events_tagged_home %}
+  {% for event in events_tagged_home %}
+    <h2>
+    <a href="/event/{{ event.eid }}.html" class="event_link">
+    {{ event.title }}
+    {{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}
+    </a>
+    </h2>
+    <a href="/event/{{ event.eid }}.html" class="event_link">
+      <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
+    </a>
+    <hr>
+    <hr>
+  {% endfor %}
   {% endif %}
-  </div>
 
-  <div class="col-md-3">
-    <a href="/calendar.html#{{ event.eid }}" class="event_link">
-      <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="logo"/>
-    </a>
-  </div>
+    <!-- <div id="paper_calendar"></div> -->
+    {# calendar.html|safe #}
 
-  <div class="col-md-5">
-    {% if event.eid != 95 %}
-      <h4>{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}</h4>
-    {% endif %}
-    <a href="/calendar.html#{{ event.eid }}" class="event_link">
-      <h3>{{ event.title }}</h3>
-    </a>
-    <div>
-    {% set event_desc = event.description.split(' ') %}
-    {% for e in event_desc -%}{% if loop.index < 30 %}{{ e }} {% endif %}{%- endfor %}
-    ... <a href="/calendar.html#{{ event.eid }}" class="event_link">Read More</a>
+    <!-- second column end -->
+
+  </div>
+  <div class="col-sm-3">
+
+    <!-- third column start -->
+
+    <div id="event_list">
+    <div><h2>Next 7 events:</h2></div>
+    {{ event_list_html|safe }}
+    <div><a href="/calendar.html">See full list of events</a></div>
     </div>
+
+    <hr>
+    <hr>
+
+    <h2><a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s">Gift cards now available</a></h2>
+
+    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s"><img src="/img/gift-card.jpg" class="event_image gift_card_border"></a>
+
+    <div>Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through PayPal, 
+       over the phone and in person at our studio and may be redeemed for any of our services.</div>
+
+    <hr>
+    <hr>
+
+    <!-- third column end -->
+
   </div>
 
   <div class="col-sm-2">
   </div>
 
-  </div>
+</div>
 
-  {% endfor %}
-
-{% endif %}
-
+<!--
 <div class="row top-buffer">
   <div class="col-sm-1" style="text-align: right;">
     <a href="#" onclick="slide_gallery('backward'); return false;" id="home_gallery_backward">«</a>
@@ -296,13 +328,16 @@ mark {
     <a href="#" onclick="slide_gallery('forward'); return false;" id="home_gallery_forward">»</a>
   </div>
 </div>
+-->
 
+<!--
 <div class="row">
   <div class="col-sm-12 home_sample_activity">
     Sample activity: <a href="/{{ gallery.name|replace(' ', '-')|lower }}.html">{{ gallery.name|safe }}</a>
-    <!-- {{ gallery.comment|safe }} -->
+    {# gallery.comment|safe #}
   </div>
 </div>
+-->
 
 <script>
 var home_gallery_image_list = [
@@ -334,7 +369,7 @@ function slide_gallery(direction) {
     n++;
   }
 }
-slide_gallery('start');
+//slide_gallery('start');
 
 var d = new Date();
 var this_month = d.getMonth()+1;

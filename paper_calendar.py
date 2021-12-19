@@ -64,8 +64,7 @@ def make_cal(db, month, year):
 
 def make_list(db):
     c = db.cursor()
-    c.execute(f"select eid, edatetime, title from events where edatetime > now() and (tags <> 'invisible' or tags is null) \
-        and title != 'Private Event' \
+    c.execute(f"select eid, edatetime, title, description from events where edatetime > now() and (tags <> 'invisible' or tags is null) \
         and title != 'Studio Closed' \
         limit 7")
     allrows = c.fetchall()
@@ -76,6 +75,10 @@ def make_list(db):
         edatetime = d[1]
         date_string = edatetime.strftime("%b %d %Y")
         title = d[2]
-        event_list_string += f'<div class="event_item">{date_string} <a href="/event/{eid}.html">{title}</a></div>\n'
+        description = d[3]
+        if "private event" in title.lower() or "private event" in description.lower():
+            event_list_string += f'<div class="event_item">{date_string} <br> {title}</div>\n'
+        else:
+            event_list_string += f'<div class="event_item">{date_string} <br> <a href="/event/{eid}.html">{title}</a></div>\n'
     return event_list_string
 

@@ -11,13 +11,31 @@
     <div class="col-sm-1">
     </div>
     <div class="col-md-2">
-      <a href="/event/{{ event.eid }}.html">
+
+      {% if "private event" in event.title|lower or "private event" in event.description|lower %}
+        {% set private_event = "True" %}
+      {% else %}
+        {% set private_event = "False" %}
+      {% endif %}
+
+      {% if private_event == "True" %}
         <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
-      </a>
+      {% else %}
+        <a href="/event/{{ event.eid }}.html"><img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/></a>
+      {% endif %}
+
     </div>
     <div class="col-lg-8">
       <h2>{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ') }}</h2>
-      <h3><a href="/event/{{ event.eid }}.html">{{ event.title }}</a></h3>
+      <h3>
+
+      {% if private_event == "True" %}
+        {{ event.title }}
+      {% else %}
+        <a href="/event/{{ event.eid }}.html">{{ event.title }}</a>
+      {% endif %}
+
+      </h3>
       <div>
         {{ event.description|safe }}
       </div>

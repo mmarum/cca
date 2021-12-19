@@ -295,7 +295,7 @@ function checkTime(edatetime) {
   var dd = new Date(d);
   var nn = new Date(n);
   //var time_window = 10; // hours
-  var time_window = 7; // hours
+  var time_window = 2; // hours
   if (d - n > 60*60* time_window *1000) {
     //console.log("NOT within xh window. OK to book.");
   } else {
@@ -371,6 +371,16 @@ function getVariableTimeSlot() {
     return "";
   {% endif %}
 }
+
+{% if deleted %}
+  {% if deleted == True %}
+    document.getElementById("location").innerHTML = "<div class='alert alert-warning'>This event has been cancelled.</div>";
+    document.getElementById("price").style.display = "none";
+    document.getElementById("quantity_form").style.display = "none";
+    document.getElementById("total").style.display = "none";
+    document.getElementById("paypal-button-container").style.display = "none";
+  {% endif %}
+{% endif %}
 
 var cca_order_id = getCcaOrderId();
 

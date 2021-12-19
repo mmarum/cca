@@ -202,10 +202,22 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == "/admin/events/delete":
             eid = int(environ['QUERY_STRING'].split("=")[1])
             if type(eid) == int:
+
+                # FIRST UPDATE THE HTML PAGE !!!!
+                db.query(f"SELECT * FROM events WHERE eid = {eid}")
+                e = db.store_result()
+                event = e.fetch_row(maxrows=1, how=1)[0]
+                event["quantity_sum"] = 0
+                event["remaining_spots"] = 0
+                template = env.get_template("event.html")
+                content = template.render(event=event, deleted=True)
+                write_file(f"../www/event/{eid}.html", content)
+
                 sql = f"DELETE FROM events WHERE eid = {eid}"
                 c = db.cursor()
                 c.execute(sql)
                 c.close()
+
                 response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
             else:
                 response = ""
@@ -506,6 +518,7 @@ def app(environ, start_response):
             db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() \
                 and (tags <> 'invisible' or tags is null) \
                 and title != 'Private Event' \
+                and description not like '%Private Event%' \
                 and title != 'Studio Closed' \
                 ORDER BY edatetime limit 1")
             r = db.store_result()

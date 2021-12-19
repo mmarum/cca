@@ -9,6 +9,7 @@
 .event_item {
   margin-top: 15px;
   margin-bottom: 15px;
+  font-size: 110%;
 }
 .event_item:nth-child(odd) {
   background-color: WhiteSmoke;
@@ -154,37 +155,11 @@ mark {
 
     <!-- first column start -->
 
-    <!--
-    <a href="https://arlingtonlibrary.org/node/4923"><img src="/img/art-for-everyone.jpg" class="event_image"></a>
-
-    <h2><a href="https://arlingtonlibrary.org/node/4923">Art is for Everyone: Artist - Jaime Marum</a></h2>
-
-    <div>
-      <p>The Arlington Public Library's "Art is for Everyone" series continues into July, 2021 with April's featured artist, Jaime Marum.</p>
-      <p>Marum will be teaching the community all about water marbling and using various techniques with silk.</p>
-      <p>Water marbling classes will be held at the George W. Hawkes Downtown Library, July 27 and July 31.</p>
-    </div>
+    <!-- <h2><a href="/event/587.html">Holiday Candlelight Jazz Sat Dec 18, 2021 at 7:30 PM</a></h2>
+    <a href="/event/587.html"><img src="/img/jazz-graphic-2021-12.jpg" class="event_image"></a>
 
     <hr>
-
-    <a href="/summer-camp.html"><img src="/img/summer-camp-2021-1.jpg" class="event_image"></a>
-
-    <h2><a href="/summer-camp.html">Summer Camp Programs</a></h2>
-
-    <div>
-      <p>We are bringing back our popular summer camp and extending our offering by adding 2 extra camps in order to split camps up by different ages.</p>
-      <p>This will allow each camp to be focused on activities better matched to those ages.</p>
-    </div>
-    -->
-
-    <!--
-    <a href="/event/548.html"><img src="/img/small/Adobe_Post_20210730_1739320.84685698145039421.jpg" class="event_image"></a>
-    <h2><a href="/event/548.html">Candlelight Jazz</a></h2>
-    <div>Sat Sep 25, 2021 at 8:30 PM</div>
-    <div>Join us for an intimate evening of jazz music at The Listening Room @ Catalyst Creative Arts Arlington's Sky Jazz Quartet will present classic jazz hits and jazz arrangements of pop music to the soft glow of a candle lit stage. This event is for ages 10 and up. Seating is first come, first served Pre-sale ticket price of $30 ends August 31 Regular ticket price is $35 and $40 at the door. BYOB</div>
-
-    <hr>
-    -->
+    <hr> -->
 
     {% if next_event %}
     <h2>
@@ -220,26 +195,13 @@ mark {
 
     <!-- second column start -->
 
-    <!--
-    <a href="/3-wednesdays-workshop.html"><img src="/img/small/20210313_171112-01.jpeg" class="event_image"></a>
-
-    <h2><a href="/3-wednesdays-workshop.html">3 Wednesdays Workshop</a></h2>
-
-    <div>
-      <p>Our 3 Wednesdays Workshop Series continues!</p>
-      <p>Up next: Ceramic Succulent Garden, starts Wed Sep 8.</p>
-    </div>
-
-    <hr>
-    -->
-
     <h2>
     <a href="/shop/">
     Visit our online store:<br>
     Handmade water marbled silk scarves and hand-knit decorative stockings
     </a>
     </h2>
-    <a href="/shop"><img src="/img/store-front-xmas.jpg" class="event_image"></a>
+    <a href='/shop'><img src='/img/scarves-shop-ig.jpg' class='event_image'></a>
 
     <hr>
     <hr>
@@ -281,7 +243,7 @@ mark {
 
     <h2><a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s">Gift cards now available</a></h2>
 
-    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s"><img src="/img/gift-card.png" class="event_image gift_card_border"></a>
+    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s"><img src="/img/gift-card.jpg" class="event_image gift_card_border"></a>
 
     <div>Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through PayPal, 
        over the phone and in person at our studio and may be redeemed for any of our services.</div>
@@ -297,41 +259,6 @@ mark {
   </div>
 
 </div>
-
-<!--
-<div class="row top-buffer">
-  <div class="col-sm-1" style="text-align: right;">
-    <a href="#" onclick="slide_gallery('backward'); return false;" id="home_gallery_backward">«</a>
-  </div>
-  <div class="col-sm-2">
-    <img id="slide_0" src="" class="home-gallery"/>
-  </div>
-  <div class="col-sm-2">
-    <img id="slide_1" src="" class="home-gallery"/>
-  </div>
-  <div class="col-sm-2">
-    <img id="slide_2" src="" class="home-gallery"/>
-  </div>
-  <div class="col-sm-2">
-    <img id="slide_3" src="" class="home-gallery"/>
-  </div>
-  <div class="col-sm-2">
-    <img id="slide_4" src="" class="home-gallery"/>
-  </div>
-  <div class="col-sm-1">
-    <a href="#" onclick="slide_gallery('forward'); return false;" id="home_gallery_forward">»</a>
-  </div>
-</div>
--->
-
-<!--
-<div class="row">
-  <div class="col-sm-12 home_sample_activity">
-    Sample activity: <a href="/{{ gallery.name|replace(' ', '-')|lower }}.html">{{ gallery.name|safe }}</a>
-    {# gallery.comment|safe #}
-  </div>
-</div>
--->
 
 <script>
 var home_gallery_image_list = [
@@ -363,7 +290,6 @@ function slide_gallery(direction) {
     n++;
   }
 }
-//slide_gallery('start');
 
 var d = new Date();
 var this_month = d.getMonth()+1;

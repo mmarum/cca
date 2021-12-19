@@ -67,7 +67,7 @@ def shop(environ, start_response):
         response = template.render(products=allrows, allowed_filter_words=allowed_filter_words)
 
     else:
-        db.query("SELECT *, CEILING(inventory / 100) as invt FROM products WHERE active = 1 order by invt desc, pid asc")
+        db.query("SELECT *, CEILING(inventory / 100) as invt FROM products WHERE active = 1 order by invt desc, name desc")
         r = db.store_result()
         allrows = r.fetch_row(maxrows=100, how=1)
         template = env.get_template("list-products.html")
