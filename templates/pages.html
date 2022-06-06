@@ -25,19 +25,23 @@
 </div>
 
 <div class="col-md-5">
+
 <h2 class="art-brew">Contact Us</h2>
 <div>Call or Text: (972) 446-0444</div>
 <div>Email: info@catalystcreativearts.com</div>
+
 <p>
 Have a question about classes? Interested in booking a private party?
 Fill out this form and we'll be in touch ASAP!
 <mark>Note: Do not add links to the message.</mark>
 </p>
+
 <form action="/contact/submit" method="POST" enctype="text/plain">
 <p><input class="form-control" type="text" name="email" placeholder="Your email"/></p>
 <p><textarea class="form-control" name="message" onfocus="clearContents(this);">Your message</textarea></p>
 <p><input class="form-control btn btn-success" type="submit" name="submit"/></p>
 </form>
+
 <script>
 if (window.location.hash) {
   var hash = window.location.hash.substr(1);
@@ -50,6 +54,33 @@ function clearContents(element) {
   element.value = "";
 }
 </script>
+
+<h2 class="art-brew">Media</h2>
+
+  <div>
+    <a href="https://www.youtube.com/watch?v=i7kPoG8JVrU"><img src="/img/media-jim-ross.jpg" class="event_image"></a>
+    <h4><a href="https://www.youtube.com/watch?v=i7kPoG8JVrU">Watch: The Arlington Experience with Jim Ross: Episode Seventeen</a></h4>
+    <p>Feb 11, 2021 - In the latest episode of The Arlington Experience, Jim visits with the owners of a newer business in Arlington - but also one of its most unique - Catalyst Creative Arts!</p>
+  </div>
+
+  <div>
+    <a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/"><img src="/img/media-dmn-art-market.jpg" class="event_image"></a>
+    <h4><a href="https://www.dallasnews.com/arts-entertainment/things-to-do/2020/11/05/artists-have-struggled-to-show-their-work-during-the-pandemic-this-arlington-market-wants-to-help/">Read: Catalyst Creative Arts hosts second annual Arlington Art Market</a></h4>
+    <p>Nov 5, 2020 - Artists have struggled to show their work during the pandemic. This Arlington market wants to help. Catalyst Creative Arts is inviting residents to come support local artists downtown this weekend. Eight North Texas artists will have their work on display</p>
+  </div>
+
+  <div>
+    <a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&amp;feature=youtu.be"><img src="/img/media-culture-buzz.jpg" class="event_image"></a>
+    <h4><a href="https://www.youtube.com/watch?v=nFa6GVyB8bE&amp;feature=youtu.be">Watch: Culture Buzz: Catalyst Creative Arts</a></h4>
+    <p>From City of Arlington, TX YouTube channel Jun 25, 2020</p>
+  </div>
+
+  <div>
+    <a href="https://downtownarlington.org/post/nurturing-creativity-catalyst-creative-studio-comes-to-downtown-arlington"><img src="/img/media-downtown-arlington.jpg" class="event_image"></a>
+    <h4><a href="https://downtownarlington.org/post/nurturing-creativity-catalyst-creative-studio-comes-to-downtown-arlington">Read: Nurturing Creativity: Catalyst Creative Studio Comes to Downtown Arlington</a></h4>
+    <p>Feb 26, 2020 - What do you get when you combine an art and craft studio, DIY shop, event space, and gathering place to meet family, friends and kindred creative spirits?</p>
+  </div>
+
 </div>
 
 {% else %}

@@ -73,7 +73,7 @@ def app(environ, start_response):
 
     #today = date.today() #today.year, today.month, today.day
 
-    pages = ["private-events", "about-us", "media", "reviews", "custom-built", "after-school", "summer-camp", "3-wednesdays-workshop"]
+    pages = ["crafts-gallery", "private-events", "about-us", "media", "reviews", "custom-built", "after-school", "summer-camp", "art-camp", "3-wednesdays-workshop", "listening-room", "wheel-wars"]
 
     #galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18, "string-art": 19, "pottery-lessons": 20}
 
@@ -88,7 +88,7 @@ def app(environ, start_response):
     "fluid-art": 6,
     "summer-art-camp": 7,
     "commissioned-art": 8,
-    "alcohol-ink": 9,
+    #"alcohol-ink": 9,
     "artist-guided-family-painting": 10,
     "handbuilt-pottery": 11,
     "leathercraft": 12,
@@ -373,12 +373,14 @@ def app(environ, start_response):
 
             view = ""
             gtlt = ">=" # default
+            ascdesc = "asc"
 
             if environ['QUERY_STRING'] and "view" in environ['QUERY_STRING']:
                 view = environ['QUERY_STRING'].split("=")[1]
 
                 if view == "past-events":
                     gtlt = "<"
+                    ascdesc = "desc"
 
             # TODO: This first part should be call-able separately
             # And should be called about once per minute 
@@ -471,7 +473,7 @@ def app(environ, start_response):
             # PART-2: Select future-event-date orders from database for admin view
             #c = db.cursor()
             query = f"SELECT e.title, e.edatetime, e.elimit, o.* \
-                FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime {gtlt} CURDATE() ORDER BY e.edatetime"
+                FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime {gtlt} CURDATE() ORDER BY e.edatetime {ascdesc}"
             #c.execute(query)
             #allrows = c.fetchall()
             #c.close()
@@ -519,6 +521,7 @@ def app(environ, start_response):
                 and (tags <> 'invisible' or tags is null) \
                 and title != 'Private Event' \
                 and description not like '%Private Event%' \
+                and title not like '%Studio Closed%' \
                 and title != 'Studio Closed' \
                 ORDER BY edatetime limit 1")
             r = db.store_result()
@@ -530,6 +533,11 @@ def app(environ, start_response):
             db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and tags = 'home' ORDER BY edatetime limit 10")
             r = db.store_result()
             events_tagged_home = r.fetch_row(maxrows=10, how=1)
+
+            # RANDOM PRODUCT
+            db.query(f"select pid, name, image_path_array, price from products where inventory > 0 and active = 1 ORDER BY RAND() LIMIT 1")
+            r = db.store_result()
+            random_product = r.fetch_row(maxrows=10, how=1)[0]
 
             # GALLERY / SLIDESHOW
             #random_number = random.randint(1,len(galleries_dict))
@@ -544,7 +552,7 @@ def app(environ, start_response):
             template = env.get_template("home.html")
             response = template.render(next_event=next_event, calendar={"html": html_cal}, 
                 events_tagged_home=events_tagged_home, gallery=gallery, images=images, 
-                event_list_html=event_list_html)
+                event_list_html=event_list_html, random_product=random_product)
 
 
         elif environ['PATH_INFO'] == '/admin/pages':
@@ -581,10 +589,10 @@ def app(environ, start_response):
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
-            #data = json.loads(read_file("../registration/data/wheel-wars.json"))
+            data = json.loads(read_file("../registration/data/wheel-wars.json"))
 
             template = env.get_template("admin-registration.html")
-            response = template.render(allrows=allrows) #, data=data)
+            response = template.render(allrows=allrows, data=data)
 
 
         #elif environ['PATH_INFO'] == '/admin/registration2':
@@ -595,6 +603,12 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/summer-camp-registration':
             template = env.get_template("summer-camp-registration.html")
+            form = RegistrationForm()
+            response = template.render(form=form)
+
+
+        elif environ['PATH_INFO'] == '/art-camp-registration':
+            template = env.get_template("art-camp-registration.html")
             form = RegistrationForm()
             response = template.render(form=form)
 

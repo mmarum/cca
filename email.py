@@ -92,7 +92,10 @@ def email(environ, start_response):
 
         try:
             sg = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
-            from_email = Email("order@catalystcreativearts.com")
+            if subject == "Downtown Arlington Urban Market":
+                from_email = Email("biztime@arlington.market")
+            else:
+                from_email = Email("order@catalystcreativearts.com")
             to_email = To(to_email)
             subject = subject
             content = Content("text/plain", content)

@@ -1,0 +1,136 @@
+<style>
+.camp-choice {
+  padding: 20px;
+  border-right: 1px dashed DarkGray;
+}
+@media only screen and (max-width: 600px) {
+  .camp-choice {
+    border-right: none;
+    border-bottom: 5px dotted DarkGray;
+    padding-bottom: 40px;
+    padding-top: 40px;
+  }
+}
+.camp-choice:last-child {
+  border-right: none;
+}
+.camp-choice p {
+  font-family: 'Cutive-Regular', serif;
+}
+#flex-gallery {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+#flex-gallery img {
+    padding: 10px;
+}
+.camp_image {
+  width: 220px;
+}
+</style>
+<center>
+<h1 class="art-brew">Art Camp 2022</h1>
+<p>2022 Summer Art Camp at Catalyst Creative Arts will feature a broad range of activities including pottery wheel, water marbling, fluid art, fused glass, water color, self portrait painting and ink on paper collage.</p>
+<p>$200 per camper. $180 per additional family member.</p>
+</center>
+
+<div class="row">
+
+<div class="col-sm-3 camp-choice">
+ <p><b>Art Camp 1</b></p>
+ <p>Ages 5 thru 12</p>
+ <p style="background-color: #F8F8F8">June 13-17, 2022</p>
+ <p>9am-12pm</p>
+<button type="button" class="btn btn-warning">
+<!-- <button type="button" class="btn btn-success" onclick="labelSubmit('art_camp_2022_1');"> -->
+  Camp 1: FULL
+</button>
+</div>
+
+<div class="col-sm-3 camp-choice">
+ <p><b>Art Camp 2</b></p>
+ <p>Ages 5 thru 12</p>
+ <p style="background-color: #E8E8E8">June 20-24, 2022</p>
+ <p>9am-12pm</p>
+<button type="button" class="btn btn-warning">
+  Camp 2: FULL
+</button>
+</div>
+
+<div class="col-sm-3 camp-choice">
+ <p><b>Art Camp 5</b></p>
+ <!-- <p><span style="background-color: red; color: white; padding: 5px; margin-bottom: 10px;"><b>JUST ADDED!</b></span></p> -->
+ <p>Ages 5 thru 12</p>
+ <p style="background-color: #E8E8E8">Jun 27 - Jul 1, 2022</p>
+ <p>9am-12pm</p>
+<!-- <button type="button" class="btn btn-success" onclick="labelSubmit('art_camp_2022_5');"> -->
+<button type="button" class="btn btn-warning"> 
+  <!-- Register for Camp 5 -->
+  Camp 5: FULL
+</button>
+</div>
+
+<div class="col-sm-3 camp-choice">
+ <p><b>Art Camp 3</b></p>
+ <p style="background-color: Yellow;">Ages 12 and Up</p>
+ <p style="background-color: #D8D8D8">July 11-15, 2022</p>
+ <p>9am-12pm</p>
+<!-- <button type="button" class="btn btn-success" onclick="labelSubmit('art_camp_2022_3');"> -->
+<button type="button" class="btn btn-warning">
+  <!-- Register for Camp 3 -->
+  Camp 3: FULL
+</button>
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="col-sm-12 camp-choice">
+ <p><b>Art Camp 4</b></p>
+ <p>Ages 5 thru 12</p>
+ <p style="background-color: #C8C8C8; display: inline">July 18-22, 2022</p>
+ <p>9am-12pm</p>
+<button type="button" class="btn btn-warning">
+  Camp 4: FULL
+</button>
+</div>
+
+</div>
+
+<div class="row">
+<div class="col-sm-12">
+
+<div id="flex-gallery">
+  <img src="/img/art-class-7.jpg" class="camp_image">
+  <img src="/img/art-class-8.jpg" class="camp_image">
+  <img src="/img/art-class-9.jpg" class="camp_image">
+  <img src="/img/art-class-11.jpg" class="camp_image">
+  <img src="/img/art-class-10.jpg" class="camp_image">
+  <img src="/img/art-class-1.jpg" class="camp_image">
+  <img src="/img/art-class-2.jpg" class="camp_image">
+  <img src="/img/art-class-3.jpg" class="camp_image">
+  <img src="/img/art-class-4.jpg" class="camp_image">
+  <img src="/img/art-class-5.jpg" class="camp_image">
+  <img src="/img/art-class-6.jpg" class="camp_image">
+</div>
+
+</div>
+</div>
+
+<script>
+function labelSubmit(id) {
+  if(id == "art_camp_1" || id == "art_camp_3") {
+    alert("CLASS FULL");
+  } else if(id == "art_camp_2") {
+    alert("CLASS CLOSED");
+  } else if(id == "art_camp_4") {
+    alert("CLASS PASSED");
+  } else {
+    window.location.href = "/registration/art-camp/"+id;
+  }
+}
+</script>

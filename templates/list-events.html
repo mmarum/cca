@@ -1,13 +1,18 @@
 {% extends "base-site.html" %}
 {% block title %}Catalyst Creative Arts Events List{% endblock %}
 {% block html_head %}
+<style>
+.h2, h2 {
+  font-size: 1.6rem;
+}
+</style>
 {% endblock %}
 {% block content %}
 <center id="upcoming_events">
 <h1 class="art-brew">Upcoming Events</h1>
 </center>
 {% for event in events %}
-  <div class="row event_row {% if loop.index != 1 %}top-buffer {%endif%}date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
+  <div class="row event_row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
     <div class="col-sm-1">
     </div>
     <div class="col-md-2">
@@ -26,7 +31,7 @@
 
     </div>
     <div class="col-lg-8">
-      <h2>{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ') }}</h2>
+      <h2>{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</h2>
       <h3>
 
       {% if private_event == "True" %}
@@ -37,7 +42,16 @@
 
       </h3>
       <div>
-        {{ event.description|safe }}
+        {# event.description|safe #}
+        {% set event_desc = event.description.split('\n') %}
+        {% for e in event_desc %}
+          {% if e.startswith("http") %}
+            <a href="{{ e }}">Buy tickets</a>
+          {% else %}
+            {{ e|safe }}
+          {% endif %}
+        {% endfor %}
+
       </div>
     </div>
     <div class="col-sm-1">

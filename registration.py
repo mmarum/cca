@@ -46,7 +46,7 @@ def registration(environ, start_response):
     method = environ['REQUEST_METHOD']
     path = environ['PATH_INFO']
 
-    valid_registrations = ["after-school", "summer-camp", "wheel-wars", "testing-123"]
+    valid_registrations = ["art-camp", "wheel-wars"] # "after-school", "summer-camp"
 
     if path == "" or path == "/":
         registration_name = "summer-camp" # set default
@@ -59,8 +59,12 @@ def registration(environ, start_response):
     print("path", path)
     print("method", method)
 
-    camps = ["art_camp_1", "art_camp_2", "art_camp_3", "art_camp_4", "pottery_camp_1"]
-    if "summer-camp" in path and path.split("/")[2] in camps:
+    #camps = ["art_camp_1", "art_camp_2", "art_camp_3", "art_camp_4", "pottery_camp_1"]
+
+    camps = ["art_camp_2022_1", "art_camp_2022_2", "art_camp_2022_3", "art_camp_2022_4", "art_camp_2022_5"]
+
+    #if "summer-camp" in path and path.split("/")[2] in camps:
+    if "art-camp" in path and path.split("/")[2] in camps:
         session_detail = path.split("/")[2]
     elif path.endswith("after-school"):
         session_detail = "After School Pottery Program 2020"
@@ -88,7 +92,7 @@ def registration(environ, start_response):
             except:
                 pass
 
-        if registration_name in ["summer-camp", "after-school"]:
+        if registration_name in ["art-camp"]: # "summer-camp", "after-school"
             # An unchecked checkbox doesn't pass a value so we need this
             for i in ["treatment_permission", "photo_release"]:
                 if i not in fields:
@@ -111,7 +115,7 @@ def registration(environ, start_response):
         # UPDATE
         if action == "update":
 
-            if registration_name in ["summer-camp", "after-school"]:
+            if registration_name in ["art-camp"]: # "summer-camp", "after-school"
 
                 rid = int(post_input_dict["rid"])
 
@@ -129,7 +133,8 @@ def registration(environ, start_response):
                 c.execute(sql)
                 c.close()
 
-                template = env.get_template("summer-camp.html")
+                #template = env.get_template("summer-camp.html")
+                template = env.get_template("art-camp-registration.html")
 
             elif registration_name == "wheel-wars":
 
@@ -155,7 +160,7 @@ def registration(environ, start_response):
         # INSERT
         else:
 
-            if registration_name in ["summer-camp", "after-school"]:
+            if registration_name in ["art-camp"]: # "summer-camp", "after-school"
 
                 # Removing rid becuase this is an insert
                 del fields[0]
@@ -185,7 +190,8 @@ def registration(environ, start_response):
                 rid = int(d.fetchone()[0])
                 d.close()
 
-                template = env.get_template("summer-camp.html")
+                #template = env.get_template("summer-camp.html")
+                template = env.get_template("art-camp-registration.html")
                 response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
 
             elif registration_name == "wheel-wars":
@@ -251,7 +257,8 @@ def registration(environ, start_response):
             row = r.fetch_row(maxrows=1, how=1)[0]
             print(f"row: {row}")
             form = RegistrationForm(**row)
-            template = env.get_template("summer-camp.html")
+            #template = env.get_template("summer-camp.html")
+            template = env.get_template("art-camp-registration.html")
 
         response = template.render(form=form, registration_name=registration_name)
 
@@ -264,7 +271,7 @@ def registration(environ, start_response):
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
-        if registration_name in ["summer-camp", "after-school"]:
+        if registration_name in ["art-camp"]: # "summer-camp", "after-school"
 
             form_registration = json.loads(post_input)
             try:
@@ -342,7 +349,8 @@ def registration(environ, start_response):
             camper_count = "" # only for summer-school
         else:
             form = RegistrationForm()
-            template = env.get_template("summer-camp.html")
+            #template = env.get_template("summer-camp.html")
+            template = env.get_template("art-camp-registration.html")
 
             # CAMPER COUNT:
             query = f"select camper1_name, camper2_name, camper3_name from registration where session_detail = '{session_detail}' and order_id is not NULL"

@@ -194,11 +194,15 @@ def order(environ, start_response):
 
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/paypal-webhook":
 
+        # curl -X POST -H "Content-Type: application/json" --data '{"testing": "123"}' https://www.catalystcreativearts.com/order/paypal-webhook
+
         try:
             length = int(environ.get('CONTENT_LENGTH', '0'))
             post_input = environ['wsgi.input'].read(length).decode('UTF-8')
             i = json.loads(post_input)
             print("post_input from paypal-webhook", i)
+            create_time = i["create_time"]
+            write_file(f"webhook-receipts/{create_time}.json", json.dumps(i, indent=4))
             response = "POKEY DOKEY"
         except:
             print("post_input from paypal-webhook", "FAIL")

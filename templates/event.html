@@ -82,7 +82,7 @@ select, input {
     <h1>{{ event.title }}</h1>
 
     <h2>
-      {{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ') }} 
+      {{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }} 
       <span class="duration" id="duration">({{ event.duration }} hrs)</span>
     </h2>
 
@@ -295,7 +295,7 @@ function checkTime(edatetime) {
   var dd = new Date(d);
   var nn = new Date(n);
   //var time_window = 10; // hours
-  var time_window = 2; // hours
+  var time_window = 6; // hours
   if (d - n > 60*60* time_window *1000) {
     //console.log("NOT within xh window. OK to book.");
   } else {
@@ -340,8 +340,8 @@ function hidePurchase() {
 
 {# PRIVATE EVENTS #}
 {% if "private event" in event.title.lower() or "series" in event.tags %}
-  hidePurchase();
-  console.log("Hiding purchase because private event or series");
+  //hidePurchase();
+  //console.log("Hiding purchase because private event or series");
 {% endif %}
 
 
@@ -415,8 +415,16 @@ paypal.Buttons({
       thanks_text += ". Order ID: " + details.id;
       document.getElementById("thanks").innerHTML += thanks_text;
       document.getElementById("paypal-button-container").style.display = "none";
-      document.getElementById("quantity_form").style.display = "none";
+      // "quantity_form"
       console.log(details);
+
+      {% if "scarf" in event.title.lower() %}
+      var test_total_number_scarf = (getScarfSubtotal() / additional_scarf_cost) + Number(getOptionValue("guest_quantity"));
+      console.log("getScarfSubtotal: " + getScarfSubtotal);
+      console.log("additional_scarf_cost: " + additional_scarf_cost);
+      console.log("getOptionValue_guest_quantity: " + Number(getOptionValue("guest_quantity")));
+      {% endif %}
+
       return fetch('/order/submit', {
         method: 'POST',
         headers: {

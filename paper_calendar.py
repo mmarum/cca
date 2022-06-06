@@ -76,7 +76,7 @@ def make_list(db):
         date_string = edatetime.strftime("%b %d %Y")
         title = d[2]
         description = d[3]
-        if "private event" in title.lower() or "private event" in description.lower():
+        if "private event" in title.lower() or "private event" in description.lower() or "studio closed" in title.lower():
             event_list_string += f'<div class="event_item">{date_string} <br> {title}</div>\n'
         else:
             event_list_string += f'<div class="event_item">{date_string} <br> <a href="/event/{eid}.html">{title}</a></div>\n'

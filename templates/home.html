@@ -3,6 +3,32 @@
 
 {% block html_head %}
 <style>
+hr {
+  height: 10px;
+  background-color: LightGray;
+}
+.home_caption {
+  font-family: 'Cutive-Regular', serif;
+  padding: 0 10px 0 10px;
+}
+
+.home_caption a:hover {
+  text-decoration-color: LightGray;
+}
+
+.home_section_label { 
+  font-size: 90%;
+  color: #336699;
+}
+.home_event_date {
+  font-size: 90%;
+  color: DarkGoldenRod;
+}
+.home_event_title {
+  font-size: 90%;
+  color: #303030;
+}
+
 .event_image {
   max-width: 100%;
 }
@@ -148,89 +174,186 @@ mark {
 
 <div class="row top-buffer">
 
-  <div class="col-sm-1">
-  </div>
-
   <div class="col-md-3">
 
     <!-- first column start -->
 
-    <!-- <h2><a href="/event/587.html">Holiday Candlelight Jazz Sat Dec 18, 2021 at 7:30 PM</a></h2>
-    <a href="/event/587.html"><img src="/img/jazz-graphic-2021-12.jpg" class="event_image"></a>
-
-    <hr>
-    <hr> -->
-
     {% if next_event %}
+    <div class="home_caption">
     <h2>
     <a href="/event/{{ next_event.eid }}.html">
-    Next Event:<br>
-    {{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}<br>
-    {{ next_event.title }}
+    <div class="home_section_label">Next Event</div>
+    <div class="home_event_date">{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</div>
+    <div class="home_event_title">{{ next_event.title }}</div>
     </a>
     </h2>
+    </div>
     <a href="/event/{{ next_event.eid }}.html">
       <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
     </a>
-    <hr>
-    <hr>
     {% endif %}
 
-    <h2>
-    <a href="/about-us.html">
-    Holiday Parties:
-    We are booking Holiday Parties! Call or email us. We have wonderful neighbors that can help you with catering!
-    </a>
-    </h2>
-    <a href="/about-us.html">
-      <img src="/img/holiday-parties-2021.jpg" class="event_image">
-    </a>
     <hr>
+
+    {% if random_product %}
+    <div class="home_caption">
+    <h2>
+    <a href="/shop/product/{{ random_product.pid }}">
+    <div class="home_section_label">Shop the Online store</div>
+    <div class="home_event_date">{{ random_product.name }} ${{ random_product.price }}</div>
+    <img src="/img/small/{{ random_product.image_path_array.split(",")[1] }}" class='event_image'>
+    </h2>
+    </a>
+    </div>
+    {% endif %}
+
     <hr>
 
     <!-- first column end -->
 
   </div>
-  <div class="col-sm-3">
+  <div class="col-md-3">
 
     <!-- second column start -->
 
+    <!--
+
+    <div class="home_caption">
     <h2>
-    <a href="/shop/">
-    Visit our online store:<br>
-    Handmade water marbled silk scarves and hand-knit decorative stockings
+    <a href="/art-camp.html">
+    <div class="home_section_label">Art Camp 2022</div>
+    <div class="home_event_date">Registration open</div>
+    <div class="home_event_title">Four camps in June & July</div>
     </a>
     </h2>
-    <a href='/shop'><img src='/img/scarves-shop-ig.jpg' class='event_image'></a>
+    </div>
+    <a href='/art-camp.html'>
+      <img src='/img/art-class-6.jpg' class='event_image'>
+    </a>
 
     <hr>
+
+    -->
+
+    <!--
+    <div class="home_caption">
+    <h2>
+    <a href="/wheel-wars.html">
+    <div class="home_section_label">Wheel Wars is back!</div>
+    <div class="home_event_date">Thursday May 12</div>
+    <div class="home_event_date">5-7 PM</div>
+    </a>
+    <a href="https://arlington.market">
+    <div class="home_event_title">At the Urban Market 506 E Division St Arlington, TX 76011</div>
+    </a>
+    </h2>
+    </div>
+    <a href='/wheel-wars.html'>
+      <img src='/img/small/wheel%20wars%20ad%201.jpg' class='event_image'>
+    </a>
+
+    <hr>
+    -->
+
+    <div class="home_caption">
+    <h2>
+    <a href="/shop/">
+    <div class="home_section_label">Visit Our Online Store</div>
+    <div class="home_event_date">Handmade silk scarves</div>
+    <div class="home_event_title">Hand-knit stockings and more</div>
+    </a>
+    </h2>
+    </div>
+    <a href='/shop'>
+      <img src='/img/scarves-shop-ig.jpg' class='event_image'>
+    </a>
+
     <hr>
 
   {% if events_tagged_home %}
   {% for event in events_tagged_home %}
+    <div class="home_caption">
     <h2>
     <a href="/event/{{ event.eid }}.html" class="event_link">
-    {{ event.title }}
-    {{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ') }}
+    <div class="home_section_label">Coming Soon</div>
+    <div class="home_event_date">{{ event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</div>
+    <div class="home_event_title">{{ event.title }}</div>
     </a>
     </h2>
+    </div>
     <a href="/event/{{ event.eid }}.html" class="event_link">
       <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
     </a>
     <hr>
-    <hr>
   {% endfor %}
   {% endif %}
-
-    <!-- <div id="paper_calendar"></div> -->
-    {# calendar.html|safe #}
 
     <!-- second column end -->
 
   </div>
-  <div class="col-sm-3">
+  <div class="col-md-3">
 
     <!-- third column start -->
+
+    <!--
+    <div class="home_caption">
+    <h2>
+    <a href="/event/660.html">
+    <div class="home_section_label">3 Wednesdays Workshop</div>
+    <div class="home_event_date">Beginner Printmaking Workshop</div>
+    <div class="home_event_title"></div>
+    </a>
+    </h2>
+    </div>
+    <a href="/event/660.html">
+      <img src="/img/wedwork.jpg" class="event_image">
+    </a>
+
+    <hr>
+    -->
+
+    <div class="home_caption">
+    <h2>
+    <a href="https://arlington.market">
+    <div class="home_section_label">Downtown Arlington Urban Market</div>
+    <div class="home_event_date">2nd Thursday of each month</div>
+    <div class="home_event_title">Next date: Jun 9</div>
+    </a>
+    </h2>
+    </div>
+    <a href="https://arlington.market">
+      <img src="/img/market-mini-gnome.jpg" class="event_image">
+    </a>
+
+    <hr>
+ 
+    <div class="home_caption">
+    <h2>
+    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s">
+    <div class="home_section_label">Gift Cards Now Available</div>
+    </a>
+    </h2>
+    </div>
+
+    Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through PayPal, 
+       over the phone and in person at our studio and may be redeemed for any of our services.
+
+    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s"><img src="/img/gift-card.jpg" class="event_image gift_card_border"></a>
+
+
+    <hr>
+
+    <!-- third column end -->
+
+  </div>
+
+  <div class="col-md-3">
+    <!-- fourth column start -->
+
+    <div id="paper_calendar"></div>
+    {{ calendar.html|safe }}
+
+    <hr>
 
     <div id="event_list">
     <div><h2>Next 7 events:</h2></div>
@@ -238,24 +361,7 @@ mark {
     <div><a href="/calendar.html">See full list of events</a></div>
     </div>
 
-    <hr>
-    <hr>
-
-    <h2><a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s">Gift cards now available</a></h2>
-
-    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s"><img src="/img/gift-card.jpg" class="event_image gift_card_border"></a>
-
-    <div>Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through PayPal, 
-       over the phone and in person at our studio and may be redeemed for any of our services.</div>
-
-    <hr>
-    <hr>
-
-    <!-- third column end -->
-
-  </div>
-
-  <div class="col-sm-2">
+    <!-- fourth column end -->
   </div>
 
 </div>

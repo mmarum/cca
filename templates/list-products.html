@@ -6,12 +6,38 @@
 .product_image {
   max-width: 100%;
 }
+.product_image_2 {
+  max-width: 200px;
+}
 .sold_out{
   color: red;
 }
 #cart_link_container {
-  margin-top: 5px;
-  padding-top: 5px;
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+.filter_row {
+  padding-bottom: 20px;
+}
+.product_name_box {
+  width: 200px;
+  padding-bottom: 20px;
+}
+@media only screen and (max-width: 600px) {
+  #cart_link_container {
+    margin-top: -10px;
+    margin-bottom: 10px;
+  }
+  .product_image_2 {
+    max-width: 600px;
+    width: 100%;
+  }
+  .product_name_box {
+    width: 100%;
+    border-bottom: 2px solid LightGray;
+    margin-bottom: 20px;
+    font-size: 150%;
+  }
 }
 </style>
 {% endblock %}
@@ -25,12 +51,20 @@
 </div>
 
 <div class="col-md-3 text-center">
-  <h2>Shop</h2>
+  <h1 class="art-brew">Shop</h1>
 </div>
 
 <div class="col-md-4 text-center">
   <div id="cart_link_container">
-    <a href="/cart/">Cart</a>
+    <a href="/cart/">
+
+<svg enable-background="new 0 0 48 48" fill="Lightseagreen" height="48px" id="Layer_1" version="1.1" viewBox="0 0 48 48" width="48px" x="0px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="0px">
+<g transform="scale(3)">
+  <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+</g>
+</svg>
+
+    </a>
   </div>
 </div>
 
@@ -48,8 +82,8 @@
 <div class="col-sm-1">
 </div>
 
-<div class="col-md-10 text-center">
-  Filter by available product types:
+<div class="col-md-10 text-center filter_row">
+  Filter by available product types:<br>
   <a href="/shop/">All</a> | 
   {% for word in allowed_filter_words %}
     <a href="/shop/filter/{{ word }}">{{ word }}</a>
@@ -62,7 +96,7 @@
 
 </div>
 
-
+{#
 
 {% for product in products %}
   <div class="row product_row top-buffer id="pid_{{ product.pid }}">
@@ -71,19 +105,12 @@
     </div>
 
     <div class="col-md-2">
-      <!-- {{ product.image_path_array }} -->
       {% set image_array = product.image_path_array.split(',') %}
-      {# for i in image_array #}
-        <!-- <img src="/img/small/{# i.strip() #}" alt="" class="product_image"/><br/> -->
-      {# endfor #}
       <a href="/shop/product/{{ product.pid }}"><img src="/img/small/{{ image_array[1] }}" alt="" class="product_image"/></a>
-
     </div>
 
     <div class="col-lg-8">
-      <!-- <div>{{ product.pid }}</div> -->
       {% set product_name_slug = product.name|replace(' ', '-')|lower %}
-      <!-- <h3><a href="/app/products/{{ product_name_slug }}/{{ product.pid }}">{{ product.name }}</a></h3> -->
       {% if product.inventory > 0 %}
         <h3><a href="/shop/product/{{ product.pid }}">{{ product.name }}</a></h3>
       {% else %}
@@ -98,10 +125,7 @@
           {% endif %}
         {% endfor %}
       </div>
-      <!-- <div>{{ product.invt }}</div> -->
-      <!-- <div>{{ product.inventory }}</div> -->
       <div>${{ product.price }}</div>
-      <!-- <div>{{ product.keywords_array }}</div> -->
     </div>
 
     <div class="col-sm-1">
@@ -109,5 +133,54 @@
 
   </div>
 {% endfor %}
+
+#}
+
+<div class="row">
+
+{# for test_number in range(20) #}
+{% for product in products %}
+
+  {% if loop.index+1 % 4 %}{% else %}
+    </div>
+    <div class="row">
+  {% endif %}
+
+    <div class="col-md-3">
+      {# loop.index+1 #}
+
+      {% set image_array = product.image_path_array.split(',') %}
+
+      {% if product.inventory <= 0 %}
+
+      <div>
+          <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image_2"/>
+      </div>
+
+      <div class="product_name_box">
+          {{ product.name }} Sold out
+      </div>
+
+      {% else %}
+
+      <div>
+        <a href="/shop/product/{{ product.pid }}">
+          <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image_2"/>
+        </a>
+      </div>
+
+      <div class="product_name_box">
+        <a href="/shop/product/{{ product.pid }}">
+          {{ product.name }} ${{ product.price }}
+        </a>
+      </div>
+
+      {% endif %}
+
+    </div>
+
+{% endfor %}
+
+</div>
 
 {% endblock %}
