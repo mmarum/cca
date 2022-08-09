@@ -159,6 +159,11 @@ select, input {
     <!-- elimit: {{ event.elimit }} -->
     <!-- quantity_sum: {{ event.quantity_sum }} -->
     <!-- remaining_spots: {{ event.remaining_spots }} -->
+
+    {% if event.elimit == event.quantity_sum and event.remaining_spots == 0 %}
+      <div class="alert alert-warning" role="alert">This class is sold out.</div>
+    {% endif %}
+
     {# REGULAR EVENT #}
     {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
     {% else %}

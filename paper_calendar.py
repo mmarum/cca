@@ -41,7 +41,8 @@ def make_cal(db, month, year):
         one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
         c = db.cursor()
 
-        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() and (tags <> 'invisible' or tags is null)")
+        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) \
+            and tags NOT LIKE '%pottery-lesson%'")
         allrows = c.fetchall()
 
         #print(allrows)
@@ -66,6 +67,7 @@ def make_list(db):
     c = db.cursor()
     c.execute(f"select eid, edatetime, title, description from events where edatetime > now() and (tags <> 'invisible' or tags is null) \
         and title != 'Studio Closed' \
+        and tags NOT LIKE '%pottery-lesson%' \
         limit 7")
     allrows = c.fetchall()
     c.close()

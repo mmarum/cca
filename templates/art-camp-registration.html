@@ -69,7 +69,7 @@ h5 {
 
 <div id="session_detail_box">
 
-{% if camper_count and camper_count >= 15 %}
+{% if camper_count and (camper_count >= 15 and session_name not in ["art_camp_2022_2", "art_camp_2022_3"]) %}
   CLASS IS FULL
   <script>var class_full = true;</script>
 {% else %}

@@ -263,7 +263,7 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/list/events' or environ['PATH_INFO'] == '/calendar':
 
-            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) ORDER BY edatetime")
+            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags NOT LIKE '%pottery-lesson%' ORDER BY edatetime")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
@@ -523,6 +523,7 @@ def app(environ, start_response):
                 and description not like '%Private Event%' \
                 and title not like '%Studio Closed%' \
                 and title != 'Studio Closed' \
+                and tags NOT LIKE '%pottery-lesson%' \
                 ORDER BY edatetime limit 1")
             r = db.store_result()
             next_event = r.fetch_row(maxrows=1, how=1)[0]
@@ -530,7 +531,7 @@ def app(environ, start_response):
             #next_event = ""
 
             # FEATURED / PINNED EVENTS
-            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and tags = 'home' ORDER BY edatetime limit 10")
+            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and tags = 'home' and tags NOT LIKE '%pottery-lesson%' ORDER BY edatetime limit 10")
             r = db.store_result()
             events_tagged_home = r.fetch_row(maxrows=10, how=1)
 
