@@ -1,0 +1,109 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Checkout{% endblock %}
+
+{% block html_head %}
+
+<link rel="stylesheet" href="/checkout.css" />
+<script src="https://js.stripe.com/v3/"></script>
+
+{% if form_data %}
+  <script src="/store-checkout.js" defer></script>
+{% endif %}
+
+<style>
+#custom-metadata {
+  content: "";
+  display: table;
+  clear: both;
+  border-bottom: lightgray solid 1px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.custom-metadata-col {
+  float: left;
+  width: 45%;
+  padding: 5px;
+  margin: 5px;
+}
+#custom-metadata-col-1 {
+  border-right: lightgray solid 1px;
+  padding-right: 10px;
+  margin-right: 10px;
+}
+#event_title {
+  font-weight: bold;
+}
+#event_date {
+  color: green;
+}
+.hide {
+  display: none;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<body>
+
+    {% if form_data %}
+
+    <!-- Display a payment form -->
+    <form id="payment-form">
+
+    <div id="custom-metadata">
+
+      <span class="custom-metadata-col" id="custom-metadata-col-1">
+
+        <div><span id="product_names">{{ form_data["product_names"] }}</span></div>
+
+        <div><span>Total: </span>$<span id="total_cost">{{ form_data["total_cost"] }}</span></div>
+        <div style="display: none; visibility: hidden;"><span id="event_id">{{ form_data["event_id"] }}</span></div>
+        <div style="display: none; visibility: hidden;"><span id="session_id">{{ form_data["session_id"] }}</span></div>
+
+      </span>
+
+      <span class="custom-metadata-col" id="custom-metadata-col-2">
+
+        <div><span id="customer_name">{{ form_data["customer_name"] }}</span></div>
+        <div><span id="customer_phone">{{ form_data["customer_phone"] }}</span></div>
+
+      </span>
+
+    </div>
+
+    <div id="link-authentication-element">
+      <!--Stripe.js injects the Link Authentication Element-->
+    </div>
+
+    <div id="payment-element">
+      <!--Stripe.js injects the Payment Element-->
+    </div>
+
+    <button id="submit">
+      <div class="spinner hidden" id="spinner"></div>
+      <span id="button-text">Pay now</span>
+    </button>
+
+    <div id="payment-message" class="hidden"></div>
+    
+    </form>
+
+    {% else %}
+
+    {# else if no form_data ... #}
+
+    <center>
+    <div id="message" style="padding: 20px;"></div>
+    </center>
+
+    <script src="/store-checkout-status.js" defer></script>
+
+    {% endif %}
+
+</body>
+</html>
+
+{% endblock %}
+

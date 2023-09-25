@@ -1,0 +1,149 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Checkout{% endblock %}
+
+{% block html_head %}
+
+<link rel="stylesheet" href="/checkout.css" />
+<script src="https://js.stripe.com/v3/"></script>
+
+{% if form_data %}
+  <script src="/checkout.js" defer></script>
+{% endif %}
+
+<style>
+#custom-metadata {
+  content: "";
+  display: table;
+  clear: both;
+  border-bottom: lightgray solid 1px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.custom-metadata-col {
+  float: left;
+  width: 45%;
+  padding: 5px;
+  margin: 5px;
+}
+#custom-metadata-col-1 {
+  border-right: lightgray solid 1px;
+  padding-right: 10px;
+  margin-right: 10px;
+}
+#event_title {
+  font-weight: bold;
+}
+#event_date {
+  color: green;
+}
+.hide {
+  display: none;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<body>
+
+    {% if form_data %}
+
+    <!-- Display a payment form -->
+    <form id="payment-form">
+
+    <div id="custom-metadata">
+
+      <span class="custom-metadata-col" id="custom-metadata-col-1">
+
+        <div><span id="event_title">{{ form_data["event_title"] }}</span></div>
+        <div><span id="event_date">{{ form_data["event_date"] }}</span></div>
+
+
+        {% if form_data["variable_price"] %}
+          <div><span id="variable_price">{{ form_data["variable_price"] }}</span></div>
+        {% else %}
+          <div style="display: none; visibility: hidden;"><span id="variable_price"></span></div>
+        {% endif %}
+
+
+        {% if form_data["additional_scarf"] %}
+          <div>Additional Scarf: </span><span id="additional_scarf">{{ form_data["additional_scarf"] }}</span></div>
+        {% else %}
+          <div style="display: none; visibility: hidden;"><span id="additional_scarf"></span></div>
+        {% endif %}
+
+        <div><span>Total: </span>$<span id="total_cost">{{ form_data["total_cost"] }}</span></div>
+        <div style="display: none; visibility: hidden;"><span id="event_id">{{ form_data["event_id"] }}</span></div>
+
+      </span>
+
+      <span class="custom-metadata-col" id="custom-metadata-col-2">
+
+        <div><span id="customer_name">{{ form_data["customer_name"] }}</span></div>
+        <div><span id="customer_phone">{{ form_data["customer_phone"] }}</span></div>
+
+        <div><span>Guests: </span><span id="guest_quantity">{{ form_data["guest_quantity"] }}</span></div>
+
+      </span>
+
+
+      {% if form_data["event_title"] == "Art Camp Registration 2023" %}
+
+        {% if form_data["camper1_name"] %}<span class="hide" id="camper1_name">{{ form_data["camper1_name"] }}</span>{% endif %}
+        {% if form_data["camper2_name"] %}<span class="hide" id="camper2_name">{{ form_data["camper2_name"] }}</span>{% endif %}
+        {% if form_data["camper3_name"] %}<span class="hide" id="camper3_name">{{ form_data["camper3_name"] }}</span>{% endif %}
+        {% if form_data["camper1_age"] and form_data["camper1_age"] != "0" %}<span class="hide" id="camper1_age">{{ form_data["camper1_age"] }}</span>{% endif %}
+        {% if form_data["camper2_age"] and form_data["camper2_age"] != "0" %}<span class="hide" id="camper2_age">{{ form_data["camper2_age"] }}</span>{% endif %}
+        {% if form_data["camper3_age"] and form_data["camper3_age"] != "0" %}<span class="hide" id="camper3_age">{{ form_data["camper3_age"] }}</span>{% endif %}
+        {% if form_data["parent_address"] %}<span class="hide" id="parent_address">{{ form_data["parent_address"] }}</span>{% endif %}
+        {% if form_data["parent_city"] %}<span class="hide" id="parent_city">{{ form_data["parent_city"] }}</span>{% endif %}
+        {% if form_data["parent_state"] %}<span class="hide" id="parent_state">{{ form_data["parent_state"] }}</span>{% endif %}
+        {% if form_data["parent_zip"] %}<span class="hide" id="parent_zip">{{ form_data["parent_zip"] }}</span>{% endif %}
+        {% if form_data["parent_em_name"] %}<span class="hide" id="parent_em_name">{{ form_data["parent_em_name"] }}</span>{% endif %}
+        {% if form_data["parent_em_phone"] %}<span class="hide" id="parent_em_phone">{{ form_data["parent_em_phone"] }}</span>{% endif %}
+        {% if form_data["pickup1_name"] %}<span class="hide" id="pickup1_name">{{ form_data["pickup1_name"] }}</span>{% endif %}
+        {% if form_data["pickup1_phone"] %}<span class="hide" id="pickup1_phone">{{ form_data["pickup1_phone"] }}</span>{% endif %}
+        {% if form_data["pickup2_name"] %}<span class="hide" id="pickup2_name">{{ form_data["pickup2_name"] }}</span>{% endif %}
+        {% if form_data["pickup2_phone"] %}<span class="hide" id="pickup2_phone">{{ form_data["pickup2_phone"] }}</span>{% endif %}
+        {% if form_data["session_detail"] %}<span class="hide" id="session_detail">{{ form_data["session_detail"] }}</span>{% endif %}
+
+      {% endif %}
+
+
+    </div>
+
+    <div id="link-authentication-element">
+      <!--Stripe.js injects the Link Authentication Element-->
+    </div>
+
+    <div id="payment-element">
+      <!--Stripe.js injects the Payment Element-->
+    </div>
+
+    <button id="submit">
+      <div class="spinner hidden" id="spinner"></div>
+      <span id="button-text">Pay now</span>
+    </button>
+
+    <div id="payment-message" class="hidden"></div>
+    
+    </form>
+
+    {% else %}
+
+    {# else if no form_data ... #}
+
+    <center>
+    <div id="message" style="padding: 20px;"></div>
+    </center>
+
+    <script src="/checkout-status.js" defer></script>
+
+    {% endif %}
+
+</body>
+</html>
+
+{% endblock %}
+

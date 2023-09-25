@@ -13,8 +13,14 @@ cp /home/catalystcreative/registration/templates/*.* /home/catalystcreative/app/
 cp /home/catalystcreative/email/email.py /home/catalystcreative/app/cca/email.py
 cp /home/catalystcreative/cart-api/cart.py /home/catalystcreative/app/cca/cart.py
 cp /home/catalystcreative/shop/shop.py /home/catalystcreative/app/cca/shop.py
+cp /home/catalystcreative/webhook/webhook.py /home/catalystcreative/app/cca/webhook.py
 
-#cp /home/catalystcreative/checkout/checkout.py /home/catalystcreative/app/cca/checkout.py
-#cp /home/catalystcreative/checkout/templates/*.* /home/catalystcreative/app/cca/checkout_templates/
-#cp /home/catalystcreative/www/checkout*.* /home/catalystcreative/app/cca/checkout_templates/
+cp /home/catalystcreative/checkout/checkout.py /home/catalystcreative/app/cca/checkout.py
+cp /home/catalystcreative/checkout/templates/*.* /home/catalystcreative/app/cca/checkout_templates/
+cp /home/catalystcreative/www/checkout*.* /home/catalystcreative/app/cca/checkout_templates/
+
+cp /home/catalystcreative/store-checkout/store_checkout.py /home/catalystcreative/app/cca/store_checkout.py
+cp /home/catalystcreative/store-checkout/templates/*.* /home/catalystcreative/app/cca/store-checkout_templates/
+cp /home/catalystcreative/www/store-checkout*.* /home/catalystcreative/app/cca/store-checkout_templates/
+
 

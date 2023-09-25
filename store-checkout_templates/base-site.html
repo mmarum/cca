@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+
+<meta property="og:site_name" content="Catalyst Creative Arts"/>
+<meta property="og:title" content="Catalyst Creative Arts"/>
+
+<meta property="og:description" content="Arlington art craft and DIY studio and event venue"/>
+<meta name="description" content="Arlington art craft and DIY studio and event venue"/>
+
+<meta property="og:image" content="https://www.catalystcreativearts.com/img/logo.png"/>
+<meta property="og:url" content="https://www.catalystcreativearts.com/"/>
+
+<meta name="keywords" content="Parties, birthday, girls night out, date night, parents night out, corporate event, team building, fundraiser, lessons, bachelorette, shower, office party, christmas party, holiday party, summer art camp, workshops, after school art,  DIY, mommy and me, art show, walk-in, art market, byob, crafts, mobile events, gift certificates, mother's day, art studio, event venue, art gallery, art school, DIY bar"/>
+
+<link rel="stylesheet" 
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
+    crossorigin="anonymous">
+
+<title>{% block title %}{% endblock %}</title>
+
+{% block html_head %}{% endblock %}
+
+<script>
+var browser_size = {
+  width: window.innerWidth || document.body.clientWidth,
+  height: window.innerHeight || document.body.clientHeight
+}
+</script>
+
+<style>
+@font-face {
+  font-family: BebasNeue-Bold;
+  src: url('/fonts/BebasNeue-Bold.otf');
+  src: url('/fonts/BebasNeue-Bold.otf') format('embedded-opentype'),
+  url('/fonts/BebasNeue-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: Cutive-Regular;
+  src: url('/fonts/Cutive-Regular.otf');
+  src: url('/fonts/Cutive-Regular.otf') format('embedded-opentype'),
+  url('/fonts/Cutive-Regular.ttf') format('truetype');
+}
+
+#logo-box {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-stretch: normal;
+  font-size: xx-large;
+  line-height: normal;
+  color: #101010;
+  font-family: 'BebasNeue-Bold', Arial, Verdana, Sans-serif;
+}
+
+#logo-name a {
+  text-decoration: none;
+  color: #101010;
+}
+
+.art-brew {
+  font-weight: normal;
+  letter-spacing: 1px;
+  color: #A0A0A0;
+  line-height: 90%;
+  padding-top: 10px;
+  font-family: 'BebasNeue-Bold', Arial, Verdana, Sans-serif;
+}
+
+.nav-item {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+@media only screen and (max-width: 600px) {
+
+  .art-brew {
+    font-size: 300%;
+  }
+  .logo-circle {
+    width: 150px;
+  }
+  #logo-circles {
+    width: 300px;
+    overflow: hidden;
+  }
+  #logo-circle-one {
+    width: 150px; 
+    float: left;
+  }
+  #logo-circle-two {
+    width: 150px; 
+    margin-left: 150px;
+  }
+  #logo-name, #logo-circles {
+    text-align: center;
+  }
+  #logo-name-one {
+    font-size: 280%;
+    letter-spacing: 3px;
+  }
+  #logo-name-two {
+    font-size: 180%;
+    line-height: 50%;
+    letter-spacing: 2px;
+  }
+  .nav-item:first-child {
+    margin-left: -10px;
+  }
+  #dropdown-menu {
+    position: static;
+  }
+
+}
+
+@media only screen and (min-width: 601px) {
+
+  .art-brew {
+    font-size: 400%;
+  }
+  #logo-box {
+    width: 850px;
+    overflow: hidden;
+  }
+  #logo-circles {
+    width: 100px; 
+    float: left;
+  }
+  #logo-name {
+    margin-left: 250px;
+  }
+  #logo-name-one {
+    font-size: 530%;
+    letter-spacing: 10px;
+  }
+  #logo-name-two {
+    font-size: 375%;
+    line-height: 50%;
+    letter-spacing: 1px;
+  }
+  #dropdown-menu {
+    width: 250px;
+    height: 350px;
+    border: 1px solid Gray;
+    cursor: pointer;
+    position: absolute;
+    margin-left: 350px;
+    z-index: 2;
+  }
+
+}
+
+.top-buffer { 
+  padding: 10px 0 10px 0;
+  margin: 10px 0 10px 0;
+  border-top: 1px dashed LightGray;
+}
+.top-buffer-no-line { 
+  padding: 10px 0 10px 0;
+  margin: 10px 0 10px 0;
+}
+table {
+  width: 100%;
+}
+td {
+  border-bottom: 1px solid LightGray;
+  border-right: 1px solid LightGray;
+  padding: 5px;
+  padding: 5px;
+}
+.event_image {
+  width: 100%;
+  padding: 5px;
+}
+
+@media only screen and (max-width: 600px) {
+  .top-buffer {
+    padding: 15px 0 15px 0;
+    margin: 15px 0 15px 0;
+    border-bottom: 3px dashed Gray;
+  }
+  .logo {
+    padding: 10px 0 10px 0;
+  }
+  img {
+    width: 100%;
+  }
+  .tagline {
+    display: block;
+    line-height: 80%;
+  }
+  .nav-scroll {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+  .nav-item {
+    display: inline-block;
+  }
+}
+
+#tagline-box {
+  font-size: 30px;
+  font-family: 'BebasNeue-Bold', Arial, Verdana, Sans-serif;
+  padding: 10px 0 5px 0;
+}
+.tag-one, .tag-three {
+  color: #404040;
+}
+.tag-two {
+  color: #707070;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.logo {
+  width: 100%;
+  max-width: 915px;
+}
+.nav {
+  background-color: #EEE;
+  padding: 10px;
+}
+.nav a {
+  padding-right: 0px;
+  color: #555;
+  text-decoration: none;
+}
+#dropdown-menu a {
+  display: block;
+}
+#dropdown-menu {
+  display: none;
+  background-color: #FFF;
+}
+#upcoming_events {
+  padding-top: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="top"></div>
+
+<div id="content">
+
+<div class="container">
+
+<div class="row">
+  <div class="col-sm-12">
+    <center>
+
+<div id="logo-box">
+  <div id="logo-circles">
+
+   <center>
+
+    <div id="logo-circle-one">
+      <a href="/"><img src="/img/logo-circle-one.gif" class="logo-circle"></a>
+    </div>
+    <div id="logo-circle-two">
+      <a href="/"><img src="/img/logo-circle-two.gif" class="logo-circle"></a>
+    </div>
+
+   </center>
+
+  </div>
+  <div id="logo-name">
+    <div id="logo-name-one">
+      <a href="/">Catalyst</a>
+    </div>
+    <div id="logo-name-two">
+      <a href="/">Creative Arts</a>
+    </div>
+  </div>
+</div>
+
+    </center>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <center>
+    <div id="tagline-box">
+      <span class="tagline tag-one">Art Craft DIY</span>
+      <span class="tagline tag-two">Studio and Event Venue</span>
+      <span class="tagline tag-three">Arlington Texas</span>
+    </div>
+    </center>
+  </div>
+</div>
+
+<div class="row nav">
+  <div class="col-sm-12 nav-scroll">
+    <center>
+
+	<a class="nav-item" href="/shop">Online Store</a>
+	<a class="nav-item" href="/calendar.html">Events Calendar</a>
+	<a class="nav-item" href="/pottery-lessons.html">Pottery Lessons</a>
+	<!-- <a class="nav-item" href="/art-camp.html">Art Camp</a> -->
+	<a class="nav-item" href="/paint-wars.html">Paint Wars</a>
+	<a class="nav-item" href="/private-events.html">Private Events</a>
+	<a class="nav-item" href="/crafts-gallery.html">Crafts Gallery</a>
+	<a class="nav-item" href="/about-us.html">About Us</a>
+
+    </center>
+  </div><!-- close col -->
+</div><!-- close row -->
+
+{% block content %}{% endblock %}
+
+</div><!-- close container -->
+
+<div id="footer" class="text-center bg-light top-buffer">
+{% block footer %}
+<div>300 West Main St Arlington, TX 76010 <br> (972) 446-0444</div>
+<a href="/about-us.html" alt="Contact Us">Contact Us</a> | 
+<a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a> |
+<a href="https://www.facebook.com/catalystcreativeart/" alt="Facebook">Facebook</a> | 
+<a href="https://www.tiktok.com/@catalystcreativearts" alt="TikTok">TikTok</a> | 
+<a href="https://www.instagram.com/catalystcreativearts/" alt="Instagram">Instagram</a>
+{% endblock %}
+</div>
+
+</div><!-- close content -->
+
+<script>
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function make_request_get_total(session_id) {
+  fetch('/cart-api/total', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: session_id
+    })
+  })
+  .then(response=>response.json())
+  .then(data=>{
+    console.log(data); 
+    //document.getElementById("top_right_cart_container").style.display = "block";
+    //document.getElementById("top_right_cart_total").innerHTML = data;
+  })
+}
+
+function checkCartTotal() {
+  // FIRST CHECK IF USER HAS SESSION COOKIE
+  //var session_id = document.cookie.split("=")[1];
+  var session_id = getCookie("session_id");
+  console.log("base-site.html session_id: " + session_id);
+  if (session_id) {
+    console.log(session_id)
+    // MAKE A REQUEST TO THE NEW CART API
+    console.log("request to cart api");
+    make_request_get_total(session_id);
+  } else {
+    console.log("No session_id");
+  }
+}
+
+//checkCartTotal();
+</script>
+
+</body>
+
+</html>

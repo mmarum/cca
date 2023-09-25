@@ -37,11 +37,21 @@ site = "https://www.catalystcreativearts.com"
 
 def get_intent(form_data):
     stripe.api_key = passwords["stripe_api_key_prod"]
-    print("stripe_api_key_prod", passwords["stripe_api_key_prod"])
+
+    event_title = form_data["event_title"]
+    event_date = form_data["event_date"]
+    description = f"{event_title} {event_date}"
+
+    if event_title == "Art Camp Registration 2023":
+        calculated_amount = calculate_reg_amount(form_data)
+    else:
+        calculated_amount = calculate_order_amount(form_data)
+
     return stripe.PaymentIntent.create(
-        amount=calculate_order_amount(form_data),
+        amount=calculated_amount,
         currency="usd",
         #automatic_payment_methods={"enabled": False},
+        description=description,
         metadata=form_data,
         payment_method_types=["card"]
     )
@@ -49,6 +59,27 @@ def get_intent(form_data):
 
 def clean_text(text):
     return text.replace(";", "")
+
+
+def calculate_reg_amount(form_data):
+    """
+    $200 per camper. $180 per additional sibling.
+    """
+
+    guest_quantity = int(form_data["guest_quantity"])
+    print("guest_quantity", guest_quantity)
+    total_cost = int(form_data["total_cost"])
+    print("total_cost", total_cost)
+
+    if guest_quantity == 1:
+        return int(200 * 100) # Stripe counts by cents
+
+    elif guest_quantity == 2:
+        return int(380 * 100)
+
+    elif guest_quantity == 3:
+        return int(560 * 100)
+
 
 
 def calculate_order_amount(form_data):
@@ -96,23 +127,27 @@ def calculate_order_amount(form_data):
     price_from_db = int(row[0]["price"])
     print("price_from_db", price_from_db)
 
-    price_text_from_db = row[0]["price_text"].replace("@", " ")
+    price_text_from_db = row[0]["price_text"] #.replace("@", " ")
     print("price_text_from_db", price_text_from_db)
 
+    # variable_price:
     if price_text_from_db != "":
         if variable_price in price_text_from_db:
             var_price = int(variable_price.split("$")[1])
             print("var_price", var_price)
             if int(var_price * guest_quantity) == total_cost:
-                return int(var_price * 100) # Stripe counts by cents
+                return int(total_cost * 100) # Stripe counts by cents
             else:
                 raise Exception("var_price (from form) DOES NOT EQUAL total_from_db")
         else:
             raise Exception("variable_price (from form) IS NOT IN price_text_from_db")
 
+    # additional_scarf:
     elif additional_scarf != "":
         total_minus_extras_from_db = int(price_from_db * guest_quantity)
+
         extra_scarf_cost = 30
+
         extra_costs_subtotal = int(additional_scarf * extra_scarf_cost)
         total_with_extra_scarf = total_minus_extras_from_db + extra_costs_subtotal
         print("total_with_extra_scarf", total_with_extra_scarf)
@@ -121,6 +156,7 @@ def calculate_order_amount(form_data):
         else:
             raise Exception("total_cost (from form) DOES NOT EQUAL total_with_extra_scarf (extra scarves)")
 
+    # all others:
     else:
         total_from_db = int(price_from_db * guest_quantity)
         print("total_from_db", total_from_db)
@@ -130,7 +166,7 @@ def calculate_order_amount(form_data):
             raise Exception("total_cost (from form) DOES NOT EQUAL total_from_db")
 
 
-def clean_phone_number(v):
+def clean_href(v):
     v = v.replace("</a>", "")
     v = re.sub("<a href=.*?>", "", v)
     return v
@@ -146,8 +182,8 @@ def filter_form_data(environ):
             name = temp[0]
             value = unquote(temp[1].replace("+", " "))
             if value != "":
-                if name == "customer_phone" and "href" in value:
-                    value = clean_phone_number(value)
+                if "a href=" in value:
+                    value = clean_href(value)
                 form_data[name] = value
 
         # HTML FORM REQUIREMENTS:
@@ -162,11 +198,14 @@ def filter_form_data(environ):
 
 def unquote_dict(form_data):
     new_dict = {}
+
+    #print("unquote_dict() form_data", form_data)
+
     for k, v in form_data.items():
         v = v.replace("+", " ")
         if v != "":
-            if k == "customer_phone" and "href" in v:
-                v = clean_phone_number(v)
+            if "a href=" in v:
+                v = clean_href(v)
             new_dict[k] = unquote(v)
     return new_dict
 
@@ -193,6 +232,7 @@ def checkout(environ, start_response):
     #### /checkout/ (complete)
     elif environ['REQUEST_METHOD'].upper() == "GET" and environ['PATH_INFO'] == "/" \
         and "payment_intent_client_secret" in environ["QUERY_STRING"]:
+        print("/checkout/ (complete)")
         template = env.get_template("checkout.html")
         response = template.render()
 
@@ -209,7 +249,9 @@ def checkout(environ, start_response):
         print("/checkout/create-payment-intent form_data", form_data)
         #try:
         # form_data becomes the intent object metadata
+
         intent = get_intent(form_data=form_data)
+
         #print("/checkout/create-payment-intent intent", intent)
         intent_data = {
             "clientSecret": intent["client_secret"]
