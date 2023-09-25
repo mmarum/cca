@@ -2,12 +2,58 @@
 {% block title %}Catalyst Creative Arts {{ page_name.replace("-", " ") }}{% endblock %}
 
 {% block html_head %}
+
+{% if page_name == "paint-wars" %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "Paint Wars",
+  "startDate": "2023-10-28 19:00:00",
+  "endDate": "2023-10-28 21:00:00",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "location": {
+    "@type": "Place",
+    "name": "Studio",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "300 West Main St",
+      "addressLocality": "Arlington",
+      "postalCode": "76010",
+      "addressRegion": "TX",
+      "addressCountry": "US"
+    }
+  },
+  "image": [
+    "https://www.catalystcreativearts.com/img/paint-wars-2023-promo.jpg"
+   ],
+  "description": "Paint Wars is a fast and fun painting competition where eight local artists compete in 3 round eliminations where the winners of each round are determined by audience vote. Artists will have to complete their painting in 20 minutes on an 18 x 24 inch canvas.",
+  "offers": {
+    "@type": "Offer",
+    "url": "https://www.catalystcreativearts.com/paint-wars.html",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "validFrom": ""
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": "Catalyst Creative Arts",
+    "url": "https://www.catalystcreativearts.com"
+  }
+}
+</script>
+{% endif %}
+
 <style>
 #thanks_message p {
   padding: 10px;
 }
 </style>
+
 {% endblock %}
+
 
 {% block content %}
 
@@ -26,10 +72,16 @@
 
 <div class="col-md-5">
 
-<h2 class="art-brew">Contact Us</h2>
+<div style="padding-top: 10px;">
+  <h2 class="art-brew">Contact Us</h2>
+</div>
+
 <div>Call or Text: (972) 446-0444</div>
 <div>Email: info@catalystcreativearts.com</div>
 
+<hr>
+
+<!--
 <p>
 Have a question about classes? Interested in booking a private party?
 Fill out this form and we'll be in touch ASAP!
@@ -41,6 +93,7 @@ Fill out this form and we'll be in touch ASAP!
 <p><textarea class="form-control" name="message" onfocus="clearContents(this);">Your message</textarea></p>
 <p><input class="form-control btn btn-success" type="submit" name="submit"/></p>
 </form>
+-->
 
 <script>
 if (window.location.hash) {

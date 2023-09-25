@@ -8,68 +8,158 @@
     max-width: 1350px;
   }
 }
+td {
+  padding: 10px;
+  border-right: 1px dashed LightGray;
+}
+.tr_regs {
+  border: 1px dashed LightGray;
+}
+.tr_divider {
+  height: 50px;
+}
+.new_title {
+  background-color: Khaki;
+  padding: 5px;
+  margin: 5px;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- <p><a href="#wheel-wars">Wheel Wars Registration</a></p> -->
-<!-- <p><a href="/app/admin/registration?view=all">View all including no order IDs</a></p> -->
-
 <h1>Registration</h1>
 
-<table class="table table-striped">
+<table>
+<tr style="background-color: LightGray;">
+  <td>Camper</td>
+  <td>Parent</td>
+  <td>Pickup</td>
+  <td>Order</td>
+</tr>
 
-{% for row in allrows %}
-{% if loop.first %}
-  <tr>
-  <th>Session</th>
-  {% for key, val in row.items() %}
-    <th>{{ key|replace("_", " ") }}</th>
-  {% endfor %}
-  </tr>
+{% for camp, regs in new_reg_dict.items() %}
+
+{% if camp == "art_camp_2023_1" %}
+  {% set camp_date = "June 5-9" %}
+{% elif camp == "art_camp_2023_2" %}
+  {% set camp_date = "June 12-16" %}
+{% elif camp == "art_camp_2023_3" %}
+  {% set camp_date = "June 19-23" %}
+{% elif camp == "art_camp_2023_4" %}
+  {% set camp_date = "June 26-30" %}
+{% elif camp == "art_camp_2023_5" %}
+  {% set camp_date = "July 10-14" %}
+{% elif camp == "art_camp_2023_6" %}
+  {% set camp_date = "July 17-21" %}
+{% elif camp == "art_camp_2023_7" %}
+  {% set camp_date = "July 24-28" %}
+{% elif camp == "art_camp_2023_8" %}
+  {% set camp_date = "July 31 - Aug 4" %}
 {% endif %}
-{% endfor %}
 
+<tr>
+  <td colspan="3"><span class="new_title"><b>{{ camp_date }}</b> {{ camp }}</a></td>
+</tr>
 
-{% for row in allrows %}
-  <tr>
-  <td>{{ row.session_detail }}</td>
-  {% for key, val in row.items() %}
-    <td>{{ val }}</td>
-  {% endfor %}
+{% for reg in regs %}
+  <tr class="tr_regs">
+    <td>
+	{{ reg["camper1_name"] }}
+	{{ reg["camper1_age"] }}
+	{% if reg["camper2_name"] %}<br> {{ reg["camper2_name"] }} {% endif %}
+	{% if reg["camper2_age"] and reg["camper2_age"] != 0 %} {{ reg["camper2_age"] }} {% endif %}
+	{% if reg["camper3_name"] %}<br> {{ reg["camper3_name"] }} {% endif %}
+	{% if reg["camper3_age"] and reg["camper3_age"] != 0 %} {{ reg["camper3_age"] }} {% endif %}
+    </td>
+    <td>
+        {{ reg["parent_name"] }}<br>
+        {{ reg["parent_address"] }}
+        {{ reg["parent_city"] }}
+        {{ reg["parent_state"] }}
+        {{ reg["parent_zip"] }}<br>
+        {{ reg["parent_email"] }}<br>
+        {{ reg["parent_phone"] }}
+    </td>
+    <td>
+        {{ reg["parent_em_name"] }}
+        {{ reg["parent_em_phone"] }}<br>
+        {{ reg["pickup1_name"] }}
+        {{ reg["pickup1_phone"] }}<br>
+        {{ reg["pickup2_name"] }}
+        {{ reg["pickup2_phone"] }}
+    </td>
+    <td>
+
+    {% set order_id = reg["order_id"] %}
+    {% if order_id.startswith("pi_") %}
+      <a href="https://dashboard.stripe.com/payments/{{ order_id }}" target="_blank">{{ order_id }}</a>
+    {% else %}
+      {{ order_id }}
+    {% endif %}
+
+    </td>
   </tr>
 {% endfor %}
 
+<tr class="tr_divider">
+  <td colspan="3"></td>
+</tr>
+
+{% endfor %}
 </table>
 
 <hr>
 
-<a name="wheel-wars"><h1>Wheel Wars</h1></a>
+<a name="wheel-wars"><h1>Paint Wars</h1></a>
 
-<table class="table table-striped">
+<div class="new_title">Saturday Oct 28, 2023, 7-9 PM</div>
 
-<tr class="p-3 mb-2 bg-light text-dark">
-<th></th>
-{% for key, val in data.items() %}
-  {% if loop.index == 1 %}
-    {% for k, v in val.items() %}
-      <th>{{ k }}</th>
-    {% endfor %}
-  {% endif %}
-{% endfor %}
+<table>
+
+<tr style="background-color: LightGray;">
+
+    <td>name, age</td>
+    <td>phone_number</td>
+    <td>email</td>
+    <td>instagram</td>
+    <td>can_paint</td>
+    <td>can_promote</td>
+
 </tr>
 
-{% for key, val in data.items() %}
-  <tr>
-  <td>{{ loop.index }}</td>
-  {% for k, v in val.items() %}
-    <td>{{ v }}</td>
-  {% endfor %}
-  </tr>
+{% for key, reg in data.items() %}
+{% if reg["event_date"] == "Saturday Oct 28, 2023, 7-9 PM" %}
+
+<tr class="tr_regs">
+
+<td>
+    {{ reg["name"] }}<br>
+    Age {{ reg["age"] }}<br>
+</td>
+<td>
+    {{ reg["phone_number"] }}<br>
+</td>
+<td>
+    {{ reg["email"] }}
+</td>
+<td>
+    {{ reg["instagram"] }}
+</td>
+<td>
+    {{ reg["can_paint"] }}
+</td>
+<td>
+    {{ reg["can_promote"] }}
+</td>
+
+</tr>
+
+{% endif %}
 {% endfor %}
 
 </table>
+
 
 
 {% endblock %}

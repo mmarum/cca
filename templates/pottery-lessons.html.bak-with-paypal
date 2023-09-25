@@ -1,0 +1,215 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Pottery Lessons{% endblock %}
+{% block html_head %}
+
+<style>
+.h2, h2 {
+  font-size: 1.6rem;
+}
+#class-option-box, #paypal-button-container, #total {
+  display: none;
+}
+#total {
+  padding: 10px;
+}
+#pottery-images {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+@media only screen and (max-width: 600px) {
+  #pottery-images img {
+    width: 200px;
+  }
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+<center id="upcoming_events">
+<h1 class="art-brew">Pottery Lessons</h1>
+</center>
+
+<div id="pottery-images">
+<img src="/img/small/Resized_20200418_125357-01.jpeg">
+<img src="/img/small/20200624_110444-2.jpg">
+<img src="/img/small/20210424_154335-01.jpeg">
+<img src="/img/small/20210622_115227.jpg">
+</div>
+
+<!--
+events: {{ events }}
+<hr>
+orders_count: {{ orders_count }}
+<hr>
+events_object: {{ events_object }}
+<hr>
+-->
+
+<div class="col-lg-12">
+<h3>Private Pottery Wheel Lesson</h3>
+<ul>
+<li>Private pottery wheel lessons can be purchased for $100 for a single 90 minute lesson. </li>
+<li>Or $250 for a 6 hour lesson package (split up into 4 days). Lesson 2 thru 4 will be scheduled at the first lesson.</li>
+<li>Lesson choices are designed for 1 person or for 2 people that want to share the lesson. </li>
+<li><span style="color: green; font-weight: bold; background-color: LightGray;">Book one time for up to 2 people</span></li>
+<li>Pottery projects made at lessons will be glazed (painted) at a scheduled date about 2 weeks after the original lesson. </li>
+<li>Students need to wear clothes that can get dirty and fingernails must be trimmed no longer than the end of the finger tip. </li>
+<li>Recommended for ages 8 and up. </li>
+<li><span style="color: green; font-weight: bold; background-color: LightGray;">24 hour notice required for lesson cancelation or reschedule</span></li>
+</ul>
+</div>
+
+<form name="pottery_form" id="pottery_form">
+
+<div class="col-lg-12">
+<h3>Choose a date:</h3>
+{% for event in events %}
+  {% if orders_count[event.eid] and orders_count[event.eid] >= event.elimit %}
+    <!-- class purchased already -->
+  {% else %}
+      <div>
+      <input type="radio" id="eid_{{ event.eid }}" name="pottery_lesson" value="{{ event.eid }}" onClick="chooseDate({{ event.eid }})">
+      <label for="eid_{{ event.eid }}">
+      {{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}
+      </label>
+      </div>
+  {% endif %}
+{% endfor %}
+</div>
+
+<div class="col-lg-12" id="class-option-box">
+<h3>Choose a class type:</h3>
+  <div>
+    <input type="radio" id="class_option_1" name="class_option" value="90 minute lesson @ $100" onClick="chooseType('class_option_1')">
+    <label for="class_option_1">90 minute lesson @ $100</label>
+  </div>
+  <div>
+    <input type="radio" id="class_option_2" name="class_option" value="6 hour lesson package @ $250" onClick="chooseType('class_option_2')">
+    <label for="class_option_2">6 hour lesson package @ $250</label>
+    <div style="padding-left: 40px; font-size: 11px; margin-top: -10px">
+      6 hour lesson package: <br> Date chosen above will be the first of 4 lessons. <br> The other 3 will be scheduled on first visit.
+    </div>
+  </div>
+</div>
+
+<div class="col-lg-12">
+
+    <div id="total">
+      <center>
+      <div style="padding: 10px; width: 75%">
+        <input type="text" id="cca_buyer_name" name="cca_buyer_name" placeholder="Your name" required class="form-control">
+      </div>
+      <div style="padding: 10px; width: 75%">
+        <input type="tel" id="cca_buyer_phone" name="cca_buyer_phone" placeholder="Your phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required class="form-control">
+      </div>
+      <center>Total: $<span id="subtotal">0</span></center>
+      </center>
+    </div>
+
+    <div id="thanks"></div>
+
+    <div id="paypal-button-container" class="text-center"></div>
+
+    <!--
+    <script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
+    // SANDBOX
+    </script>
+    -->
+
+    <script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+    // PRODUCTION
+    </script>
+
+</div>
+
+</form>
+
+<script>
+
+function chooseDate(eid) {
+  document.getElementById("class-option-box").style.display = "block";
+  location.href='#class-option-box';
+}
+
+function chooseType(choice) {
+  document.getElementById("paypal-button-container").style.display = "block";
+  document.getElementById("total").style.display = "block";
+  var class_price = getFormChoices()["class_price"];
+  document.getElementById("subtotal").innerHTML = class_price;
+  location.href='#paypal-button-container';
+}
+
+function getFormChoices() {
+  var event_id = document.getElementById("pottery_form").pottery_lesson.value;
+  var class_option = document.getElementById("pottery_form").class_option.value;
+  var cca_buyer_name = document.getElementById("pottery_form").cca_buyer_name.value;
+  var cca_buyer_phone = document.getElementById("pottery_form").cca_buyer_phone.value;
+  if (class_option == '90 minute lesson @ $100') {
+    var class_price = 100;
+  } else {
+    var class_price = 250;
+  }
+  return { "event_id": event_id, "class_price": class_price, "cca_buyer_name": cca_buyer_name, "cca_buyer_phone": cca_buyer_phone }
+}
+
+function getCcaOrderId() {
+  epoch_time = new Date().getTime();
+  random_num = Math.floor((Math.random() * 100000) + 10000);
+  return String(epoch_time) + "_" + String(random_num);
+}
+
+var cca_order_id = getCcaOrderId();
+
+paypal.Buttons({
+  createOrder: function(data, actions) {
+    console.log(cca_order_id);
+    fetch('/order/prep', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        event_id: getFormChoices()["event_id"],
+        cca_order_id: cca_order_id,
+        cca_buyer_name: getFormChoices()["cca_buyer_name"],
+        cca_buyer_phone: getFormChoices()["cca_buyer_phone"],
+        class_price: getFormChoices()["class_price"]
+      })
+    });
+    return actions.order.create({
+      purchase_units: [{
+        amount: {
+          value: getFormChoices()["class_price"]
+        }
+      }]
+    });
+  },
+  onApprove: function(data, actions) {
+    return actions.order.capture().then(function(details) {
+      var thanks_text = "Transaction complete. Thank you " + details.payer.name.given_name;
+      thanks_text += ". Order ID: " + details.id;
+      document.getElementById("thanks").innerHTML += thanks_text;
+      document.getElementById("paypal-button-container").style.display = "none";
+      console.log(details);
+      return fetch('/order/submit', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          orderID: data.orderID,
+          event_id: getFormChoices()["event_id"],
+          quantity: 1,
+          cca_order_id: cca_order_id,
+          variable_time_slot: "",
+          details: details
+        })
+      });
+    });
+  }
+}).render('#paypal-button-container');
+
+</script>
+{% endblock %}

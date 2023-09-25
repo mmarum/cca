@@ -80,15 +80,6 @@ var browser_size = {
   padding-right: 20px;
 }
 
-.nav-item:nth-child(odd) {
-  /* color: #404040; */
-  color: Lightseagreen;
-}
-
-.nav-item:nth-child(even) {
-  color: #707070;
-}
-
 @media only screen and (max-width: 600px) {
 
   .art-brew {
@@ -249,6 +240,9 @@ td {
   display: none;
   background-color: #FFF;
 }
+#upcoming_events {
+  padding-top: 10px;
+}
 </style>
 
 </head>
@@ -310,26 +304,14 @@ td {
   <div class="col-sm-12 nav-scroll">
     <center>
 
-	<a class="nav-item" href="/">Home</a>
 	<a class="nav-item" href="/shop">Online Store</a>
 	<a class="nav-item" href="/calendar.html">Events Calendar</a>
+	<a class="nav-item" href="/pottery-lessons.html">Pottery Lessons</a>
+	<!-- <a class="nav-item" href="/art-camp.html">Art Camp</a> -->
+	<a class="nav-item" href="/paint-wars.html">Paint Wars</a>
 	<a class="nav-item" href="/private-events.html">Private Events</a>
-	<!-- <a class="nav-item" href="#" onclick="navbardrop('dropdown-menu'); return false;">Crafts Gallery</a> -->
 	<a class="nav-item" href="/crafts-gallery.html">Crafts Gallery</a>
-	<!-- <a class="nav-item" href="/3-wednesdays-workshop.html">3 Wednesdays Workshop</a> -->
-	<!-- <a class="nav-item" href="/after-school.html">After School</a> -->
-	<!-- <a class="nav-item" href="/summer-camp.html">Summer Camp</a> -->
-	<a class="nav-item" href="/art-camp.html">Art Camp</a>
-	<!-- <a class="nav-item" href="/media.html">Media</a> -->
 	<a class="nav-item" href="/about-us.html">About Us</a>
-
-  <!--
-  <div id="dropdown-menu">
-  {% for i in ["Acrylic Painting", "Watercolor Painting", "Paint Your Pet", "Artist Guided Family Painting", "Alcohol Ink", "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", "Resin Crafts", "Water Marbling", "Pottery Painting", "String Art", "Pottery Lessons"] -%}
-    <a href="/{{ i|replace(' ', '-')|replace(',', '')|replace('&', '')|lower }}.html">{{ i }}</a>
-  {%- endfor %}
-  </div>
-  -->
 
     </center>
   </div><!-- close col -->
@@ -341,11 +323,10 @@ td {
 
 <div id="footer" class="text-center bg-light top-buffer">
 {% block footer %}
-<div>400 E. Division St. Ste 100 Arlington, TX 76011 | (972) 446-0444</div>
+<div>300 West Main St Arlington, TX 76010 <br> (972) 446-0444</div>
 <a href="/about-us.html" alt="Contact Us">Contact Us</a> | 
 <a href="mailto:INFO@CATALYSTCREATIVEARTS.COM">info@catalystcreativearts.com</a> |
 <a href="https://www.facebook.com/catalystcreativeart/" alt="Facebook">Facebook</a> | 
-<!-- <a href="https://www.twitter.com/PWI_Carrollton" alt="Twitter">Twitter</a> | -->
 <a href="https://www.tiktok.com/@catalystcreativearts" alt="TikTok">TikTok</a> | 
 <a href="https://www.instagram.com/catalystcreativearts/" alt="Instagram">Instagram</a>
 {% endblock %}
@@ -354,17 +335,57 @@ td {
 </div><!-- close content -->
 
 <script>
-function navbardrop(div_id_name) {
-  var navbardrop_state = document.getElementById(div_id_name).style.display;
-  if (navbardrop_state == "block") {
-    console.log("closing "+div_id_name);
-    navbardrop_state = "none";
-  } else {
-    console.log("opening "+div_id_name);
-    navbardrop_state = "block";
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
   }
-  document.getElementById(div_id_name).style.display = navbardrop_state;
+  return "";
 }
+
+function make_request_get_total(session_id) {
+  fetch('/cart-api/total', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      session_id: session_id
+    })
+  })
+  .then(response=>response.json())
+  .then(data=>{
+    console.log(data); 
+    //document.getElementById("top_right_cart_container").style.display = "block";
+    //document.getElementById("top_right_cart_total").innerHTML = data;
+  })
+}
+
+function checkCartTotal() {
+  // FIRST CHECK IF USER HAS SESSION COOKIE
+  //var session_id = document.cookie.split("=")[1];
+  var session_id = getCookie("session_id");
+  console.log("base-site.html session_id: " + session_id);
+  if (session_id) {
+    console.log(session_id)
+    // MAKE A REQUEST TO THE NEW CART API
+    console.log("request to cart api");
+    make_request_get_total(session_id);
+  } else {
+    console.log("No session_id");
+  }
+}
+
+//checkCartTotal();
 </script>
 
 </body>

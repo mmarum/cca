@@ -24,6 +24,7 @@ groups = {
     "home",
     "calendar",
     "private-events", 
+    "gift-card", 
     #"about-contact", 
     "about-us", 
     "media",
@@ -33,11 +34,13 @@ groups = {
     #"summer-camp",
     "art-camp",
     "wheel-wars",
+    "paint-wars",
     "3-wednesdays-workshop",
     "cart",
     "build-individual-event",
     "crafts-gallery",
-    "listening-room"
+    "listening-room",
+    "pottery-lessons"
   ],
 "galleries": [
     "commissioned-art",

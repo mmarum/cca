@@ -1,5 +1,5 @@
 {% extends "base-site.html" %}
-{% block title %}Catalyst Creative Arts Wheel Wars Registration{% endblock %}
+{% block title %}Catalyst Creative Arts Paint Wars Registration{% endblock %}
 
 {% block html_head %}
 <style>
@@ -16,32 +16,29 @@ h5 {
   }
 }
 </style>
+
 {% endblock %}
 
 {% block content %}
 
 <center>
-<h1>Catalyst Creative Arts Wheel Wars</h1>
+<h1 style="padding-top: 10px;">Catalyst Creative Arts Paint Wars</h1>
 <h3>Registration & Release Form</h3>
+
+<p style="padding-top: 10px;">Saturday Oct 28, 2023, 7-9 PM</p>
+<p>Hosted By Growl Records and Division Brewing</p>
+   
 </center>
 
-<p>Wheel Wars Saturday, March 25, 2023 3-5PM</p>
-<p>Hosted By Growl Records, 509 E Abram St, Arlington, TX 76010</p>
-   
-<!--
 <div class="row">
   <div class="col-sm-12">
     <h5>{% if data %}CONFIRM YOUR{% else %}PARTICIPANT{% endif %} INFORMATION</h5>
-    (Eight competitors will be chosen)
+    <!-- (Eight competitors will be chosen) -->
   </div>
 </div>
--->
-
-<p>Registration closed</p>
 
 {% if data %}
 
-<!--
 <form action="/registration/{{ registration_name }}/edit" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
 <input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
 
@@ -54,7 +51,7 @@ h5 {
 
 <div class="row" id="edit_continue_row">
   <div class="col-sm-6 text-right">
-    <button type="button" class="btn btn-warning" onClick="edit(); return false;">Edit</button>
+    <!-- <button type="button" class="btn btn-warning" onClick="edit(); return false;">Edit</button> -->
   </div>
   <div class="col-sm-6">
     <button type="button" class="btn btn-success" onClick="complete(); return false;">Submit</button>
@@ -63,11 +60,15 @@ h5 {
 
 </form>
 
--->
 
 {% elif form %}
 
 <!--
+<div style="background-color: Yellow; padding: 10px;">
+Registration closed
+</div>
+-->
+
 
 <form action="/registration/{{ registration_name }}/confirm" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
 
@@ -98,40 +99,23 @@ h5 {
     {{ form.email(class="form-control") }}
   </div>
   <div class="col-sm-4">
-    {{ form.shirt_size.label(class="form-text text-muted") }}
-    {{ form.shirt_size(class="form-control") }}
+    {{ form.instagram.label(class="form-text text-muted") }}
+    {{ form.instagram(class="form-control") }}
   </div>
   <div class="col-sm-4">
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-sm-4">
-    {{ form.city.label(class="form-text text-muted") }}
-    {{ form.city(class="form-control") }}
-  </div>
-  <div class="col-sm-4">
-    {{ form.career.label(class="form-text text-muted") }}
-    {{ form.career(class="form-control") }}
-  </div>
-  <div class="col-sm-4">
-    {{ form.use_wheel.label(class="form-text text-muted") }}
-    {{ form.use_wheel(class="form-control") }}
+    {{ form.can_paint.label(class="form-text text-muted") }}
+    {{ form.can_paint(class="form-control") }}
   </div>
 </div>
 
 <div class="row">
   <div class="col-sm-4">
-    {{ form.experience.label(class="form-text text-muted") }}
-    {{ form.experience(class="form-control") }}
+    {{ form.can_promote.label(class="form-text text-muted") }}
+    {{ form.can_promote(class="form-control") }}
   </div>
   <div class="col-sm-4">
-    {{ form.items.label(class="form-text text-muted") }}
-    {{ form.items(class="form-control") }}
   </div>
   <div class="col-sm-4">
-    {{ form.interests.label(class="form-text text-muted") }}
-    {{ form.interests(class="form-control") }}
   </div>
 </div>
 
@@ -139,7 +123,7 @@ h5 {
   <div class="col-sm-12">
 {{ form.photo_release }}
 {{ form.photo_release.label(for="photo_release") }}<br/>
-<small>I, the undersigned, grant Catalyst Creative, LLC d/b/a CATALYST CREATIVE ARTS, permission to use any pictures taken in public view of myself individually, my child (participant(s) listed above), or any in which I (or the participant(s)) appear in whole or in part during Wheel Wars competition. I understand that these pictures may be reproduced in print and electronic media specifically to promote CATALYST CREATIVE ARTS. I waive any right to inspect or approve said pictures, or any captions or accompanying texts that may be used in connection with them, or to approve the use to which said materials may be applied</small>
+<small>I, the undersigned, grant Catalyst Creative, LLC d/b/a CATALYST CREATIVE ARTS, permission to use any pictures taken in public view of myself individually, my child (participant(s) listed above), or any in which I (or the participant(s)) appear in whole or in part during Paint Wars competition. I understand that these pictures may be reproduced in print and electronic media specifically to promote CATALYST CREATIVE ARTS. I waive any right to inspect or approve said pictures, or any captions or accompanying texts that may be used in connection with them, or to approve the use to which said materials may be applied</small>
   </div>
 </div>
 
@@ -160,7 +144,8 @@ h5 {
 
 </form>
 
--->
+
+
 
 {% elif status == "complete" %}
 
@@ -171,7 +156,6 @@ Thank you for registering. We will contact you soon for details.
 <script>
 {% if form %}
 document.getElementById("age").placeholder = "{{ form.age.description }}";
-document.getElementById("items").placeholder = "{{ form.items.description }}";
 
 function validate() {
   if (document.getElementById("name").value == "") {

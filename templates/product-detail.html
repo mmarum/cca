@@ -3,6 +3,7 @@
 
 {% block html_head %}
 <style>
+
 #continue_shopping {
   margin-top: 10px;
   display: none;
@@ -51,21 +52,28 @@ img.check {
 </div>
 
 <div class="col-md-3 text-center">
-  <a href="/shop/">Shop</a>
+  <div style="padding-top: 15px;">
+  <a href="/shop/" id="shop_link">Back to shop</a>
+  </div>
 </div>
 
 <div class="col-md-4 text-center">
-  <a href="/cart/">Cart</a>
+  <center id="upcoming_events">
+    <h1 class="art-brew">Shop</h1>
+  </center>
 </div>
 
-<div class="col-md-3 text-center">
-  <!-- placeholder -->
+<div class="col-md-3 text-center" id="totals_box">
+  <div style="padding-top: 15px;">
+  <a href="/cart/" id="shop_link">Go to cart</a>
+  </div>
 </div>
 
 <div class="col-sm-1">
 </div>
 
 </div>
+
 
 <div class="row product_row top-buffer-no-line">
 
@@ -140,6 +148,22 @@ img.check {
 //  alert(val);
 //}
 
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
 function plusMinus(n) {
   v = document.getElementById("product_quantity_select").value;
   //console.log(v);
@@ -184,7 +208,9 @@ function addToCart(pid) {
     alert("Select quantity");
   } else {
     // FIRST CHECK IF USER HAS SESSION COOKIE
-    var session_id = document.cookie.split("=")[1];
+    //var session_id = document.cookie.split("=")[1];
+    var session_id = getCookie("session_id");
+    console.log("product-detail.html session_id: " + session_id);
 
     if (session_id) {
       console.log("Existing session_id. Let's use it");

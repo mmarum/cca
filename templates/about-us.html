@@ -18,12 +18,16 @@
   Fill out this form and we'll be in touch ASAP! To view the paintings 
   available for classes and parties, visit our gallery HERE!</p>
 
-  <h2 class="art-brew">CONTACT US</h2>
+  <div style="padding-top: 10px;">
+    <h2 class="art-brew">Contact Us</h2>
+  </div>
+
   <form action="/app/contact" method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
   <p><input type="text" name="email" placeholder="Email"/></p>
   <p><textarea name="message"></textarea></p>
   <p><input type="submit" name="submit"/></p>
   </form>
+
 {% endif %}
 
 {% endblock %}

@@ -31,7 +31,10 @@
 
     </div>
     <div class="col-lg-8">
-      <h2>{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</h2>
+      {% if event.eid == 964 or "gift card" in event.title.lower() %}
+      {% else %}
+        <h2>{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</h2>
+      {% endif %}
       <h3>
 
       {% if private_event == "True" %}

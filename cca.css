@@ -1,0 +1,212 @@
+@font-face {
+  font-family: BebasNeue-Bold;
+  src: url('/fonts/BebasNeue-Bold.otf');
+  src: url('/fonts/BebasNeue-Bold.otf') format('embedded-opentype'),
+  url('/fonts/BebasNeue-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: Cutive-Regular;
+  src: url('/fonts/Cutive-Regular.otf');
+  src: url('/fonts/Cutive-Regular.otf') format('embedded-opentype'),
+  url('/fonts/Cutive-Regular.ttf') format('truetype');
+}
+
+#logo-box {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-stretch: normal;
+  font-size: xx-large;
+  line-height: normal;
+  color: #101010;
+  font-family: 'BebasNeue-Bold', Arial, Verdana, Sans-serif;
+}
+
+#logo-name a {
+  text-decoration: none;
+  color: #101010;
+}
+
+.art-brew {
+  font-weight: normal;
+  letter-spacing: 1px;
+  color: #A0A0A0;
+  line-height: 90%;
+  padding-top: 10px;
+  font-family: 'BebasNeue-Bold', Arial, Verdana, Sans-serif;
+}
+
+.nav-item {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.nav-item:nth-child(odd) {
+  /* color: #404040; */
+  color: Lightseagreen;
+}
+
+.nav-item:nth-child(even) {
+  color: #707070;
+}
+
+@media only screen and (max-width: 600px) {
+
+  .art-brew {
+    font-size: 300%;
+  }
+  .logo-circle {
+    width: 150px;
+  }
+  #logo-circles {
+    width: 300px;
+    overflow: hidden;
+  }
+  #logo-circle-one {
+    width: 150px; 
+    float: left;
+  }
+  #logo-circle-two {
+    width: 150px; 
+    margin-left: 150px;
+  }
+  #logo-name, #logo-circles {
+    text-align: center;
+  }
+  #logo-name-one {
+    font-size: 280%;
+    letter-spacing: 3px;
+  }
+  #logo-name-two {
+    font-size: 180%;
+    line-height: 50%;
+    letter-spacing: 2px;
+  }
+  .nav-item:first-child {
+    margin-left: -10px;
+  }
+  #dropdown-menu {
+    position: static;
+  }
+
+}
+
+@media only screen and (min-width: 601px) {
+
+  .art-brew {
+    font-size: 400%;
+  }
+  #logo-box {
+    width: 850px;
+    overflow: hidden;
+  }
+  #logo-circles {
+    width: 100px; 
+    float: left;
+  }
+  #logo-name {
+    margin-left: 250px;
+  }
+  #logo-name-one {
+    font-size: 530%;
+    letter-spacing: 10px;
+  }
+  #logo-name-two {
+    font-size: 375%;
+    line-height: 50%;
+    letter-spacing: 1px;
+  }
+  #dropdown-menu {
+    width: 250px;
+    height: 350px;
+    border: 1px solid Gray;
+    cursor: pointer;
+    position: absolute;
+    margin-left: 350px;
+    z-index: 2;
+  }
+
+}
+
+.top-buffer { 
+  padding: 10px 0 10px 0;
+  margin: 10px 0 10px 0;
+  border-top: 1px dashed LightGray;
+}
+.top-buffer-no-line { 
+  padding: 10px 0 10px 0;
+  margin: 10px 0 10px 0;
+}
+table {
+  width: 100%;
+}
+td {
+  border-bottom: 1px solid LightGray;
+  border-right: 1px solid LightGray;
+  padding: 5px;
+  padding: 5px;
+}
+.event_image {
+  width: 100%;
+  padding: 5px;
+}
+
+@media only screen and (max-width: 600px) {
+  .top-buffer {
+    padding: 15px 0 15px 0;
+    margin: 15px 0 15px 0;
+    border-bottom: 3px dashed Gray;
+  }
+  .logo {
+    padding: 10px 0 10px 0;
+  }
+  img {
+    width: 100%;
+  }
+  .tagline {
+    display: block;
+    line-height: 80%;
+  }
+  .nav-scroll {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+  .nav-item {
+    display: inline-block;
+  }
+}
+
+#tagline-box {
+  font-size: 30px;
+  font-family: 'BebasNeue-Bold', Arial, Verdana, Sans-serif;
+  padding: 10px 0 5px 0;
+}
+.tag-one, .tag-three {
+  color: #404040;
+}
+.tag-two {
+  color: #707070;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.logo {
+  width: 100%;
+  max-width: 915px;
+}
+.nav {
+  background-color: #EEE;
+  padding: 10px;
+}
+.nav a {
+  padding-right: 0px;
+  color: #555;
+  text-decoration: none;
+}
+#dropdown-menu a {
+  display: block;
+}
+#dropdown-menu {
+  display: none;
+  background-color: #FFF;
+}

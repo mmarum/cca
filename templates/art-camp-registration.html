@@ -1,26 +1,19 @@
 {% extends "base-site.html" %}
 
-{% block title %}Catalyst Creative Arts: Art Camp 2022 Registration{% endblock %}
+{% block title %}Catalyst Creative Arts: Art Camp 2023 Registration{% endblock %}
 
 {% block html_head %}
 <style>
-h5 {
+h3, h5 {
   padding-top: 20px;
 }
 #session_detail_box {
-  border-left: 2px dashed Gray;
-  padding: 19px 10px 1px 10px;
-}
-#session_detail_box p {
-  line-height: 10px;
+  text-align: center;
+  padding: 20px;
 }
 .top-pad {
   padding-top: 10px;
 }
-{% if form %}
-{% if not form.camper2_name.data %}#camper2_group, #add_camper2, {% endif %}
-{% if not form.camper3_name.data %}#camper3_group, #add_camper3, {% endif %}
-{% endif %}
 #paypal-button-container {
   display: none;
 }
@@ -40,7 +33,7 @@ h5 {
 {% block content %}
 
 <center>
-<h3>Art Camp 2022 Registration & Release Form</h3>
+<h3>Art Camp 2023 Registration & Release Form</h3>
 </center>
 
 {% if form %}
@@ -69,32 +62,36 @@ h5 {
 
 <div id="session_detail_box">
 
-{% if camper_count and (camper_count >= 15 and session_name not in ["art_camp_2022_2", "art_camp_2022_3"]) %}
+{% if camper_count and camper_count >= 15 %}
   CLASS IS FULL
   <script>var class_full = true;</script>
+{% elif session_name == "art_camp_2023_1" or session_name == "art_camp_2023_2"%}
+  CLASS IS CLOSED
+  <script>var class_full = true;</script>
 {% else %}
-  <p>Art Camp {{ session_name|replace("art_camp_2022_", "") }}</p>
-  <p>{% if session_name == "art_camp_2022_3" %}Ages 12 and Up{% else %}Ages 5 thru 12{% endif %}</p>
+  <p><b>"Art Camp {{ session_name|replace("art_camp_2023_", "") }}"
+  {% if session_name == "art_camp_2023_3" or session_name == "art_camp_2023_7" %}Ages 11 thru 15{% else %}Ages 6 thru 11{% endif %}</b></p>
   <p>Begins
-    {% if session_name == "art_camp_2022_1" %}
-      June 13,
-    {% elif session_name == "art_camp_2022_2" %}
-      June 20,
-    {% elif session_name == "art_camp_2022_3" %}
-      July 11,
-    {% elif session_name == "art_camp_2022_4" %}
-      July 18,
-    {% elif session_name == "art_camp_2022_5" %}
-      Jun 27,
+    {% if session_name == "art_camp_2023_1" %}
+    June 5-9
+    {% elif session_name == "art_camp_2023_2" %}
+    June 12-16
+    {% elif session_name == "art_camp_2023_3" %}
+    June 19-23
+    {% elif session_name == "art_camp_2023_4" %}
+    June 26-30
+    {% elif session_name == "art_camp_2023_5" %}
+    July 10-14
+    {% elif session_name == "art_camp_2023_6" %}
+    July 17-21
+    {% elif session_name == "art_camp_2023_7" %}
+    July 24-28
+    {% elif session_name == "art_camp_2023_8" %}
+    July 31 - Aug 4
     {% endif %}
-  2022</p>
-  <p>$200 per camper. $180 per additional family member.</p>
-  <p>9am-12pm</p>
-  {% if session_name == "art_camp_2022_2" %}
-    <p>1 spot left</p>
-  {% else %}
-    <p>{% if camper_count %}{{ 15 - camper_count }}{% else %}15{% endif %} spots left</p>
-  {% endif %}
+  2023 9am-12pm</p>
+  <p><span style="background-color: Beige; padding: 10px;">{% if camper_count %}{{ 15 - camper_count }}{% else %}15{% endif %} (of 15) spots left</span></p>
+  <p>$200 per camper. $180 per additional sibling.</p>
 {% endif %}
 
 </div>
@@ -103,10 +100,56 @@ h5 {
 
 {% if data and rid %}
 
+<!--
+{{ data|safe }}
+-->
+
 <!-- BELOW IS THE CONFIRM SCREEN -->
 
-<form action="/registration/{{ registration_name }}/edit" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
+<form action="/checkout/" method="POST" name="registration_form" id="registration_form">
+
 <input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
+
+<input type="hidden" name="event_title" value="Art Camp Registration 2023">
+
+{% if session_name == "art_camp_2023_1" %}
+  <input type="hidden" name="event_date" value="June 5-9 2023">
+{% elif session_name == "art_camp_2023_2" %}
+  <input type="hidden" name="event_date" value="June 12-16 2023">
+{% elif session_name == "art_camp_2023_3" %}
+  <input type="hidden" name="event_date" value="June 19-23 2023">
+{% elif session_name == "art_camp_2023_4" %}
+  <input type="hidden" name="event_date" value="June 26-30 2023">
+{% elif session_name == "art_camp_2023_5" %}
+  <input type="hidden" name="event_date" value="July 10-14 2023">
+{% elif session_name == "art_camp_2023_6" %}
+  <input type="hidden" name="event_date" value="July 17-21 2023">
+{% elif session_name == "art_camp_2023_7" %}
+  <input type="hidden" name="event_date" value="July 24-28 2023">
+{% elif session_name == "art_camp_2023_8" %}
+  <input type="hidden" name="event_date" value="July 31 - Aug 4 2023">
+{% endif %}
+
+<!-- TAKE EMAIL OFF THE PAGE CUZ CC PAGE COLLECTS IT -->
+
+<input type="hidden" name="camper1_name" value="{{ data['camper1_name'] }}">
+<input type="hidden" name="camper1_age" value="{{ data['camper1_age'] }}">
+<input type="hidden" name="camper2_name" value="{{ data['camper2_name'] }}">
+<input type="hidden" name="camper2_age" value="{{ data['camper2_age'] }}">
+<input type="hidden" name="camper3_name" value="{{ data['camper3_name'] }}">
+<input type="hidden" name="camper3_age" value="{{ data['camper3_age'] }}">
+<input type="hidden" name="customer_name" value="{{ data['parent_name'] }}">
+<input type="hidden" name="parent_address" value="{{ data['parent_address'] }}">
+<input type="hidden" name="parent_city" value="{{ data['parent_city'] }}">
+<input type="hidden" name="parent_state" value="{{ data['parent_state'] }}">
+<input type="hidden" name="parent_zip" value="{{ data['parent_zip'] }}">
+<input type="hidden" name="customer_phone" value="{{ data['parent_phone'] }}">
+<input type="hidden" name="parent_em_name" value="{{ data['parent_em_name'] }}">
+<input type="hidden" name="parent_em_phone" value="{{ data['parent_em_phone'] }}">
+<input type="hidden" name="pickup1_name" value="{{ data['pickup1_name'] }}">
+<input type="hidden" name="pickup1_phone" value="{{ data['pickup1_phone'] }}">
+<input type="hidden" name="pickup2_name" value="{{ data['pickup2_name'] }}">
+<input type="hidden" name="pickup2_phone" value="{{ data['pickup2_phone'] }}">
 
 {% if data and data["session_detail"] %}
 <input type="hidden" name="session_detail" id="session_detail" value="{{ data['session_detail'] }}"/>
@@ -143,7 +186,9 @@ h5 {
     <button type="button" class="btn btn-warning" onClick="edit(); return false;">Edit Info</button>
   </div>
   <div class="col-sm-6">
-    <button type="button" class="btn btn-success" onClick="continuePay(); return false;">Pay with PayPal</button>
+    <input type="hidden" name="total_cost" id="total_cost" value="">
+    <input type="hidden" name="guest_quantity" id="guest_quantity" value="">
+    <button type="button" class="btn btn-success" onClick="continuePay(); return false;">Proceed to checkout</button>
   </div>
 </div>
 </form>
@@ -177,46 +222,30 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
   </div>
   <div class="col-sm-4">
     {{ form.camper1_age.label(class="form-text text-muted") }}
-    {{ form.camper1_age(class="form-control", onfocus="showMore('add_camper2');") }}
+    {{ form.camper1_age(class="form-control") }}
   </div>
 </div>
 
-<div class="row" id="add_camper2">
-  <div class="col-sm-12">
-    <p><a href="#" onclick="showMore(2); return false;">Add a second participant</a></p>
-  </div>
-</div>
-
-<div id="camper2_group">
 <div class="row">
   <div class="col-sm-4">
     {{ form.camper2_name.label(class="form-text text-muted") }}
-    {{ form.camper2_name(class="form-control") }}
+    {{ form.camper2_name(class="form-control", placeholder="OPTIONAL") }}
   </div>
   <div class="col-sm-4">
     {{ form.camper2_age.label(class="form-text text-muted") }}
-    {{ form.camper2_age(class="form-control", onfocus="showMore('add_camper3');") }}
-  </div>
-</div>
-</div>
-
-<div class="row" id="add_camper3">
-  <div class="col-sm-12">
-    <p><a href="#" onclick="showMore(3); return false;">Add a third participant</a></p>
+    {{ form.camper2_age(class="form-control") }}
   </div>
 </div>
 
-<div id="camper3_group">
 <div class="row">
   <div class="col-sm-4">
     {{ form.camper3_name.label(class="form-text text-muted") }}
-    {{ form.camper3_name(class="form-control") }}
+    {{ form.camper3_name(class="form-control", placeholder="OPTIONAL") }}
   </div>
   <div class="col-sm-4">
     {{ form.camper3_age.label(class="form-text text-muted") }}
     {{ form.camper3_age(class="form-control") }}
   </div>
-</div>
 </div>
 
 <div class="row">
@@ -334,21 +363,7 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
 
 {% endif %}
 
-{% if data and data.parent_name == "__TEST__" %}
-<h1>SANDBOX</h1>
-<script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
-// SANDBOX
-</script>
-{% else %}
-<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
-// PRODUCTION
-</script>
-{% endif %}
-
-<div id="paypal-button-container" class="text-center top-buffer"></div>
-
 <script>
-
 if (class_full && class_full == true) {
   document.getElementById("registration_form").style.display = "none";
 }
@@ -360,7 +375,6 @@ function calculate() {
   var first_camper_price = 200;
   var more_camper_price = 180;
   for (i = 1; i <= 3; i++) {
-    //console.log(i);
     try {
       camperNameLen[i] = document.getElementById("camper"+i+"_name").innerHTML.length;
       console.log(camperNameLen[i]);
@@ -378,10 +392,10 @@ function calculate() {
       console.log("total: " + total);
     }
   }
-
   document.getElementById("total").innerHTML = total;
   document.getElementById("number_of_campers").innerHTML = number_of_campers;
-
+  document.getElementById("total_cost").value = total;
+  document.getElementById("guest_quantity").value = number_of_campers;
   return total;
 }
 
@@ -389,73 +403,15 @@ if (page == "confirm") {
   calculate();
 }
 
-function showMore(n) {
-  if (n == "add_camper2" || n == "add_camper3") {
-    document.getElementById(n).style.display = "block";
-  } else {
-    document.getElementById("camper"+n+"_group").style.display = "block";
-    document.getElementById("add_camper"+n).style.display = "none";
-  }
-}
-
 function edit() {
+  document.registration_form.action = "/registration/{{ registration_name }}/edit";
   document.registration_form.submit();
   return true;
 }
 
 function continuePay() {
-  document.getElementById("paypal-button-container").style.display = "block";
-  return false;
-}
-
-// PAYPAL STUFF
-if (page == "confirm") {
-  paypal.Buttons({
-    createOrder: function(data, actions) {
-      return actions.order.create({
-        purchase_units: [{
-          amount: {
-            value: calculate()
-          }
-        }]
-      });
-    },
-    onApprove: function(data, actions) {
-      return actions.order.capture().then(function(details) {
-        //alert('Transaction completed by ' + details.payer.name.given_name);
-
-        var transaction_completed_text = "Transaction complete. Thank you " + details.payer.name.given_name;
-        transaction_completed_text += " Order ID: " + details.id;
-        document.getElementById("paypal-button-container").style.display = 'none';
-        document.getElementById("edit_continue_row").innerHTML = transaction_completed_text;
-        document.getElementById("edit_continue_row").style.backgroundColor = "green";
-
-        //console.log(details);
-        // Call your server to save the transaction
-        //return fetch('/app/paypal-transaction-complete', {
-        return fetch('/registration/{{ registration_name }}/complete', {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            {% if data and rid %}registration_id: {{ rid }},{% endif %}
-            order_id: data.orderID,
-            parent_name: document.getElementById("parent_name").innerHTML,
-            parent_address: document.getElementById("parent_address").innerHTML,
-            parent_city: document.getElementById("parent_city").innerHTML,
-            parent_state: document.getElementById("parent_state").innerHTML,
-            parent_zip: document.getElementById("parent_zip").innerHTML,
-            parent_email: document.getElementById("parent_email").innerHTML,
-            parent_phone: document.getElementById("parent_phone").innerHTML,
-            number_of_campers: document.getElementById("number_of_campers").innerHTML,
-            total_cost: document.getElementById("total").innerHTML,
-            details: details
-          })
-        });
-      });
-    }
-  }).render('#paypal-button-container');
+  document.registration_form.submit();
+  return true;
 }
 </script>
 

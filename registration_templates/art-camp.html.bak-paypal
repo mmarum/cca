@@ -118,9 +118,7 @@ Fri - Glaze pottery<br>
 
 {# THIS IS THE CONFIRM SCREEN #}
 
-<!--
-{{ data }}
--->
+{# data #}
 
 
 <form action="/registration/{{ registration_name }}/edit" method="POST" enctype="text/plain" name="registration_form" id="registration_form">

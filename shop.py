@@ -51,9 +51,13 @@ def shop(environ, start_response):
             raise ValueError(f"Attempted pid not an int: {pid}")
         db.query(f"SELECT * FROM products WHERE pid = {pid}")
         r = db.store_result()
-        row = r.fetch_row(maxrows=1, how=1)[0]
-        template = env.get_template("product-detail.html")
-        response = template.render(row=row)
+        try:
+            row = r.fetch_row(maxrows=1, how=1)[0]
+            template = env.get_template("product-detail.html")
+            response = template.render(row=row)
+        except:
+            raise ValueError(f"Could not fetch row for pid: {pid}")
+
 
     elif path.startswith("/filter"):
         filter_word = path.replace("/filter/", "")

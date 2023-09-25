@@ -3,6 +3,7 @@
 
 {% block html_head %}
 <style>
+
 #price_includes_shipping {
   font-size: small;
   line-height: 90%;
@@ -13,18 +14,6 @@
   margin-top: 10px;
 }
 #with_tax_container {
-  font-weight: bold;
-}
-#paypal-button-container, #show-total-container {
-  display: none;
-}
-#show-total {
-  margin: 10px;
-  padding: 10px;
-  border: 1px dashed LightGray;
-  border-radius: 10px;
-}
-#show-total-container {
   font-weight: bold;
 }
 .product_price, .product_total {
@@ -85,9 +74,9 @@ img.check {
 
 {% block content %}
 
-<form>
-<input type="hidden" id="temporary" value="">
-</form>
+<form id="shop_form" name="shop_form" class="form-group" action="/store-checkout/" method="POST">
+<input type="hidden" name="session_id" id="session_id" value="">
+<input type="hidden" id="subtotal" value="">
 
 <div class="row">
 
@@ -95,18 +84,22 @@ img.check {
 </div>
 
 <div class="col-md-3 text-center">
-  <h1 class="art-brew">Your cart</h1>
-</div>
-
-<div class="col-md-4 text-center">
-  <div id="shop_link_container">
-    <a href="/shop/" id="shop_link">Shop</a>
+  <div style="padding-top: 15px;">
+  <a href="/shop/" id="shop_link">Back to shop</a>
   </div>
 </div>
 
+<div class="col-md-4 text-center">
+  <center id="upcoming_events">
+    <h1 class="art-brew">Cart</h1>
+  </center>
+</div>
+
 <div class="col-md-3 text-center" id="totals_box">
+  <div style="padding-top: 15px;">
   (<span id="subtotal_num_items"></span> items) Subtotal: $<span id="subtotal_value">0</span>
   <div id="with_tax_container">Total with tax: $<span id="total_with_tax">0</span></div>
+  </div>
 </div>
 
 <div class="col-sm-1">
@@ -118,7 +111,7 @@ img.check {
 
 <div class="row">
 
-<div class="col-sm-1">
+<div class="col-sm-2">
 </div>
 
 <div class="col-md-8">
@@ -126,58 +119,62 @@ img.check {
   </div>
 </div>
 
-<div class="col-sm-3">
-  <div id="checkout_button_right_col">
-    <div id="price_includes_shipping">Price includes shipping<br>to contiguous US</div>
-    <button type="button" class="btn btn-info" onclick="showPayPal(); return false;">Checkout</button>
+<div class="col-sm-2">
+  <!-- right col -->
+</div>
+
+</div>
+
+<!-- -->
+
+<div class="row">
+
+<div class="col-sm-2">
+</div>
+
+<div class="col-md-8">
+  <div>
+
+<center id="price_includes_shipping">Price includes shipping to contiguous US</center>
+<p><center><b>Total with tax: $<span id="total_with_tax_2">0</span></b></center></p>
+<p><input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control"></p>
+<p><input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control"></p>
+<input type="hidden" name="product_names" id="product_names" value="">
+<input type="hidden" name="total_cost" id="total_cost" value="">
+<p><center>
+<input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning" onclick="spin();">
+</center></p>
+</form>
+
   </div>
 </div>
 
+<div class="col-sm-2">
+  <!-- right col -->
 </div>
 
-
-<div id="show-total-container" class="text-center">
-  <div id="show-total"></div>
 </div>
-<div id="paypal-button-container" class="text-center"></div>
-
-<!--
-<script src="https://www.paypal.com/sdk/js?client-id=AXKEaqz681f2qirO35vWWcvYbA2ZqsfY5CmeTi-_UnAjoXVIiJl5VKbuD5KvVNMyrMQm6jbCyFWBlnPj">
-// Dwejidesignsllc SANDBOX
-</script>
--->
-
-<script src="https://www.paypal.com/sdk/js?client-id=AZ8f_18ukONyew8rbZyDpVw4tl489UXN0HY2ncv9be4MYhXmIe4jiGTZlxfZAxXfIRcEYmdmP4qkOXNv">
-// Dwejidesignsllc LIVE
-</script>
-
-<!--
-<script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
-// SANDBOX
-</script>
--->
-
-<!--
-<script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
-// LIVE
-</script>
--->
-
 
 <script>
 
-function showPayPal() {
-  document.getElementById("paypal-button-container").style.display = "block";
-  total = getTemporary();
-  console.log("Total with sales tax: " + total);
-  document.getElementById("show-total").innerHTML = "Total with sales tax: $" + total;
-  document.getElementById("show-total-container").style.display = "block";
-  location.href='#paypal-button-container';
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
 }
 
-
 function addSalesTax(subtotal) {
-  total = Number(subtotal) + Number(subtotal) * 6.25 / 100;
+  total = Number(subtotal) + Number(subtotal) * 8.25 / 100;
   total = Math.round(100*total)/100;
   return total;
 }
@@ -185,7 +182,12 @@ function addSalesTax(subtotal) {
 
 function getCartList() {
   console.log("function getCartList");
-  var session_id = document.cookie.split("=")[1];
+  //var session_id = document.cookie.split("=")[1];
+  var session_id = getCookie("session_id");
+  console.log("cart-list.html session_id: " + session_id);
+
+  document.getElementById("session_id").value = session_id;
+
   if (!session_id) {
     return false;
   }
@@ -203,6 +205,7 @@ function getCartList() {
     var arrLen = data.length;
     var product_total_sum = 0;
     var lines = '';
+    var names = '';
     for (var i = 0; i < arrLen; i++) {
       obj = data[i];
       inventory = obj.inventory;
@@ -225,17 +228,21 @@ function getCartList() {
 <a href="/shop/product/${obj.pid}"><h3>${obj.name}</h3></a>
 <div class="product_price">$${obj.price}</div>
 <div>
-<form action="" id="product_quantity_form_${obj.pid}">
+<!-- <form action="" id="product_quantity_form_${obj.pid}"> -->
 <select name="quantity" id="product_quantity_select_${obj.pid}" class="form-control" onchange="updateQuantity(${obj.pid}, this.options[this.selectedIndex].value);">
 <option value=${obj.quantity}>${obj.quantity}</option>
 ${quantity_option_html}
 </select>
-</form>
+<!-- </form> -->
 </div>
 </div>
 <div class="col-sm-1"></div>
 </div>
 `;
+      var name = `${obj.name}`;
+      var quant = `${obj.quantity}`;
+      var price = `${obj.price}`;
+      var product_id = `${obj.pid}`;
 
 
     if (inventory == 0) {
@@ -261,10 +268,12 @@ ${quantity_option_html}
 
 
       lines += line;
+      names += quant + " " + name + " " + product_id + " $" + price + ", ";
       product_total_sum += product_total;
     }
     document.getElementById("subtotal_value").innerHTML = product_total_sum;
     document.getElementById("cart_contents").innerHTML = lines;
+    document.getElementById("product_names").value = names + "plus tax";
     //document.getElementById("cart_sum_bottom").innerHTML += product_total_sum;
   })
 }
@@ -296,18 +305,19 @@ function getCartSnapshot(session_id) {
     }
     if (window.location.pathname == "/cart/" && Number(data.subtotal) > 0) {
         document.getElementById("subtotal_value").innerHTML = data.subtotal;
-        // test temporary:
-        document.getElementById("temporary").value = data.subtotal;
+        document.getElementById("subtotal").value = data.subtotal;
     }
     //----
     var total_with_tax = getTemporary();
     document.getElementById("total_with_tax").innerHTML = total_with_tax;
+    document.getElementById("total_with_tax_2").innerHTML = total_with_tax;
+    document.getElementById("total_cost").value = total_with_tax;
     //----
   });
 }
 
 function getTemporary() {
-  subtotal = document.getElementById("temporary").value;
+  subtotal = document.getElementById("subtotal").value;
   total = addSalesTax(subtotal);
   console.log("total with tax: "+total);
   return total;
@@ -334,7 +344,9 @@ function updateCart(session_id, product_id, quantity) {
 
 function updateQuantity(pid, quantity) {
   console.log("function updateQuantity");
-  var session_id = document.cookie.split("=")[1];
+  //var session_id = document.cookie.split("=")[1];
+  var session_id = getCookie("session_id");
+  console.log("cart-list.html session_id: " + session_id);
   if (session_id) {
     updateCart(session_id, pid, quantity);
     if (quantity == 0) {
@@ -348,52 +360,15 @@ function updateQuantity(pid, quantity) {
 
 function checkCartTotal() {
   console.log("function checkCartTotal");
-  var session_id = document.cookie.split("=")[1];
+  //var session_id = document.cookie.split("=")[1];
+  var session_id = getCookie("session_id");
+  console.log("cart-list.html session_id: " + session_id);
   if (session_id) {
     getCartSnapshot(session_id);
   }
 }
 
 checkCartTotal();
-
-paypal.Buttons({
-  createOrder: function(data, actions) {
-    console.log("buy stuff");
-    console.log(getCartSnapshot.subtotal);
-    return actions.order.create({
-      purchase_units: [{
-        amount: {
-          value: getTemporary()
-        }
-      }]
-    });
-  },
-  onApprove: function(data, actions) {
-    return actions.order.capture().then(function(details) {
-      console.log(details);
-
-      var thanks_html = "Transaction complete. Thank you " + details.payer.name.given_name;
-      thanks_html += ". Order ID: " + details.id;
-      document.getElementById("cart_contents").innerHTML = thanks_html;
-      document.getElementById("paypal-button-container").style.display = "none";
-      document.getElementById("totals_box").style.display = "none";
-
-      return fetch('/cart-api/checkout-approved', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({
-          paypal_order_id: data.orderID,
-          session_id: document.cookie.split("=")[1],
-          total: getTemporary(),
-          details: details
-        })
-      });
-
-    });
-  }
-}).render('#paypal-button-container');
 
 </script>
 

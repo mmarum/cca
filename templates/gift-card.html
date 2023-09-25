@@ -1,0 +1,83 @@
+{% extends "base-site.html" %}
+{% block title %}{{ page_name.replace("-", " ").title() }}{% endblock %}
+
+{% block html_head %}
+<style>
+input, textarea {
+  width: 200px;
+  margin: 10px 0px 10px 0px;
+  display: inline-table;
+}
+.left-col {
+  width: 200px;
+  margin: 10px;
+  text-align: right;
+}
+@media only screen and (max-width: 600px) {
+  input, textarea {
+    width: 300px;
+    margin: 0px 0px 5px 5px;
+  }
+  .left-col {
+    width: 100%;
+    margin: 5px;
+    text-align: left;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+{{ page_content|safe }}
+
+  <form id="gift_card_form" class="form-group" action="/checkout/" method="POST">
+
+    <div class="" id="">
+
+      <div class="">
+          <label for="giftPrice" class="left-col">Enter Custom Value</label>
+          <input type="text" id="" name="custom_value" title="price" required>
+      </div>
+
+      <div class="">
+          <label for="eGiftEmail" class="left-col">Recipient's Email Address</label>
+          <input type="text" id="" name="recipient_email" title="recipient_email" required>
+      </div>
+
+      <div class="" style="padding: 10px">
+          <span class="" style="margin-left: 10px; background-color: WhiteSmoke; padding: 5px;">Your message: (optional)</span>
+      </div>
+
+      <div class="">
+          <label for="giftTo" class="left-col">To</label>
+          <input type="text" id="" name="message_to" title="To" maxlength="60">
+      </div>
+
+      <div class="">
+          <label for="giftTo" class="left-col">From</label>
+          <input type="text" id="" name="message_from" title="From" maxlength="60">
+      </div>
+
+      <div class="">
+          <label for="giftMessage" class="left-col">Message</label>
+          <textarea id="" name="message" type="text" title="Message" maxlength="200"></textarea>
+      </div>
+
+      <div class="">
+          <label for="eGiftBuyerEmail" class="left-col">Your Email Address</label>
+          <input type="text" id="" name="buyer_email" title="buyer_email" required>
+      </div>
+
+      <div class="">
+          <label class="left-col"></label>
+          <!-- <button id="" type="button" class="btn btn-warning" style="margin: 10px 0px 10px 0px;">Proceed to checkout</button> -->
+          <input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning">
+
+      </div>
+
+    </div>
+
+  </form>
+
+{% endblock %}

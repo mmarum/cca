@@ -44,32 +44,27 @@
 
 {% block content %}
 
-
 <div class="row">
 
 <div class="col-sm-1">
 </div>
 
 <div class="col-md-3 text-center">
-  <h1 class="art-brew">Shop</h1>
-</div>
-
-<div class="col-md-4 text-center">
-  <div id="cart_link_container">
-    <a href="/cart/">
-
-<svg enable-background="new 0 0 48 48" fill="Lightseagreen" height="48px" id="Layer_1" version="1.1" viewBox="0 0 48 48" width="48px" x="0px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="0px">
-<g transform="scale(3)">
-  <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-</g>
-</svg>
-
-    </a>
+  <div style="padding-top: 15px;">
+  <a href="/cart/" id="shop_link">Go to cart</a>
   </div>
 </div>
 
-<div class="col-md-3 text-center">
-  <!-- placeholder -->
+<div class="col-md-4 text-center">
+  <center id="upcoming_events">
+    <h1 class="art-brew">Shop</h1>
+  </center>
+</div>
+
+<div class="col-md-3 text-center" id="totals_box">
+  <div style="padding-top: 15px;">
+    <!-- -->
+  </div>
 </div>
 
 <div class="col-sm-1">
@@ -153,6 +148,8 @@
 
       {% if product.inventory <= 0 %}
 
+      <!--
+
       <div>
           <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image_2"/>
       </div>
@@ -161,7 +158,10 @@
           {{ product.name }} Sold out
       </div>
 
+      -->
+
       {% else %}
+
 
       <div>
         <a href="/shop/product/{{ product.pid }}">
@@ -180,7 +180,9 @@
     </div>
 
 {% endfor %}
-
+      
 </div>
+
+<!-- <center style="background-color: yellow">Down for temporary maintenance. Try back later tonight or tomorrow.</center> -->
 
 {% endblock %}

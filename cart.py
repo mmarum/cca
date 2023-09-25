@@ -108,30 +108,44 @@ def cart_api(environ, start_response):
         #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/total
         sub_query = f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL"
 
+        main_query = f"SELECT SUM(b.quantity) AS sum FROM cart_order_product b, products c \
+            WHERE b.product_id = c.pid \
+            AND c.inventory > 0 \
+            AND b.cart_order_id = ({sub_query})"
+
+        print("cart /total main_query", main_query)
+
         try:
-            db.query(f"SELECT SUM(b.quantity) AS sum FROM cart_order_product b, products c \
-                WHERE b.product_id = c.pid \
-                AND c.inventory > 0 \
-                AND b.cart_order_id = ({sub_query})")
+            db.query(main_query)
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             number_of_items = int(row["sum"])
         except:
             number_of_items = 0
 
+        print("cart /total number_of_items", number_of_items)
+
+
+        main_query_2 = f"SELECT sum(a.quantity * b.price) as subtotal \
+            from cart_order_product a, products b \
+            where a.product_id = b.pid \
+            and b.inventory > 0 \
+            and a.cart_order_id = ({sub_query})"
+
+        print("cart /total main_query_2", main_query_2)
+
         try:
-            db.query(f"SELECT sum(a.quantity * b.price) as subtotal \
-                from cart_order_product a, products b \
-                where a.product_id = b.pid \
-                and b.inventory > 0 \
-                and a.cart_order_id = ({sub_query})")
+            db.query(main_query_2)
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             subtotal = int(row["subtotal"])
         except:
             subtotal = 0
 
+        print("cart /total subtotal", subtotal)
+
         snapshot = { "number_of_items": number_of_items, "subtotal": subtotal }
+        print("cart snapshot", snapshot)
         snapshot = json.dumps(snapshot)
         response = str(snapshot)
  
@@ -140,23 +154,35 @@ def cart_api(environ, start_response):
     elif environ['PATH_INFO'] == "/list":
         #curl -X POST -H "Content-Type: application/json" --data '{"session_id": "123"}' https://www.catalystcreativearts.com/cart-api/list
         try:
-            db.query(f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL")
+
+            query1 = f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL"
+
+            print("cart /list query1", query1)
+
+            db.query(query1)
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             cart_order_id = int(row["cart_order_id"])
 
-            db.query(f"SELECT b.product_id as pid, b.quantity, c.inventory \
+            print("cart /list cart_order_id", cart_order_id)
+
+            query2 = f"SELECT b.product_id as pid, b.quantity, c.inventory \
                 FROM cart_order a, cart_order_product b, products c \
                 WHERE a.cart_order_id = b.cart_order_id \
                 AND b.product_id = c.pid \
-                AND a.cart_order_id = {cart_order_id}")
+                AND a.cart_order_id = {cart_order_id}"
+
+            print("cart /list query2", query2)
+
+            db.query(query2)
             r = db.store_result()
             rows = r.fetch_row(maxrows=100, how=1)
             # ({'pid': 1, 'quantity': 6}, {'pid': 2, 'quantity': 4})
         except:
             rows = {}
 
-        print("rows", rows)
+        print("cart /list rows", rows)
+
 
         if len(rows) == 0:
             response = "cart empty"
@@ -170,12 +196,12 @@ def cart_api(environ, start_response):
             pids.append(p)
             quantities[p] = obj['quantity']
 
-        print("quantities", quantities)
-        print("pids", pids)
+        print("cart /list quantities", quantities)
+        print("cart /list pids", pids)
 
         pids = str(pids).strip('[').strip(']')
 
-        print("pids", pids)
+        print("cart /list pids", pids)
 
         db.query(f"select * from products where pid in ({pids})")
         r = db.store_result()

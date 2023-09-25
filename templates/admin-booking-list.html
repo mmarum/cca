@@ -8,34 +8,51 @@
     max-width: 1350px;
   }
 }
+td {
+  padding: 10px;
+  border-right: 1px dashed LightGray;
+}
+.tr_booking {
+  border: 1px dashed LightGray;
+}
+.tr_divider {
+  height: 50px;
+}
+.new_title {
+  background-color: Khaki;
+  padding: 5px;
+  margin: 5px;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 
+<!--
 <h1>Booking</h1>
 
 <table class="table table-striped">
 
 <tr class="p-3 mb-2 bg-light text-dark">
 <td><div id="add_new_link"><a href="/app/admin/booking/add-edit">+</a></div></td>
-{% for i in ["title", "event date", "email", 
-  "first name", "last name", "quantity", "total", 
-  "variable time", "extra data", "transaction id", 
-  "buyer name", "buyer phone"] %}
-  <td>{{ i }}</td>
-{% endfor %}
+<td>title</td>
+<td>event date</td>
+<td>email</td>
+<td>guest quantity</td>
+<td>paid  </td>
+<td>variable price</td>
+<td>extra data</td>
+<td>transaction id</td>
+<td>buyer name</td>
+<td>buyer phone</td>
 </tr>
 
 {% for order in orders %}
   <tr>
   <td><a href="/app/admin/booking/add-edit?id={{ order.id }}">{{ order.id }}</a></td>
   <td><a href="/app/admin/events/add-edit?eid={{ order.eid }}">{{ order.title }}</a></td>
-  <!-- <td>{{ order.edatetime.strftime('%b %-d %Y %H:%M') }}</td> -->
-  <td>{{ order.edatetime.strftime('%a %b %d %Y %I:%M %p')|replace(' 0', ' ') }}</td>
+  <td>{{ order.edatetime.strftime('%b %d %I:%M')|replace(' 0', ' ') }}</td>{# '%a %b %d %Y %I:%M %p' #}
   <td>{{ order.email|replace("@", " @") }}</td>
-  <td>{{ order.first_name }}</td>
-  <td>{{ order.last_name }}</td>
   <td>{{ order.quantity }}</td>
   <td>{{ order.paid }}</td>
   <td>{{ order.variable_time }}</td>
@@ -55,4 +72,75 @@
 </table>
 
 <p><a href="/app/admin/booking/list?view=past-events">Click here to see orders for events in the past</a></p>
+
+<hr>
+<hr>
+<p>TESTING A NEW VIEW BELOW</p>
+<hr>
+<hr>
+-->
+
+<h1>Booking</h1>
+
+<table>
+<tr>
+<td colspan="7">
+<div id="add_new_link"><a href="/app/admin/booking/add-edit">+</a></div>
+</td>
+</tr>
+<tr style="background-color: LightGray;">
+<td>Name</td>
+<td>Phone</td>
+<td>Email</td>
+<td>Guests</td>
+<td>Paid</td>
+<td>Note</td>
+<td>Order</td>
+</tr>
+{% for event_id, event_dict in new_booking_dict.items() %}
+  <tr>
+    <td colspan="7">
+    <span class="new_title">
+    <b>{{ event_dict["date"].strftime('%b %d %I:%M %P')|replace(' 0', ' ') }}</b> <a href="/app/admin/events/add-edit?eid={{ event_id }}">{{ event_dict["title"] }}</a>
+    {{ event_id }}
+    </span>
+    </td>
+  </tr>
+  {% for event in event_dict["booking"] %}
+  <tr class="tr_booking">
+    {% set event_id = event["id"] %}
+    {% if event["buyer_name"] %}
+      <td><a href="/app/admin/booking/add-edit?id={{ event_id }}">{{ event["buyer_name"] }}</a></td>
+    {% else %}
+      <td><a href="/app/admin/booking/add-edit?id={{ event_id }}">{{ event["first_name"] }} {{ event["last_name"] }}</a></td>
+    {% endif %}
+
+    <td>{{ event["buyer_phone"] }}</td>
+    <td>{{ event["email"] }}</td>
+    <td>{{ event["quantity"] }}</td>
+    <td>{{ event["paid"] }}</td>
+
+    {% if event["extra_data"] %}
+      <td>{{ event["extra_data"].replace('{"total_number_scarf"', 'scarves').replace("}", "").replace("not an event with scarf", "") }}</td>
+    {% else %}
+      <td>{{ event["variable_time"] }}</td>
+    {% endif %}
+
+    <td>
+    {% if event["transaction_id"] and event["transaction_id"].startswith("pi_") %}
+      <a href="https://dashboard.stripe.com/payments/{{ event["transaction_id"] }}" target="_blank">{{ event["transaction_id"] }}</a>
+    {% else %}
+      {{ event["transaction_id"] }}
+    {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+<tr>
+  <td colspan="7" class="tr_divider"></td>
+</tr>
+{% endfor %}
+</table>
+
+<p><a href="/app/admin/booking/list?view=past-events">Click here to see orders for events in the past</a></p>
+
 {% endblock %}

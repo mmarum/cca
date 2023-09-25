@@ -3,11 +3,9 @@
 
 {% block html_head %}
 <style>
-
-.nav {
-  margin-bottom: 20px;
+.row {
+  padding-top: 15px;
 }
-
 #thanks {
   color: Green;
 }
@@ -84,12 +82,8 @@ select, input {
     <h1>{{ event.title }}</h1>
 
     <h2>
-      {% if event.eid == 964 or "gift card" in event.title.lower() %}
-        For any upcoming event date
-      {% else %}
-        {{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }} 
-        <span class="duration" id="duration">({{ event.duration }} hrs)</span>
-      {% endif %}
+      {{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }} 
+      <span class="duration" id="duration">({{ event.duration }} hrs)</span>
     </h2>
 
     {# BUY TICKETS ELSEWHERE #}
@@ -122,7 +116,7 @@ select, input {
     </p>
 
 
-    <form id="quantity_form" class="form-group" action="/checkout/" method="POST">
+    <form id="quantity_form" class="form-group">
 
 
     {# VARIABLE TIME #}
@@ -147,16 +141,16 @@ select, input {
     {# VARIABLE PRICE #}
     {# one red @ $10, two blue @ $5, a bird @ $20 #}
     {% if "," in event.price_text and ("am" not in event.price_text and "pm" not in event.price_text) %}
-      <select id="variable_price" name="variable_price" class="form-control" onchange="getSubtotal();">
+      <select id="variable_price" class="form-control" onchange="getSubtotal();">
       <option value="">Select an item</option>
       {% set prc = event.price_text.split(',') %}
       {% for p in prc %}
         {% if "am" in event.price_text or "pm" in event.price_text %}
         {% else %}
           {% if "@" in p %}
-
-            <option value="{{ p }}">{{ p }}</option>
-
+            {% set variation_name = p.split('@')[0] %}
+            {% set variation_price = p.split('@')[1] %}
+            <option value="{{ variation_price }}">{{ variation_name }} {{ variation_price }}</option>
           {% endif %}
         {% endif %}
       {% endfor %}
@@ -187,13 +181,8 @@ select, input {
     {# REGULAR EVENT #}
     {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
     {% else %}
-
-    {% if event.eid == 964 or "gift card" in event.title.lower() %}
-
-      <input type="hidden" id="guest_quantity" name="guest_quantity" value="1">
-
-    {% elif event.elimit and event.elimit >= 1 and "series" not in event.tags %}
-      <select id="guest_quantity" name="guest_quantity" class="form-control" onchange="getSubtotal();">
+    {% if event.elimit and event.elimit >= 1 and "series" not in event.tags %}
+      <select id="guest_quantity" class="form-control" onchange="getSubtotal();">
       <option value="0">Select number of guests</option>
       {% for n in range(1, event.remaining_spots + 1) %}
         <option value={{ n }}>{{ n }} guest{% if n > 1 %}s{% endif %}</option>
@@ -203,13 +192,13 @@ select, input {
     {% endif %}
     {# REGULAR EVENT END #}
 
-    <input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control">
-    <input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control">
+    <input type="text" id="cca_buyer_name" name="cca_buyer_name" placeholder="Your name" required class="form-control">
+    <input type="tel" id="cca_buyer_phone" name="cca_buyer_phone" placeholder="Your phone" required class="form-control">
     <!-- pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" -->
 
     {# SCARF SPECIALS #}
     {% if "scarf" in event.title.lower() %}
-      <select id="additional_scarf_quantity" name="additional_scarf" class="form-control" onchange="getSubtotal();">
+      <select id="additional_scarf_quantity" class="form-control" onchange="getSubtotal();">
 
       {% if event.edatetime.strftime('%Y-%m-%d') >= "2023-01-01" %}
       <option value=0>Optional: Select additional scarf for $30</option>
@@ -227,6 +216,8 @@ select, input {
 
     {% endif %}
 
+
+    </form>
 
 
     {# EVENT SERIES #}
@@ -246,20 +237,22 @@ select, input {
 
     <div id="thanks"></div>
 
+    <div id="paypal-button-container" class="text-center"></div>
 
-    <input type="hidden" name="event_title" id="event_title" value="{{ event.title }}">
 
-    <input type="hidden" name="event_date" id="event_date" value="{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}">
-  
-    <input type="hidden" name="total_cost" id="total_cost" value="">
+    <!--
+    <script src="https://www.paypal.com/sdk/js?client-id=AbPc1YK48488Yf9_nGmIzXCbsJo_WVLWmVSdOmg-1dDf0IZScirplTicjipBJyD3cD-S2x9rTijlhIu4">
+    // SANDBOX
+    </script>
+    -->
 
-    <input type="hidden" name="event_id" id="event_id" value="{{ event.eid }}">
+    <script src="https://www.paypal.com/sdk/js?client-id=AaVfyVOubo8eefzZbeVPU011S8qwUqhxjWvwQ4oKBPGh75ltkQNs2Hob3TVxBfeU2uoEm2C9r8qP-uir">
+    // PRODUCTION
+    </script>
 
-    <input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning" onclick="spin();">
-
-    </form>
 
     {% endif %} {# closes: "if event.elimit != 0" #}
+
 
   </div>
 
@@ -269,12 +262,6 @@ select, input {
 </div>
 
 <script>
-function spin() {
-  document.getElementById("submit").value = "Processing...";
-  document.getElementById("submit").style.backgroundColor = "yellow";
-  return true;
-}
-
 var price_per_guest = {{ event.price }};
 var event_id = {{ event.eid }};
 
@@ -309,8 +296,6 @@ function getScarfSubtotal() {
 function getSubtotal() {
   {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
     quantity = 1; // for variable time
-  {% elif event.eid == 964 or "gift card" in event.title.lower() %}
-    quantity = 1; // for gift card
   {% else %}
     quantity = getOptionValue("guest_quantity");
   {% endif %}
@@ -323,6 +308,7 @@ function getSubtotal() {
     subtotal = price_per_guest * quantity;
   {% endif %}
   if (subtotal > 0) {
+    //document.getElementById("paypal-button-container").style.display = "block";
   }
   console.log("subtotal: " + subtotal);
   {% if "scarf" in event.title.lower() %}
@@ -335,7 +321,6 @@ function getSubtotal() {
     document.getElementById("additional_scarf_quantity").style.display = style_display;
   {% endif %}
   document.getElementById("subtotal").innerHTML = subtotal;
-  document.getElementById("total_cost").value = subtotal;
   getGuestQuantity();
   return subtotal;
 }
@@ -355,6 +340,7 @@ function checkTime(edatetime) {
     document.getElementById("quantity_form").style.display = "none";
     var msg = "Event occurs within " + time_window + " hours. Call to see if this event is still available.";
     document.getElementById("thanks").innerHTML = msg;
+    document.getElementById("paypal-button-container").style.display = "none";
   }
 }
 
@@ -376,6 +362,7 @@ function hidePurchase() {
   document.getElementById("quantity_form").style.display = "none";
   document.getElementById("cca_buyer_name").style.display = "none";
   document.getElementById("cca_buyer_phone").style.display = "none";
+  document.getElementById("paypal-button-container").style.display = "none";
 }
 
 {# BUY TICKETS ELSEWHERE #}
@@ -383,6 +370,7 @@ function hidePurchase() {
   {% if e.startswith("http") %}
     hidePurchase();
     console.log("Hiding purchase because but ticket elsewhere");
+    document.getElementById("paypal-button-container").style.display = "none";
   {% endif %}
 {%- endfor %}
 
@@ -427,11 +415,80 @@ function getVariableTimeSlot() {
     document.getElementById("price").style.display = "none";
     document.getElementById("quantity_form").style.display = "none";
     document.getElementById("total").style.display = "none";
+    document.getElementById("paypal-button-container").style.display = "none";
   {% endif %}
 {% endif %}
 
 var cca_order_id = getCcaOrderId();
 
+paypal.Buttons({
+  createOrder: function(data, actions) {
+    console.log(cca_order_id);
+
+    fetch('/order/prep', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        event_id: event_id,
+        cca_order_id: cca_order_id,
+        cca_buyer_name: getTextValue("cca_buyer_name"),
+        cca_buyer_phone: getTextValue("cca_buyer_phone"),
+        quantity: getGuestQuantity()
+      })
+    })
+    .then(x => x.text())
+    .then(y => console.log(y));
+
+    return actions.order.create({
+      purchase_units: [{
+        amount: {
+          value: getSubtotal()
+        }
+      }]
+    });
+
+  },
+  onApprove: function(data, actions) {
+    return actions.order.capture().then(function(details) {
+      var thanks_text = "Transaction complete. Thank you " + details.payer.name.given_name;
+      thanks_text += ". Order ID: " + details.id;
+      document.getElementById("thanks").innerHTML += thanks_text;
+      document.getElementById("paypal-button-container").style.display = "none";
+      // "quantity_form"
+      console.log(details);
+
+      {% if "scarf" in event.title.lower() %}
+      var test_total_number_scarf = (getScarfSubtotal() / additional_scarf_cost) + Number(getOptionValue("guest_quantity"));
+      console.log("getScarfSubtotal: " + getScarfSubtotal);
+      console.log("additional_scarf_cost: " + additional_scarf_cost);
+      console.log("getOptionValue_guest_quantity: " + Number(getOptionValue("guest_quantity")));
+      {% endif %}
+
+      return fetch('/order/submit', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          orderID: data.orderID,
+          event_id: event_id,
+          cca_order_id: cca_order_id,
+          quantity: getGuestQuantity(),
+          variable_time_slot: getVariableTimeSlot(),
+          {% if "scarf" in event.title.lower() -%}
+          total_number_scarf: (getScarfSubtotal() / additional_scarf_cost) + Number(getOptionValue("guest_quantity")),
+          {%- endif %}
+          {% if event.edatetime -%}
+          event_date: {{ event.edatetime.strftime('%Y-%m-%d') }},
+          {%- endif %}
+          details: details
+        })
+      });
+    });
+  }
+}).render('#paypal-button-container');
 </script>
 
 {% endblock %}

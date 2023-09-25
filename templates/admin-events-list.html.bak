@@ -1,0 +1,44 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin Events List{% endblock %}
+
+{% block html_head %}
+<style>
+img {
+  max-width: 100px;
+}
+@media only screen and (max-width: 600px) {
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Events</h1>
+<table class="table table-striped">
+<tr class="p-3 mb-2 bg-light text-dark">
+  <td><div id="add_new_link"><a href="/app/admin/events/add-edit">+</a></div></td>
+  <td>Date</td>
+  <td>Title</td>
+  <td>Duration</td>
+  <td>Price</td>
+  <td>Limit</td>
+  <td>Location</td>
+  <td>Image</td>
+</tr>
+{% for row in allrows %}
+  {% set rowloop = loop %}
+  <tr>
+  {% for item in row %}
+    {% if loop.index == 1 %}
+      <td><a class="bg-light" href="/app/admin/events/add-edit?eid={{ item }}">{{ item }}</a></td>
+    {% elif loop.index == 2 %}
+      <td>{{ item.strftime('%a %b %d %I:%M %p')|replace(' 0', ' ') }}</td>
+    {% elif loop.index == 8 %}
+      <td><img src="/img/small/{{ item }}"/></td>
+    {% elif loop.index < 9 %}
+      <td{% if loop.index > 3 %}{% endif %}>{{ item }}</td>
+    {% endif %}
+  {% endfor %}
+  </tr>
+{% endfor %}
+</table>
+{% endblock %}

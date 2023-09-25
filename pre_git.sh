@@ -14,3 +14,7 @@ cp /home/catalystcreative/email/email.py /home/catalystcreative/app/cca/email.py
 cp /home/catalystcreative/cart-api/cart.py /home/catalystcreative/app/cca/cart.py
 cp /home/catalystcreative/shop/shop.py /home/catalystcreative/app/cca/shop.py
 
+#cp /home/catalystcreative/checkout/checkout.py /home/catalystcreative/app/cca/checkout.py
+#cp /home/catalystcreative/checkout/templates/*.* /home/catalystcreative/app/cca/checkout_templates/
+#cp /home/catalystcreative/www/checkout*.* /home/catalystcreative/app/cca/checkout_templates/
+

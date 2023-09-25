@@ -1,6 +1,8 @@
 {% extends "base-site.html" %}
 {% block title %}Catalyst Creative Arts Home{% endblock %}
 
+{% set shop_visible = global_settings["shop"]["visible"] %}
+
 {% block html_head %}
 <style>
 hr {
@@ -43,10 +45,12 @@ hr {
   border-bottom: 1px dashed LightGray;
 }
 .youtube_embed {
+  width: 238px;
+  height: 500px;
   /* width: 340px; */
-  width: 247px;
+  /* width: 247px; */
   /* height: 191px; */
-  height: 139px;
+  /* height: 139px; */
 }
 h1, h2 {
   font-size: 20px;
@@ -156,8 +160,10 @@ mark {
     font-size: 16px;
   }
   .youtube_embed {
+    /* width: 315px; */
+    /* height: 177px; */
     width: 315px;
-    height: 177px;
+    height: 620px;
   }
 }
 .gift_card_border {
@@ -172,122 +178,23 @@ mark {
 
 {% block content %}
 
+
+<!--
+<div class="row">
+  <div class="col-md-12" style="padding: 20px;">
+    <center>
+    We've Moved! New location: 300 West Main St Arlington, TX 76010
+    </center>
+  </div>
+</div>
+-->
+
+
 <div class="row top-buffer">
 
   <div class="col-md-3">
 
     <!-- first column start -->
-
-    {% if next_event %}
-    <div class="home_caption">
-    <h2>
-    <a href="/event/{{ next_event.eid }}.html">
-    <div class="home_section_label">Next Event</div>
-    <div class="home_event_date">{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</div>
-    <div class="home_event_title">{{ next_event.title }}</div>
-    </a>
-    </h2>
-    </div>
-    <a href="/event/{{ next_event.eid }}.html">
-      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
-    </a>
-    {% endif %}
-
-    <hr>
-
-    {% if random_product %}
-    <div class="home_caption">
-    <h2>
-    <a href="/shop/product/{{ random_product.pid }}">
-    <div class="home_section_label">Shop the Online store</div>
-    <div class="home_event_date">{{ random_product.name }} ${{ random_product.price }}</div>
-    <img src="/img/small/{{ random_product.image_path_array.split(",")[1] }}" class='event_image'>
-    </h2>
-    </a>
-    </div>
-    {% endif %}
-
-    <hr>
-
-    <!-- first column end -->
-
-  </div>
-  <div class="col-md-3">
-
-    <!-- second column start -->
-
-    <!--
-
-    <div class="home_caption">
-    <h2>
-    <a href="/art-camp.html">
-    <div class="home_section_label">Art Camp 2022</div>
-    <div class="home_event_date">Registration open</div>
-    <div class="home_event_title">Four camps in June & July</div>
-    </a>
-    </h2>
-    </div>
-    <a href='/art-camp.html'>
-      <img src='/img/art-class-6.jpg' class='event_image'>
-    </a>
-
-    <hr>
-
-    -->
-
-    <!--
-    <div class="home_caption">
-    <h2>
-    <a href="/wheel-wars.html">
-    <div class="home_section_label">Wheel Wars is back!</div>
-    <div class="home_event_date">Thursday May 12</div>
-    <div class="home_event_date">5-7 PM</div>
-    </a>
-    <a href="https://arlington.market">
-    <div class="home_event_title">At the Urban Market 506 E Division St Arlington, TX 76011</div>
-    </a>
-    </h2>
-    </div>
-    <a href='/wheel-wars.html'>
-      <img src='/img/small/wheel%20wars%20ad%201.jpg' class='event_image'>
-    </a>
-
-    <hr>
-    -->
-
-    <div class="home_caption">
-    <h2>
-    <a href="/shop/">
-    <div class="home_section_label">Visit Our Online Store</div>
-    <div class="home_event_date">Handmade silk scarves</div>
-    <div class="home_event_title">Hand-knit stockings and more</div>
-    </a>
-    </h2>
-    </div>
-    <a href='/shop'>
-      <img src='/img/scarves-shop-ig.jpg' class='event_image'>
-    </a>
-
-    <hr>
-
-    <div class="home_caption">
-    <h2>
-    <a href="https://www.catalystcreativearts.com/event/752.html">
-    <div class="home_section_label">EBRU Water Marbling on Silk Scarf Large Flower Design</div>
-    </a>
-    </h2>
-    </div>
-    <a href='https://www.catalystcreativearts.com/event/752.html'>
-
-        <!-- https://www.youtube.com/watch?v=xHXKFyoceSI -->
-
-        <iframe width="238" height="500" src="https://www.youtube.com/embed/xHXKFyoceSI" 
-            title="EBRU Water Marbling on Silk Scarf Large Flower Design" 
-            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-    </a>
-
-    <hr>
 
   {% if events_tagged_home %}
   {% for event in events_tagged_home %}
@@ -307,29 +214,129 @@ mark {
   {% endfor %}
   {% endif %}
 
+
+    <div class="home_caption">
+    <h2>
+    <a href="/paint-wars.html">
+    <div class="home_section_label">Paint Wars!</div>
+    <div class="home_event_date">Sat Oct 28, 7-9 PM</div>
+    <div class="home_event_title">Hosted By Growl Records and Division Brewing</div>
+    </a>
+    </h2>
+    </div>
+    <a href="/paint-wars.html">
+      <img src="/img/paint-wars-2023-promo.jpg" class="event_image">
+    </a>
+    <hr>
+
+
+    <div class="home_caption">
+    <h2>
+    <a href="/event/1019.html">
+    <div class="home_section_label">Handbuilt Pottery Vase</div>
+    <div class="home_event_date">2 Saturday Workshop</div>
+    <div class="home_event_title">Sep 9 & 16 at 1pm</div>
+    </a>
+    </h2>
+    </div>
+        <!-- ORIG: width="373" height="663" -->
+        <iframe class="youtube_embed" src="https://www.youtube.com/embed/ycTQr45zFII"
+            title="handbuilt pottery vase"
+            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <hr>
+
+
+    <!--
+    <div class="home_caption">
+    <h2>
+    <a href="/event/781.html">
+    <div class="home_section_label">3 Wednesdays Workshop</div>
+    <div class="home_event_date">Relief Block Printmaking</div>
+    <div class="home_event_title"></div>
+    </a>
+    </h2>
+    </div>
+    <a href="/event/781.html">
+      <img src="/img/small/20200707_135954-2.jpg" class="event_image">
+    </a>
+
+    <hr>
+    -->
+
+
+    <!-- first column end -->
+
+  </div>
+  <div class="col-md-3">
+
+    <!-- second column start -->
+
+    <!--
+    <div class="home_caption">
+    <h2>
+    <a href="/art-camp.html">
+    <div class="home_section_label">Art Camp 2023</div>
+    <div class="home_event_date">Registration open</div>
+    <div class="home_event_title">At our NEW location 300 W Main St</div>
+    </a>
+    </h2>
+    </div>
+    <a href='/art-camp.html'>
+      <img src='/img/small/art-camp-2023.jpg' class='event_image'>
+    </a>
+    <hr>
+    -->
+
+    <div class="home_caption">
+    <h2>
+    <a href="/event/1022.html">
+    <div class="home_section_label">5th Annual Art Market</div>
+    <div class="home_event_date">Sat Nov 4, 2023 at 12 PM</div>
+    <div class="home_event_title"></div>
+    </a>
+    </h2>
+    </div>
+    <a href="/event/1022.html">
+      <img src="/img/art-market-2023.jpg" class="event_image">
+    </a>
+    <hr>
+
+
+    <div class="home_caption">
+    <h2>
+    <a href="/pottery-lessons.html">
+    <div class="home_section_label">Private Pottery Wheel Lesson</div>
+    <div class="home_event_title">Various dates available</div>
+    </a>
+    </h2>
+    </div>
+    <a href="/pottery-lessons.html">
+      <img alt="pottery lessons" src="/img/pottery-lessons-kid.jpg" class="event_image"/>
+    </a>
+    <hr>
+
+
+    <div class="home_caption">
+    <h2>
+    <a href="/shop/">
+    <div class="home_section_label">Visit Our Online Store</div>
+    <div class="home_event_date">Handmade silk scarves & more</div>
+    </a>
+    </h2>
+    </div>
+    <a href='/shop'>
+      <img src='/img/scarves-shop-ig.jpg' class='event_image'>
+    </a>
+    <hr>
+
+
     <!-- second column end -->
+
 
   </div>
   <div class="col-md-3">
 
     <!-- third column start -->
-
-    <!--
-    <div class="home_caption">
-    <h2>
-    <a href="/event/660.html">
-    <div class="home_section_label">3 Wednesdays Workshop</div>
-    <div class="home_event_date">Beginner Printmaking Workshop</div>
-    <div class="home_event_title"></div>
-    </a>
-    </h2>
-    </div>
-    <a href="/event/660.html">
-      <img src="/img/wedwork.jpg" class="event_image">
-    </a>
-
-    <hr>
-    -->
 
     <!--
     <div class="home_caption">
@@ -344,24 +351,64 @@ mark {
     <a href="https://arlington.market">
       <img src="/img/market-mini-gnome.jpg" class="event_image">
     </a>
-
     <hr>
     -->
- 
+
+    <!--
     <div class="home_caption">
     <h2>
-    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s">
-    <div class="home_section_label">Gift Cards Now Available</div>
+    <a href="/paint-wars.html">
+    <div class="home_section_label">Paint Wars!</div>
+    <div class="home_event_date">Sat Jun 17, 2023</div>
     </a>
     </h2>
     </div>
+    <a href='/paint-wars.html'>
+      <img src='/img/small/paint-wars-2023.jpg' class='event_image'>
+    </a>
+    <hr>
+    -->
 
-    Interested in sending someone a gift to come create with us? Gift certificates are available for purchase through PayPal, 
-       over the phone and in person at our studio and may be redeemed for any of our services.
+    {% if next_event %}
+    <div class="home_caption">
+    <h2>
+    <a href="/event/{{ next_event.eid }}.html">
+    <div class="home_section_label">Next Event</div>
+    <div class="home_event_date">{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</div>
+    <div class="home_event_title">{{ next_event.title }}</div>
+    </a>
+    </h2>
+    </div>
+    <a href="/event/{{ next_event.eid }}.html">
+      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
+    </a>
+    {% endif %}
+    <hr>
 
-    <a href="https://www.paypal.com/us/gifts/business/aymlzmbnverlj-catalystcreativearts?fbclid=IwAR0OBel2FRHd1SURYZEprYVqsjTDh8D3JT_w4zd3IBDTTMPl0jU09460S8s"><img src="/img/gift-card.jpg" class="event_image gift_card_border"></a>
+
+    <div class="home_caption">
+    <h2>
+    <a href="/event/964.html">
+    <div class="home_section_label">Gift Cards Now Available</div>
+    <div class="home_event_title">Purchase a Catalyst Creative Arts gift card to be used at any regularly scheculed class.</div>
+    </a>
+    </h2>
+    <a href='/event/964.html'>
+      <img src='/img/small/CCA_DOTS-02.jpeg' class='event_image'>
+    </a>
+    </div>
+    <hr>
 
 
+    <div class="home_caption">
+    <h2>
+    <div class="home_section_label">Water Marbling on Silk Scarf</div>
+    </h2>
+    </div>
+        <!-- https://www.youtube.com/watch?v=xHXKFyoceSI -->
+        <iframe class="youtube_embed" src="https://www.youtube.com/embed/xHXKFyoceSI" 
+            title="EBRU Water Marbling on Silk Scarf Large Flower Design" 
+            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     <hr>
 
     <!-- third column end -->
@@ -373,7 +420,6 @@ mark {
 
     <div id="paper_calendar"></div>
     {{ calendar.html|safe }}
-
     <hr>
 
     <div id="event_list">
@@ -381,6 +427,22 @@ mark {
     {{ event_list_html|safe }}
     <div><a href="/calendar.html">See full list of events</a></div>
     </div>
+    <hr>
+
+
+    {% if random_product %}
+    <div class="home_caption">
+    <h2>
+    <a href="/shop/product/{{ random_product.pid }}">
+    <div class="home_section_label">Shop the Online store</div>
+    <div class="home_event_date">{{ random_product.name }} ${{ random_product.price }}</div>
+    <img src="/img/small/{{ random_product.image_path_array.split(",")[1] }}" class='event_image'>
+    </h2>
+    </a>
+    </div>
+    {% endif %}
+    <hr>
+
 
     <!-- fourth column end -->
   </div>

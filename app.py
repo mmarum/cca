@@ -73,7 +73,9 @@ def app(environ, start_response):
 
     #today = date.today() #today.year, today.month, today.day
 
-    pages = ["crafts-gallery", "private-events", "about-us", "media", "reviews", "custom-built", "after-school", "summer-camp", "art-camp", "3-wednesdays-workshop", "listening-room", "wheel-wars"]
+    pages = ["crafts-gallery", "gift-card", "private-events", "about-us", "media", "reviews", "custom-built", "after-school", "summer-camp", "art-camp", "3-wednesdays-workshop", "listening-room", "wheel-wars", "paint-wars"]
+
+    pages.sort()
 
     #galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18, "string-art": 19, "pottery-lessons": 20}
 
@@ -105,6 +107,8 @@ def app(environ, start_response):
     galleries_dict_vals = list(galleries_dict.values())
 
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
+
+    global_settings = json.loads(read_file("data/global_settings.json"))
 
     ####
     ####
@@ -265,13 +269,13 @@ def app(environ, start_response):
 
             db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags NOT LIKE '%pottery-lesson%' ORDER BY edatetime")
             r = db.store_result()
-            allrows = r.fetch_row(maxrows=100, how=1)
+            allrows = r.fetch_row(maxrows=1000, how=1)
 
             db.query("SELECT eid, SUM(quantity) as sum_quantity FROM orders GROUP BY eid")
             # TODO: May need to add join to events table above
             # so as to only pull future event dates
             r = db.store_result()
-            orders_count = r.fetch_row(maxrows=100, how=1)
+            orders_count = r.fetch_row(maxrows=1000, how=1)
 
             orders_count_object = {}
             for item in orders_count:
@@ -307,6 +311,43 @@ def app(environ, start_response):
                 events_object=events_object, 
                 parent=parent, 
                 test=test)
+
+
+        ####
+
+        elif environ['PATH_INFO'] == '/pottery-lessons':
+
+            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags LIKE '%pottery-lesson%' ORDER BY edatetime ASC")
+            r = db.store_result()
+            allrows = r.fetch_row(maxrows=1000, how=1)
+
+            db.query("SELECT eid, SUM(quantity) as sum_quantity FROM orders GROUP BY eid")
+            r = db.store_result()
+            orders_count = r.fetch_row(maxrows=1000, how=1)
+
+            orders_count_object = {}
+            for item in orders_count:
+                key = int(item['eid'])
+                val = int(item['sum_quantity'])
+                orders_count_object[key] = val
+
+            events_object = {}
+            for row in allrows:
+                eid = row["eid"]
+                events_object[eid] = {}
+                events_object[eid]["date"] = int(row["edatetime"].timestamp())
+                events_object[eid]["title"] = row["title"]
+                events_object[eid]["price"] = row["price"]
+                events_object[eid]["price_text"] = row["price_text"]
+
+            events_object = json.dumps(events_object)
+
+            template = env.get_template("pottery-lessons.html")
+            response = template.render(events=allrows, 
+                orders_count=orders_count_object, 
+                events_object=events_object)
+
+        ####
 
 
         elif environ['PATH_INFO'] == '/cart':
@@ -484,8 +525,32 @@ def app(environ, start_response):
             r = db.store_result()
             allrows = r.fetch_row(maxrows=1000, how=1)
 
+            # GROUP BY EVENT ID:
+            new_booking_dict = {}
+
+            for row in allrows:
+
+                eid = row["eid"]
+                title = row["title"]
+                date = row["edatetime"]
+
+                try:
+                    # EVENT EXISTS IN DICT ALREADY:
+                    new_booking_dict[eid]["booking"].append(row)
+
+                except:
+                    # EVENT DOES NOT YET EXIST IN DICT:
+                    new_booking_dict[eid] = {}
+                    new_booking_dict[eid]["id"] = eid
+                    new_booking_dict[eid]["title"] = title
+                    new_booking_dict[eid]["date"] = date
+                    new_booking_dict[eid]["booking"] =  []
+                    new_booking_dict[eid]["booking"].append(row)
+
+ 
+
             template = env.get_template("admin-booking-list.html")
-            response = template.render(orders=allrows)
+            response = template.render(orders=allrows, new_booking_dict=new_booking_dict)
 
 
         ####
@@ -553,7 +618,8 @@ def app(environ, start_response):
             template = env.get_template("home.html")
             response = template.render(next_event=next_event, calendar={"html": html_cal}, 
                 events_tagged_home=events_tagged_home, gallery=gallery, images=images, 
-                event_list_html=event_list_html, random_product=random_product)
+                event_list_html=event_list_html, random_product=random_product,
+                global_settings=global_settings)
 
 
         elif environ['PATH_INFO'] == '/admin/pages':
@@ -583,17 +649,35 @@ def app(environ, start_response):
                 special = ""
                 orderby = "order_id, session_detail"
             else:
-                special = "where order_id is not NULL"
+                special = "AND order_id is not NULL"
                 orderby = "session_detail"
 
-            db.query(f"SELECT * FROM registration {special} ORDER BY {orderby}")
+            db.query(f"SELECT * FROM registration where session_detail LIKE '%2023%' {special} ORDER BY {orderby}")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
-            data = json.loads(read_file("../registration/data/wheel-wars.json"))
+            #data = json.loads(read_file("../registration/data/wheel-wars.json"))
+            data = json.loads(read_file("../registration/data/paint-wars.json"))
+
+
+            # GROUP BY CAMP:
+            new_reg_dict = {}
+
+            for row in allrows:
+
+                sd = row["session_detail"]
+
+                try:
+                    # REG EXISTS IN DICT ALREADY:
+                    new_reg_dict[sd].append(row)
+
+                except:
+                    # REG DOES NOT YET EXIST IN DICT:
+                    new_reg_dict[sd] = []
+                    new_reg_dict[sd].append(row)
 
             template = env.get_template("admin-registration.html")
-            response = template.render(allrows=allrows, data=data)
+            response = template.render(allrows=allrows, data=data, new_reg_dict=new_reg_dict)
 
 
         #elif environ['PATH_INFO'] == '/admin/registration2':
@@ -617,7 +701,13 @@ def app(environ, start_response):
         elif environ['PATH_INFO'].lstrip('/') in pages:
             page_name = environ['PATH_INFO'].lstrip('/')
             page_content = str(read_file(f"data/{page_name}.html"))
-            template = env.get_template("pages.html")
+
+            # TODO: I need to rethink how pages are managed
+
+            if page_name == "gift-card":
+                template = env.get_template("gift-card.html")
+            else:
+                template = env.get_template("pages.html")
             response = template.render(page_name=page_name, page_content=page_content)
 
 
@@ -627,7 +717,7 @@ def app(environ, start_response):
             allrows = c.fetchall()
             c.close()
             template = env.get_template("admin-products-list.html")
-            response = template.render(allrows=allrows)
+            response = template.render(allrows=allrows, global_settings=global_settings)
 
 
         elif environ['PATH_INFO'] == '/admin/products/add-edit':
@@ -794,8 +884,12 @@ def app(environ, start_response):
         # Backup current version just in case cuz why not
         os.rename(f"data/{page_name}.html", f"data/{page_name}.html.bak")
 
-        write_file(f"data/{page_name}.html", page_content)
-        response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages"/>'
+        try:
+            write_file(f"data/{page_name}.html", page_content)
+            response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages"/>'
+        except:
+            os.rename(f"data/{page_name}.html.bak", f"data/{page_name}.html")
+            response = "ERROR WRITING PAGE <a href='/app/admin/pages'>Go back</a>"
 
         scrape_and_write(page_name)
 

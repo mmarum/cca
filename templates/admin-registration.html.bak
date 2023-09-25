@@ -1,0 +1,76 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin View Registration{% endblock %}
+
+{% block html_head %}
+<style>
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1350px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- <p><a href="#wheel-wars">Wheel Wars Registration</a></p> -->
+<!-- <p><a href="/app/admin/registration?view=all">View all including no order IDs</a></p> -->
+
+<h1>Registration</h1>
+
+<table class="table table-striped">
+
+{% for row in allrows %}
+{% if loop.first %}
+  <tr>
+  <th>Session</th>
+  {% for key, val in row.items() %}
+    <th>{{ key|replace("_", " ") }}</th>
+  {% endfor %}
+  </tr>
+{% endif %}
+{% endfor %}
+
+
+{% for row in allrows %}
+  <tr>
+  <td>{{ row.session_detail }}</td>
+  {% for key, val in row.items() %}
+    <td>{{ val }}</td>
+  {% endfor %}
+  </tr>
+{% endfor %}
+
+</table>
+
+<hr>
+
+<a name="wheel-wars"><h1>Wheel Wars</h1></a>
+
+<table class="table table-striped">
+
+<tr class="p-3 mb-2 bg-light text-dark">
+<th></th>
+{% for key, val in data.items() %}
+  {% if loop.index == 1 %}
+    {% for k, v in val.items() %}
+      <th>{{ k }}</th>
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+</tr>
+
+{% for key, val in data.items() %}
+{% if val["event_date"] == "Saturday, March 25, 2023 3-5PM" %}
+  <tr>
+  <td>{{ loop.index }}</td>
+  {% for k, v in val.items() %}
+    <td>{{ v }}</td>
+  {% endfor %}
+  </tr>
+{% endif %}
+{% endfor %}
+
+</table>
+
+{% endblock %}

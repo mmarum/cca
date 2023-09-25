@@ -1,6 +1,6 @@
 {% extends "base-site.html" %}
 
-{% block title %}Catalyst Creative Arts Program Registration{% endblock %}
+{% block title %}Catalyst Creative Arts: Art Camp 2023 Registration{% endblock %}
 
 {% block html_head %}
 <style>
@@ -8,18 +8,15 @@ h5 {
   padding-top: 20px;
 }
 #session_detail_box {
-  background-color: LightGray;
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
+  border-left: 2px dashed Gray;
+  padding: 19px 10px 1px 10px;
+}
+#session_detail_box p {
+  line-height: 10px;
 }
 .top-pad {
   padding-top: 10px;
 }
-{% if form %}
-{% if not form.camper2_name.data %}#camper2_group, #add_camper2, {% endif %}
-{% if not form.camper3_name.data %}#camper3_group, #add_camper3, {% endif %}
-{% endif %}
 #paypal-button-container {
   display: none;
 }
@@ -33,12 +30,13 @@ h5 {
   text-align: center;
 }
 </style>
+<script>var class_full = false;</script>
 {% endblock %}
 
 {% block content %}
 
 <center>
-<h3>Registration & Release Form</h3>
+<h3>Art Camp 2023 Registration & Release Form</h3>
 </center>
 
 {% if form %}
@@ -47,7 +45,9 @@ h5 {
   {% elif session_detail %}
     {% set session_name = session_detail %}
   {% else %}
-    ERROR AAA
+    <p style="background-color: red; color: white; padding: 10px; margin: 100px; 0 100px 0;">
+      ERROR: (A) You must <a href="/art-camp.html" style="color: white;">choose a specific art camp</a>
+    </p>
   {% endif %}
 {% elif data and rid %}
   {% if data["session_detail"] %}
@@ -55,76 +55,112 @@ h5 {
   {% elif session_detail %}
     {% set session_name = session_detail %}
   {% else %}
-    ERROR BBB
+    <p style="background-color: red; color: white; padding: 10px; margin: 100px; 0 100px 0;">
+      ERROR: (B) You must <a href="/art-camp.html" style="color: white;">choose a specific art camp</a>
+    </p>
   {% endif %}
 {% endif %}
 
+{% if session_detail %}
+
 <div id="session_detail_box">
 
-{% if camper_count %}
-
-{{ camper_count }}
-
-{% endif %}
-
-{% if session_name == "art_camp_1" %}
-<h5>Art Camp 1: Ages 7 &amp; Up - June 21-25, 2021 - 9am-12pm</h5>
-Mon - Resin over collage, pottery wheel work<br>
-Tue - Fluid Art, pottery painting<br>
-Wed - Printmaking<br>
-Thu - Water marbling, glaze pottery wheel item<br>
-Fri - Abstract acrylic paint self portrait<br>
-
-{% elif session_name == "art_camp_2" %}
-<h5>Art Camp 2: Ages 12 &amp; Up - June 21-25, 2021 - 2pm-5pm</h5>
-Mon - Resin over collage, pottery wheel work<br>
-Tue - Macrame key chain, resin over collage<br>
-Wed - Relief block printmaking<br>
-Thu - Printmaking, water marbling, glaze pottery wheel item<br>
-Fri - Watercolor technique practice, watercolor painting<br>
-
-{% elif session_name == "art_camp_3" %}
-<h5>Art Camp 3: Ages 7 &amp; Up - July 12-16, 2021 - 9am-12pm</h5>
-Mon - Resin over collage, pottery wheel work<br>
-Tue - Fluid art, pottery painting<br>
-Wed - Printmaking<br>
-Thu - Water marbling, glaze pottery wheel item<br>
-Fri - Abstract acrylic paint self portrait<br>
-
-{% elif session_name == "art_camp_4" %}
-<h5>Art Camp 4: Ages 12 &amp; Up - July 12-16, 2021 - 9am-12pm</h5>
-Mon - Resin over collage, pottery wheel work<br>
-Tue - Macrame key chain, resin over collage<br>
-We - Relief block printmaking<br>
-Thu - Printmaking, water marbling, glaze pottery wheel item<br>
-Fri - Watercolor technique practice, watercolor painting<br>
-
-{% elif session_name == "pottery_camp_1" %}
-<h5>Pottery Camp - 8 &amp; Up - July 19-23, 2021 - 9am-12pm</h5>
-Mon - Introduction and handbuilding techniques practice<br>
-Tue - Slab formed bowl<br>
-Wed - Slab formed box or planter<br>
-Thu - Pinch pot, pottery wheel work<br>
-Fri - Glaze pottery<br>
-
-{% elif session_name == "After School Pottery Program 2020" %}
-<h5>After School Pottery Program 2020</h5>
-
+{% if camper_count and (camper_count >= 15) %}
+  CLASS IS FULL
+  <script>var class_full = true;</script>
+{% else %}
+  <p>Art Camp {{ session_name|replace("art_camp_2023_", "") }}</p>
+  <p>{% if session_name == "art_camp_2023_3" or session_name == "art_camp_2023_7" %}Ages 11 thru 15{% else %}Ages 6 thru 11{% endif %}</p>
+  <p>Begins
+    {% if session_name == "art_camp_2023_1" %}
+    June 5-9
+    {% elif session_name == "art_camp_2023_2" %}
+    June 12-16
+    {% elif session_name == "art_camp_2023_3" %}
+    June 19-23
+    {% elif session_name == "art_camp_2023_4" %}
+    June 26-30
+    {% elif session_name == "art_camp_2023_5" %}
+    July 10-14
+    {% elif session_name == "art_camp_2023_6" %}
+    July 17-21
+    {% elif session_name == "art_camp_2023_7" %}
+    July 24-28
+    {% elif session_name == "art_camp_2023_8" %}
+    July 31 - Aug 4
+    {% endif %}
+  2023</p>
+  <p>$200 per camper. $180 per additional sibling.</p>
+  <p>9am-12pm</p>
+  <p>{% if camper_count %}{{ 15 - camper_count }}{% else %}15{% endif %} spots left</p>
 {% endif %}
 
 </div>
 
+{% endif %}
+
 {% if data and rid %}
 
-{# THIS IS THE CONFIRM SCREEN #}
-
 <!--
-{{ data }}
+{{ data|safe }}
 -->
 
+<!-- BELOW IS THE CONFIRM SCREEN -->
 
+{% if data and data['parent_name'] == 'Matthew Marum' %}
+<form action="/checkout/" method="POST" name="registration_form" id="registration_form">
+{% else %}
 <form action="/registration/{{ registration_name }}/edit" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
+{% endif %}
+
 <input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
+
+{% if data and data['parent_name'] == 'Matthew Marum' %}
+
+<input type="hidden" name="event_title" value="Art Camp Registration 2023">
+
+{% if session_name == "art_camp_2023_1" %}
+  <input type="hidden" name="event_date" value="June 5-9 2023">
+{% elif session_name == "art_camp_2023_2" %}
+  <input type="hidden" name="event_date" value="June 12-16 2023">
+{% elif session_name == "art_camp_2023_3" %}
+  <input type="hidden" name="event_date" value="June 19-23 2023">
+{% elif session_name == "art_camp_2023_4" %}
+  <input type="hidden" name="event_date" value="June 26-30 2023">
+{% elif session_name == "art_camp_2023_5" %}
+  <input type="hidden" name="event_date" value="July 10-14 2023">
+{% elif session_name == "art_camp_2023_6" %}
+  <input type="hidden" name="event_date" value="July 17-21 2023">
+{% elif session_name == "art_camp_2023_7" %}
+  <input type="hidden" name="event_date" value="July 24-28 2023">
+{% elif session_name == "art_camp_2023_8" %}
+  <input type="hidden" name="event_date" value="July 31 - Aug 4 2023">
+{% endif %}
+
+
+<!-- TAKE EMAIL OFF THE PAGE CUZ CC PAGE COLLECTS IT -->
+
+<input type="hidden" name="camper1_name" value="{{ data['camper1_name'] }}">
+<input type="hidden" name="camper1_age" value="{{ data['camper1_age'] }}">
+<input type="hidden" name="camper2_name" value="{{ data['camper2_name'] }}">
+<input type="hidden" name="camper2_age" value="{{ data['camper2_age'] }}">
+<input type="hidden" name="camper3_name" value="{{ data['camper3_name'] }}">
+<input type="hidden" name="camper3_age" value="{{ data['camper3_age'] }}">
+<input type="hidden" name="customer_name" value="{{ data['parent_name'] }}">
+<input type="hidden" name="parent_address" value="{{ data['parent_address'] }}">
+<input type="hidden" name="parent_city" value="{{ data['parent_city'] }}">
+<input type="hidden" name="parent_state" value="{{ data['parent_state'] }}">
+<input type="hidden" name="parent_zip" value="{{ data['parent_zip'] }}">
+<input type="hidden" name="customer_phone" value="{{ data['parent_phone'] }}">
+<input type="hidden" name="parent_em_name" value="{{ data['parent_em_name'] }}">
+<input type="hidden" name="parent_em_phone" value="{{ data['parent_em_phone'] }}">
+<input type="hidden" name="pickup1_name" value="{{ data['pickup1_name'] }}">
+<input type="hidden" name="pickup1_phone" value="{{ data['pickup1_phone'] }}">
+<input type="hidden" name="pickup2_name" value="{{ data['pickup2_name'] }}">
+<input type="hidden" name="pickup2_phone" value="{{ data['pickup2_phone'] }}">
+
+
+{% endif %}
 
 {% if data and data["session_detail"] %}
 <input type="hidden" name="session_detail" id="session_detail" value="{{ data['session_detail'] }}"/>
@@ -161,7 +197,15 @@ Fri - Glaze pottery<br>
     <button type="button" class="btn btn-warning" onClick="edit(); return false;">Edit Info</button>
   </div>
   <div class="col-sm-6">
+
+    {% if data and data['parent_name'] == 'Matthew Marum' %}
+    <!-- <input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning"> -->
+    <input type="hidden" name="total_cost" id="total_cost" value="">
+    <input type="hidden" name="guest_quantity" id="guest_quantity" value="">
+    <button type="button" class="btn btn-success" onClick="continuePay(); return false;">Proceed to checkout</button>
+    {% else %}
     <button type="button" class="btn btn-success" onClick="continuePay(); return false;">Pay with PayPal</button>
+    {% endif %}
   </div>
 </div>
 </form>
@@ -170,7 +214,7 @@ Fri - Glaze pottery<br>
 
 {% if form %}
 
-{# THIS IS THE INITIAL AND EDIT SCREEN #}
+<!-- BELOW IS THE INITIAL AND EDIT SCREEN -->
 
 <form action="/registration/{{ registration_name }}/confirm" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
 {{ form.rid }}
@@ -195,46 +239,30 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
   </div>
   <div class="col-sm-4">
     {{ form.camper1_age.label(class="form-text text-muted") }}
-    {{ form.camper1_age(class="form-control", onfocus="showMore('add_camper2');") }}
+    {{ form.camper1_age(class="form-control") }}
   </div>
 </div>
 
-<div class="row" id="add_camper2">
-  <div class="col-sm-12">
-    <p><a href="#" onclick="showMore(2); return false;">Add a second participant</a></p>
-  </div>
-</div>
-
-<div id="camper2_group">
 <div class="row">
   <div class="col-sm-4">
     {{ form.camper2_name.label(class="form-text text-muted") }}
-    {{ form.camper2_name(class="form-control") }}
+    {{ form.camper2_name(class="form-control", placeholder="OPTIONAL") }}
   </div>
   <div class="col-sm-4">
     {{ form.camper2_age.label(class="form-text text-muted") }}
-    {{ form.camper2_age(class="form-control", onfocus="showMore('add_camper3');") }}
-  </div>
-</div>
-</div>
-
-<div class="row" id="add_camper3">
-  <div class="col-sm-12">
-    <p><a href="#" onclick="showMore(3); return false;">Add a third participant</a></p>
+    {{ form.camper2_age(class="form-control") }}
   </div>
 </div>
 
-<div id="camper3_group">
 <div class="row">
   <div class="col-sm-4">
     {{ form.camper3_name.label(class="form-text text-muted") }}
-    {{ form.camper3_name(class="form-control") }}
+    {{ form.camper3_name(class="form-control", placeholder="OPTIONAL") }}
   </div>
   <div class="col-sm-4">
     {{ form.camper3_age.label(class="form-text text-muted") }}
     {{ form.camper3_age(class="form-control") }}
   </div>
-</div>
 </div>
 
 <div class="row">
@@ -367,6 +395,10 @@ document.getElementById("session_detail").value = "{{ session_detail|safe }}";
 
 <script>
 
+if (class_full && class_full == true) {
+  document.getElementById("registration_form").style.display = "none";
+}
+
 function calculate() {
   var camperNameLen = {};
   var total = 0;
@@ -396,6 +428,12 @@ function calculate() {
   document.getElementById("total").innerHTML = total;
   document.getElementById("number_of_campers").innerHTML = number_of_campers;
 
+  {% if data and data['parent_name'] == 'Matthew Marum' %}
+  total = 1; // TEMPORARY
+  document.getElementById("total_cost").value = total;
+  document.getElementById("guest_quantity").value = number_of_campers;
+  {% endif %}
+
   return total;
 }
 
@@ -403,23 +441,20 @@ if (page == "confirm") {
   calculate();
 }
 
-function showMore(n) {
-  if (n == "add_camper2" || n == "add_camper3") {
-    document.getElementById(n).style.display = "block";
-  } else {
-    document.getElementById("camper"+n+"_group").style.display = "block";
-    document.getElementById("add_camper"+n).style.display = "none";
-  }
-}
-
 function edit() {
+  document.registration_form.action = "/registration/{{ registration_name }}/edit";
   document.registration_form.submit();
   return true;
 }
 
 function continuePay() {
+  {% if data and data['parent_name'] == 'Matthew Marum' %}
+  document.registration_form.submit();
+  return true;
+  {% else %}
   document.getElementById("paypal-button-container").style.display = "block";
   return false;
+  {% endif %}
 }
 
 // PAYPAL STUFF

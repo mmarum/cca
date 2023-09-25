@@ -1,1 +1,40 @@
-"acrylic painting", "watercolor painting", "PYOP", "Artist Guided Family Painting", "alcohol ink", "fluid art", "handbuilt pottery", "paint your own pottery", "fused glass", "leathercraft", "resin crafts", "water marbling", "specialty classes", "custom built tables, counter tops, art panels", 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": "{{ event.title }}",
+  "startDate": "{{ event.edatetime }}",
+  "endDate": "",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "location": {
+    "@type": "Place",
+    "name": "Studio",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "300 West Main St",
+      "addressLocality": "Arlington",
+      "postalCode": "76011",
+      "addressRegion": "TX",
+      "addressCountry": "US"
+    }
+  },
+  "image": [
+    "https://www.catalystcreativearts.com/img/small/{{ img }}"
+   ],
+  "description": "{% for s in desc %}{% if loop.index <= 3 %}{{ s|safe }} {% endif %}{% endfor %}",
+  "offers": {
+    "@type": "Offer",
+    "url": "https://www.catalystcreativearts.com/event/{{ event.eid }}.html",
+    "price": "{{ event.price }}",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "validFrom": ""
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": "Catalyst Creative Arts",
+    "url": "https://www.catalystcreativearts.com"
+  }
+}
+</script>

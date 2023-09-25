@@ -28,16 +28,55 @@ def order(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
 
     passwd = json.loads(read_file("../app/data/passwords.json"))
+    dbuser = "catalystcreative_cca"
+    db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd[dbuser], db="catalystcreative_arts")
 
     if environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/submit":
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
-        print("order.py post_input", post_input)
+        #print("order.py post_input", post_input)
 
         form_orders = json.loads(post_input)
+        #print("form_orders", form_orders)
         event_id = str(form_orders['event_id'])
         cca_order_id = str(form_orders['cca_order_id'])
+
+
+        # GATHER EVENT INFO FOR SENDGRID:
+        eid = event_id
+        db.query(f"select elimit, edatetime, title, duration, price, location from events where eid = {eid}")
+        r = db.store_result()
+        rows = r.fetch_row(maxrows=1, how=1)[0]
+
+        elimit = rows["elimit"]
+        edatetime = rows["edatetime"]
+        title = rows["title"]
+        duration = rows["duration"]
+        price = rows["price"]
+        location = rows["location"]
+
+        # AVOID OVER BOOKING:
+        # DOUBLE CHECK GUEST COUNT:
+        try:
+            db.query(f"select sum(quantity) as quantity_sum from orders where eid = {eid}")
+            q = db.store_result()
+            quantity_sum = q.fetch_row(maxrows=1, how=1)[0]["quantity_sum"]
+
+            if guest_quantity + int(quantity_sum) <= int(elimit):
+                quantity_error = False
+            else:
+                quantity_error = True
+        except:
+            quantity_error = False
+
+
+        try:
+            guest_quantity = int(form_orders['quantity'])
+        except:
+            guest_quantity = 1
+        #event_date = int(form_orders['event_date'])
+
 
         try:
             orders = json.loads(read_file(f"../app/orders/{event_id}.json"))
@@ -48,7 +87,7 @@ def order(environ, start_response):
             orders[cca_order_id]["paypal"] = form_orders
         except:
             rand_num = randint(1, 10000)
-            orders[rand_num] = form_orders
+            orders[rand_num]["paypal"] = form_orders
 
         write_file(f"../app/orders/{event_id}.json", json.dumps(orders, indent=4))
 
@@ -61,54 +100,50 @@ def order(environ, start_response):
 
             # Now rebuild the page so it reflects accurate inventory numbers
             r = requests.get(f'{domain}/app/build-individual-event?eid={event_id}', auth=(f'{user}', f'{passwd["catalystcreative"]}'))
-            print("rebuilding", r.url)
+            #print("rebuilding", r.url)
             if r.status_code == 200:
-                print(r.status_code)
+                #print(r.status_code)
                 return r.text
             else:
                 raise ValueError(f'get_page_contents fail: {path} {r.status_code}')
         except:
-            print(f"NO VARIABLE TIME for {event_id}")
+            pass
+            #print(f"NO VARIABLE TIME for {event_id}")
 
 
-        ####
         try:
             payer_info = {
-                "order_id": form_orders['orderID'],
-                "event_id": form_orders['event_id'],
-                "payer_email": form_orders['details']['payer']['email_address'],
-                "payer_name": form_orders['details']['payer']['name']['given_name'],
-                "amount": form_orders['details']['purchase_units'][0]['amount']['value']
+                "email": form_orders['details']['payer']['email_address'],
+                "name": form_orders['details']['payer']['name']['given_name'],
+                "title": title,
+                "date": edatetime.strftime("%b %d %Y at %I:%M %p"),
+                "location": location
             }
-            print(payer_info)
         except:
-            print('SOMETHING WENT WRONG WITH COLLECTING PAYER_INFO FROM FORM_ORDERS')
-            payer_info = ''
-        ####
+            payer_info = ""
+
+        print("order.py payer_info", payer_info)
 
         url = f"{domain}/email/submit"
         data = {"subject": "CCA Event purchase", "content": f"{json.dumps(orders, indent=4)}"}
         headers = {"Content-Type": "application/json"}
         r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd["catalystemail"]))
-        print(r.status_code)
+        print("order.py email/submit status code:", r.status_code)
 
-        generic_response = "generic response"
         if type(payer_info) == dict:
             try:
                 print('attempt to send to payer')
-                data = {"subject": "Thank you for your CCA Event purchase", "content": f"_hey_ _content_", "payer_info": f"{json.dumps(payer_info, indent=4)}"}
+                data = {"subject": "Thank you for your CCA Event purchase", "content": f"", "payer_info": f"{json.dumps(payer_info, indent=4)}"}
                 headers = {"Content-Type": "text/html"}
                 r = requests.post(url=url, json=data, headers=headers, auth=('catalystemail', passwd["catalystemail"]))
-                print("sendgrid resp status code", r.status_code)
-                generic_reponse = "sendgrid response: {str(r.status_code)}"
+                generic_response = f"sendgrid response: {str(r.status_code)}"
             except:
-                generic_reponse = "failed to communicate to payer by sendgrid email"
-            print(generic_response)
+                generic_response = "ERROR: failed to communicate to payer by sendgrid email"
         else:
-            generic_response = "generic response"
-            print('NO LUCK-- payer_info type is not dict')
+            generic_response = "ERROR: payer_info type is not dict"
 
-        response = generic_reponse
+        print("generic_response", generic_response)
+        response = generic_response
 
 
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/prep":
@@ -119,6 +154,10 @@ def order(environ, start_response):
         cca_order_id = str(form_prep['cca_order_id'])
         cca_buyer_name = str(form_prep['cca_buyer_name'])
         cca_buyer_phone= str(form_prep['cca_buyer_phone'])
+        try:
+            guest_quantity = int(form_prep['quantity'])
+        except:
+            guest_quantity = 1
 
         try:
             orders = json.loads(read_file(f"../app/orders/{event_id}.json"))
@@ -131,7 +170,10 @@ def order(environ, start_response):
 
         write_file(f"../app/orders/{event_id}.json", json.dumps(orders, indent=4))
 
-        response = ""
+        #if quantity_error == True:
+        #    response = "ERROR: quantity_error"
+        #else:
+        response = "ok"
 
 
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/manual-add":
@@ -139,11 +181,7 @@ def order(environ, start_response):
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
         i = json.loads(post_input)
-        print("post_input", i)
-
-        dbuser = "catalystcreative_cca"
-        passwd = json.loads(read_file("../app/data/passwords.json"))[dbuser]
-        db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
+        #print("post_input", i)
 
         keys, vals = "", ""
         for k, v in i.items():
@@ -154,7 +192,7 @@ def order(environ, start_response):
                 vals += f"'{v}',"
 
         sql = f"INSERT INTO orders ({keys.rstrip(',')}) VALUES ({vals.rstrip(',')})"
-        print("sql", sql)
+        #print("sql", sql)
 
         c = db.cursor()
         c.execute(sql)
@@ -168,14 +206,10 @@ def order(environ, start_response):
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
         i = json.loads(post_input)
-        print("post_input", i)
-
-        dbuser = "catalystcreative_cca"
-        passwd = json.loads(read_file("../app/data/passwords.json"))[dbuser]
-        db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
+        #print("manual-edit post_input", i)
 
         oid = i["id"]
-        print("oid", oid)
+        #print("oid", oid)
 
         update_string = ""
         for k, v in i.items():
@@ -183,7 +217,7 @@ def order(environ, start_response):
                 update_string += f"{k}='{v}',"
 
         sql = f"UPDATE orders SET {update_string.rstrip(',')} where id = {oid}"
-        print("sql", sql)
+        #print("sql", sql)
 
         c = db.cursor()
         c.execute(sql)
@@ -200,12 +234,12 @@ def order(environ, start_response):
             length = int(environ.get('CONTENT_LENGTH', '0'))
             post_input = environ['wsgi.input'].read(length).decode('UTF-8')
             i = json.loads(post_input)
-            print("post_input from paypal-webhook", i)
+            #print("post_input from paypal-webhook", i)
             create_time = i["create_time"]
             write_file(f"webhook-receipts/{create_time}.json", json.dumps(i, indent=4))
             response = "POKEY DOKEY"
         except:
-            print("post_input from paypal-webhook", "FAIL")
+            #print("post_input from paypal-webhook", "FAIL")
             response += f"<hr>{str(environ)}<hr>"
 
 
@@ -213,5 +247,7 @@ def order(environ, start_response):
         response = "200"
 
     #response += f"<hr>{str(environ)}"
+
+    db.close()
 
     return [response.encode()]

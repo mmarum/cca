@@ -66,14 +66,19 @@ function submitBooking() {
   console.log("date_now" + String(date_now));
 
   const params = {
-    {%- if "time" in form["order_id"]|safe %}
-    id: document.getElementById("id").value,
-    {% endif -%}
-    {%- if "time" in form["order_id"]|safe %}
-    order_id: document.getElementById("order_id").value,
-    {% else %}
+
+    {%- if 'value=""' in form["order_id"]|safe %}
+
+    id: 0,
     order_id: 'time:' + String(date_now),
+
+    {% else %}
+
+    id: document.getElementById("id").value,
+    order_id: document.getElementById("order_id").value,
+
     {% endif -%}
+
     eid: document.getElementById("eid").value,
     create_time: document.getElementById("create_time").value,
     email: document.getElementById("email").value,
@@ -97,10 +102,10 @@ function submitBooking() {
 
   console.log(options);
 
-  {%- if "time" in form["order_id"]|safe %}
-  fetch("/order/manual-edit", options)
-  {% else %}
+  {%- if 'value=""' in form["order_id"]|safe %}
   fetch("/order/manual-add", options)
+  {% else %}
+  fetch("/order/manual-edit", options)
   {% endif -%}
   .then(response => response.text())
   .then(response => {
