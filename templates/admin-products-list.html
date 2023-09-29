@@ -79,14 +79,16 @@ input:checked + .slider:before {
 
 {% block content %}
 
+<!--
 <div style="text-align: center">
 online store visible: <span id="shop_visible_value">{{ shop_visible }}</span>
-<!-- Rounded switch -->
+
 <label class="switch">
   <input type="checkbox" {% if shop_visible == "true" %}checked{% endif %}>
   <span class="slider round" onclick="shop_visible_toggle();"></span>
 </label>
 </div>
+-->
 
 <script>
 function shop_visible_toggle() {

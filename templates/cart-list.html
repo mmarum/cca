@@ -74,7 +74,7 @@ img.check {
 
 {% block content %}
 
-<form id="shop_form" name="shop_form" class="form-group" action="/store-checkout/" method="POST">
+<form id="shop_form" name="shop_form" class="form-group" action="/store-checkout-shipping/" method="POST">
 <input type="hidden" name="session_id" id="session_id" value="">
 <input type="hidden" id="subtotal" value="">
 
@@ -137,8 +137,10 @@ img.check {
 
 <center id="price_includes_shipping">Price includes shipping to contiguous US</center>
 <p><center><b>Total with tax: $<span id="total_with_tax_2">0</span></b></center></p>
+<!--
 <p><input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control"></p>
 <p><input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control"></p>
+-->
 <input type="hidden" name="product_names" id="product_names" value="">
 <input type="hidden" name="total_cost" id="total_cost" value="">
 <p><center>
@@ -228,12 +230,12 @@ function getCartList() {
 <a href="/shop/product/${obj.pid}"><h3>${obj.name}</h3></a>
 <div class="product_price">$${obj.price}</div>
 <div>
-<!-- <form action="" id="product_quantity_form_${obj.pid}"> -->
+
 <select name="quantity" id="product_quantity_select_${obj.pid}" class="form-control" onchange="updateQuantity(${obj.pid}, this.options[this.selectedIndex].value);">
 <option value=${obj.quantity}>${obj.quantity}</option>
 ${quantity_option_html}
 </select>
-<!-- </form> -->
+
 </div>
 </div>
 <div class="col-sm-1"></div>

@@ -18,95 +18,71 @@ img {
 
 <h1>Orders</h1>
 
+<p><span style="padding: 10px; background-color: lightyellow;">UNSHIPPED</span></p>
+
 <table border="1" cellpadding="10">
-
 <tr>
-  <th>cart order id</th>
-  <th>create date</th>
-  <th>checkout date</th>
-  <!-- <th>ship date</th> -->
-  <!-- <th>status</th> -->
-  <th>paypal order id</th>
-  <th>total</th>
+  <td>checkout_date</td>
+  <td>order_id</td>
+  <td>total</td>
+  <td>quantity</td>
+  <td>name</td>
+  <td>image</td>
+  <td>inventory</td>
+  <td>price</td>
+  <td>action</td>
 </tr>
 
-<tr>
-  <td colspan="5" bgcolor="WhiteSmoke"></td>
+{% for d in unshipped %}
+<tr id="row_{{ d["cart_order_id"] }}">
+  <td>{{ d["checkout_date"] }}</td>
+  <td><a href="https://dashboard.stripe.com/payments/{{ d["paypal_order_id"] }}">{{ d["paypal_order_id"] }}</a></td>
+  <td>{{ d["total"] }}</td>
+  <td>{{ d["quantity"] }}</td>
+  <td><a href="{{ d["pid"] }}">{{ d["name"] }}</a></td>
+  <td><a href="{{ d["pid"] }}"><img src="/img/small/{{ d["image_path_array"][1] }}"></a></td>
+  <td>{{ d["inventory"] }}</td>
+  <td>{{ d["price"] }}</td>
+  <td><button type="button" class="btn btn-info" onclick="if(confirm('Are you sure?')) markAsShipped({{ d["cart_order_id"] }});">Mark as shipped</button></td>
 </tr>
-
-{% for row in allrows %}
-
-  <tr>
-  <td>{{ row.cart_order_id }}</td>
-  <td>{{ row.create_date }}</td>
-  <td>{{ row.checkout_date }}</td>
-  <!-- <td>{{ row.ship_date }}</td> -->
-  <!-- <td>{{ row.status }}</td> -->
-  <td>{{ row.paypal_order_id }}</td>
-  <td>${{ row.total }}</td>
-  </tr>
-
-  {% for product in row.products %}
-    <tr>
-    <td>
-      {% if loop.index == 1 %}
-        {% if row.ship_date == None %}
-          <button type="button" class="btn btn-info" onclick="if(confirm('Are you sure?')) markAsShipped({{row.cart_order_id}});">Mark as shipped</button>
-        {% else %}
-          <div style="background-color: YellowGreen; padding: 10px; border-radius: 5px;">
-            Shipped on:<br>
-            {{ row.ship_date }}
-          </div>
-        {% endif %}
-      {% endif %}
-    </td>
-    <td colspan="4">{{ loop.index }}
-      <a href="/app/admin/products/add-edit?pid={{ product.product_id }}">{{ product.name }}</a>
-      quantity: {{ product.quantity }}
-      inventory: {{ product.inventory }}
-    </td>
-    </tr>
-  {% endfor %}
-  
-  <tr>
-    <td colspan="5">
-      {{ row.name }}<br>
-      {% if row.phone %}
-        {{ row.phone }}<br>
-      {% endif %}
-      {{ row.email }}<br>
-      {% set address = row.address %}
-      {% for k, v in address.items() %}
-        <!-- {{ k }} -->
-        {{ v }}
-      {% endfor %}
-    </td>
-  </tr>
-
-  <tr><td colspan="5"></td></tr>
-  <tr><td colspan="5" bgcolor="#CCC"></td></tr>
-  <tr><td colspan="5"></td></tr>
-
 {% endfor %}
-
-{% for month, total in per_month_totals.items() %}
-  <tr>
-  <td colspan=3>
-  </td>
-  <td>{{ month }}</td>
-  <td>${{ total }}</td>
-  </tr>
-{% endfor %}
-
-<tr>
-<td colspan=3></td>
-<td align="right">Overall total:</td>
-<td>${{ overall_total }}</td>
-</tr>
 
 </table>
 
-<br>
+<hr>
+
+<p><span style="padding: 10px; background-color: lightyellow;">SHIPPED</span></p>
+
+<table border="1" cellpadding="10">
+<tr>
+  <td>checkout_date</td>
+  <td>order_id</td>
+  <td>total</td>
+  <td>quantity</td>
+  <td>name</td>
+  <td>image</td>
+  <td>inventory</td>
+  <td>price</td>
+  <td>ship_date</td>
+</tr>
+
+{% for d in shipped %}
+<tr>
+  <td>{{ d["checkout_date"] }}</td>
+  <td><a href="https://dashboard.stripe.com/payments/{{ d["paypal_order_id"] }}">{{ d["paypal_order_id"] }}</a></td>
+  <td>{{ d["total"] }}</td>
+  <td>{{ d["quantity"] }}</td>
+  <td><a href="{{ d["pid"] }}">{{ d["name"] }}</a></td>
+  <td><a href="{{ d["pid"] }}"><img src="/img/small/{{ d["image_path_array"][1] }}"></td>
+  <td>{{ d["inventory"] }}</td>
+  <td>{{ d["price"] }}</td>
+  <td>{{ d["ship_date"] }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+
 
 <script>
 function markAsShipped(cart_order_id) {

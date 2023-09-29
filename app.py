@@ -124,64 +124,25 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/orders/list':
-            db.query(f"select *, ceiling(ship_date / 10000000000000) as ship_group from cart_order where status = 'complete' order by ship_group, ship_date desc, checkout_date desc")
-            #db.query(f"select * from cart_order where status = 'complete' order by ship_date desc, checkout_date desc") # and ship_date is NULL
+
+            base_sql = "select a.cart_order_id, a.checkout_date, a.paypal_order_id, a.total, a.ship_date, b.quantity, \
+                c.pid, c.name, c.image_path_array, c.inventory, c.price \
+                from cart_order a, cart_order_product b, products c \
+                where a.cart_order_id = b.cart_order_id \
+                and b.product_id = c.pid \
+                and checkout_date >= '2023-09-23' \
+                and status = 'complete'"
+
+            db.query(f"{base_sql} and ship_date is NULL")
             r = db.store_result()
-            allrows = r.fetch_row(maxrows=100, how=1)
+            unshipped = r.fetch_row(maxrows=100, how=1)
 
-            new_allrows = []
-
-            overall_total = 0
-            per_month_totals = {}
-
-            for row in allrows:
-                cart_order_id = row["cart_order_id"]
-                #db.query(f"select product_id, quantity from cart_order_product where cart_order_id = {cart_order_id}")
-
-                try:
-                    content = read_file(f"../cart-api/details/{cart_order_id}.json")
-                    details = json.loads(content)
-                    email = details["payer"]["email_address"]
-                    address = details["purchase_units"][0]["shipping"]["address"]
-                    given_name = details["payer"]["name"]["given_name"]
-                    surname = details["payer"]["name"]["surname"]
-                    name = f"{given_name} {surname}"
-                    try:
-                        phone = details["payer"]["phone"]["phone_number"]["national_number"]
-                    except:
-                        phone = ""
-                except:
-                    pass
-
-                db.query(f"select a.product_id, a.quantity, b.name, b.inventory \
-                    from cart_order_product a, products b \
-                    where a.product_id = b.pid and cart_order_id = {cart_order_id}")
-                r = db.store_result()
-                sub_allrows = r.fetch_row(maxrows=100, how=1)
-                row["products"] = sub_allrows
-
-                try:
-                    row["email"] = email
-                    row["address"] = address
-                    row["name"] = name
-                    row["phone"] = phone
-                except:
-                    pass
-
-                new_allrows.append(row)
-
-                overall_total += int(row["total"])
-
-                checkout_month = str(row["checkout_date"]).split("-")[1]
-
-                try:
-                    per_month_totals[checkout_month] += int(row["total"])
-                except:
-                    per_month_totals[checkout_month] = int(row["total"])
+            db.query(f"{base_sql} and ship_date is not NULL")
+            r = db.store_result()
+            shipped = r.fetch_row(maxrows=100, how=1)
 
             template = env.get_template("admin-orders-list.html")
-            response = template.render(allrows=new_allrows, 
-                overall_total=overall_total, per_month_totals=per_month_totals)
+            response = template.render(unshipped=unshipped, shipped=shipped)
 
 
         elif environ['PATH_INFO'] == '/admin/events/add-edit':
@@ -652,7 +613,7 @@ def app(environ, start_response):
                 special = "AND order_id is not NULL"
                 orderby = "session_detail"
 
-            db.query(f"SELECT * FROM registration where session_detail LIKE '%2023%' {special} ORDER BY {orderby}")
+            db.query(f"SELECT * FROM registration where session_detail LIKE '%2024%' {special} ORDER BY {orderby}")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 

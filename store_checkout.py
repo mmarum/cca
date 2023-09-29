@@ -40,9 +40,27 @@ def get_intent_shop(form_data):
 
     session_id = form_data["session_id"]
     product_names = form_data["product_names"]
-    customer_name = form_data["customer_name"]
-    customer_phone = form_data["customer_phone"]
     total_cost = form_data["total_cost"]
+
+    try:
+        line2 = form_data["line2"]
+    except:
+        line2 = ""
+
+    # TODO: write data validation
+
+    shipping = {
+        "name": form_data["name"],
+        "phone": form_data["phone"],
+        "address": {
+            "line1": form_data["line1"],
+            "line2": line2,
+            "city": form_data["city"],
+            "state": form_data["state"],
+            "postal_code": form_data["postal_code"],
+            "country": form_data["country"]
+        }
+    }
 
     total_cost = int(float(total_cost) * 100) # Stripe counts by cents
 
@@ -52,6 +70,7 @@ def get_intent_shop(form_data):
         #automatic_payment_methods={"enabled": False},
         description=product_names,
         metadata=form_data,
+        shipping=shipping,
         payment_method_types=["card"]
     )
 

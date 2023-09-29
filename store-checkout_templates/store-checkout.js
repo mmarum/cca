@@ -5,9 +5,16 @@ var items = {}
 
 items["session_id"] = document.getElementById("session_id").innerHTML;
 items["product_names"] = document.getElementById("product_names").innerHTML;
-items["customer_name"] = document.getElementById("customer_name").innerHTML;
-items["customer_phone"] = document.getElementById("customer_phone").innerHTML;
 items["total_cost"] = document.getElementById("total_cost").innerHTML;
+
+items["name"] = document.getElementById("name").innerHTML;
+items["phone"] = document.getElementById("phone").innerHTML;
+items["line1"] = document.getElementById("line1").innerHTML;
+items["line2"] = document.getElementById("line2").innerHTML;
+items["city"] = document.getElementById("city").innerHTML;
+items["state"] = document.getElementById("state").innerHTML;
+items["postal_code"] = document.getElementById("postal_code").innerHTML;
+items["country"] = document.getElementById("country").innerHTML;
 
 console.log(items);
 

@@ -10,37 +10,6 @@
   <script src="/store-checkout.js" defer></script>
 {% endif %}
 
-<style>
-#custom-metadata {
-  content: "";
-  display: table;
-  clear: both;
-  border-bottom: lightgray solid 1px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-.custom-metadata-col {
-  float: left;
-  width: 45%;
-  padding: 5px;
-  margin: 5px;
-}
-#custom-metadata-col-1 {
-  border-right: lightgray solid 1px;
-  padding-right: 10px;
-  margin-right: 10px;
-}
-#event_title {
-  font-weight: bold;
-}
-#event_date {
-  color: green;
-}
-.hide {
-  display: none;
-}
-</style>
-
 {% endblock %}
 
 {% block content %}
@@ -52,26 +21,29 @@
     <!-- Display a payment form -->
     <form id="payment-form">
 
-    <div id="custom-metadata">
+    <div style="display: none; visibility: hidden;"><span id="session_id">{{ form_data["session_id"] }}</span></div>
 
-      <span class="custom-metadata-col" id="custom-metadata-col-1">
+    <div style="display: none; visibility: hidden;"><span id="product_names">{{ form_data["product_names"] }}</span></div>
 
-        <div><span id="product_names">{{ form_data["product_names"] }}</span></div>
+    {% for product in form_data["product_names"].split(",") %}
+    {% if product|trim != "plus tax" %}<div>{{ product|trim }}</div>{% endif %}
+    {% endfor %}
 
-        <div><span>Total: </span>$<span id="total_cost">{{ form_data["total_cost"] }}</span></div>
-        <div style="display: none; visibility: hidden;"><span id="event_id">{{ form_data["event_id"] }}</span></div>
-        <div style="display: none; visibility: hidden;"><span id="session_id">{{ form_data["session_id"] }}</span></div>
+    <div><span>Total: </span>$<span id="total_cost">{{ form_data["total_cost"] }}</span></div>
 
-      </span>
+    <hr>
 
-      <span class="custom-metadata-col" id="custom-metadata-col-2">
+    <p>Shipping information:</p>
+    <div id="name">{{ form_data["name"] }}</div>
+    <div id="line1">{{ form_data["line1"] }}</div>
+    <div id="line2">{{ form_data["line2"] }}</div>
+    <span id="city">{{ form_data["city"] }}</span>
+    <span id="state">{{ form_data["state"] }}</span>
+    <span id="postal_code">{{ form_data["postal_code"] }}</span>
+    <span id="country">{{ form_data["country"] }}</span>
+    <div id="phone">{{ form_data["phone"] }}</div>
 
-        <div><span id="customer_name">{{ form_data["customer_name"] }}</span></div>
-        <div><span id="customer_phone">{{ form_data["customer_phone"] }}</span></div>
-
-      </span>
-
-    </div>
+    <hr>
 
     <div id="link-authentication-element">
       <!--Stripe.js injects the Link Authentication Element-->
