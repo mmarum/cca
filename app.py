@@ -1,21 +1,34 @@
 import os
+import re
 import sys
 import json
-import re
+import time
 import base64
-
-#import calendar
-from paper_calendar import make_cal, make_list
-
-import datetime
 import random
+import datetime
 
-#from datetime import date
+from database import Database
 
-# https://jinja.palletsprojects.com/en/2.10.x/api/
+from os import listdir
+from gallery import Gallery
+from os.path import isfile, join
+from writer import scrape_and_write
+from update_extra import UpdateExtra
+from custom_filters import get_inventory
+from paper_calendar import make_cal, make_list
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from custom_filters import get_inventory
+# https://wtforms.readthedocs.io/en/stable/index.html
+from forms import ProductsForm, EventsForm, ImageForm, RegistrationForm, BookingForm, SignupForm
+
+# https://pillow.readthedocs.io/en/stable/
+from PIL import Image
+
+# https://github.com/PyMySQL/mysqlclient-python
+# https://mysqlclient.readthedocs.io/user_guide.html
+import MySQLdb
+
+import collections
 
 env = Environment(
     loader=PackageLoader('app', 'templates'),
@@ -24,35 +37,16 @@ env = Environment(
 
 env.filters["get_inventory"] = get_inventory
 
-# TODO: Prevent SQL_injection
-
-# https://wtforms.readthedocs.io/en/stable/index.html
-from forms import ProductsForm, EventsForm, ImageForm, RegistrationForm, BookingForm
-
-from os import listdir
-from os.path import isfile, join
-
-# https://pillow.readthedocs.io/en/stable/
-from PIL import Image
-
-# https://github.com/PyMySQL/mysqlclient-python
-# https://mysqlclient.readthedocs.io/
-# https://mysqlclient.readthedocs.io/user_guide.html#some-mysql-examples
-import MySQLdb
-
-from gallery import Gallery
-from writer import scrape_and_write
-import time
-from update_extra import UpdateExtra
-
 
 sys.path.insert(0, os.path.dirname(__file__))
+
 
 def read_file(file_name):
     f = open(file_name, "r")
     content = f.read()
     f.close()
     return content
+
 
 def write_file(file_name, content):
     f = open(file_name, "w")
@@ -61,88 +55,98 @@ def write_file(file_name, content):
     return True
 
 
-# mysql -u catalystcreative_cca catalystcreative_arts -p
+def manage_post_input(post_input):
+    post_input_array = post_input.split('------')
+    data_object = {}
+    for d in post_input_array:
+        post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
+        post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
+        if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
+
+            if "[]" in post_data_key:
+                post_data_key = post_data_key.replace("[]", "")
+                post_data_key = post_data_key.replace("_indiv", "")
+                try:
+                    data_object[post_data_key].append(post_data_val)
+                except:
+                    data_object[post_data_key] = []
+                    data_object[post_data_key].append(post_data_val)
+            else:
+                data_object[post_data_key] = post_data_val
+
+    return data_object
+
+
 dbuser = "catalystcreative_cca"
 passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
 
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
-
     this_now = datetime.datetime.now()
+    epoch_now = int(time.time())
+    iso_now = str(datetime.datetime.now()).split(".")[0]
 
-    #today = date.today() #today.year, today.month, today.day
-
-    pages = ["crafts-gallery", "gift-card", "private-events", "about-us", "media", "reviews", "custom-built", "after-school", "summer-camp", "art-camp", "3-wednesdays-workshop", "listening-room", "wheel-wars", "paint-wars"]
-
+    pages = json.loads(read_file("data/pages-list.json"))
     pages.sort()
 
-    #galleries_dict = {"acrylic-painting": 1, "watercolor-painting": 2, "paint-your-pet": 3, "fused-glass": 4, "resin-crafts": 5, "fluid-art": 6, "commissioned-art": 8, "alcohol-ink": 9, "artist-guided-family-painting": 10, "handbuilt-pottery": 11, "leathercraft": 12, "water-marbling": 13, "pottery-painting": 18, "string-art": 19, "pottery-lessons": 20}
-
-    #mysql -u catalystcreative_cca catalystcreative_66
-    #SELECT lower(name), id FROM piwigz_categories order by id asc;
-    galleries_dict = {
-    "acrylic-painting": 1,
-    "watercolor-painting": 2,
-    "paint-your-pet": 3,
-    "fused-glass": 4,
-    "resin-crafts": 5, # was "resin-art"
-    "fluid-art": 6,
-    "summer-art-camp": 7,
-    "commissioned-art": 8,
-    #"alcohol-ink": 9,
-    "artist-guided-family-painting": 10,
-    "handbuilt-pottery": 11,
-    "leathercraft": 12,
-    "water-marbling": 13,
-    #"private-events": 14,
-    #"custom-counter-tops-tables": 15,
-    #"about-us": 16,
-    "pottery-painting": 18,
-    "string-art": 19,
-    "pottery-lessons": 20
-    }
-
+    galleries_dict = json.loads(read_file("data/galleries-dict.json"))
     galleries_list = list(galleries_dict.keys())
     galleries_dict_vals = list(galleries_dict.values())
 
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
+    db2 = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_66")
 
     global_settings = json.loads(read_file("data/global_settings.json"))
+    path = environ['PATH_INFO']
+    d = Database()
+
 
     ####
     ####
     if environ['REQUEST_METHOD'] == "GET":
 
-        if environ['PATH_INFO'] == '/admin/events/list':
-            c = db.cursor()
-            c.execute(f"SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime")
-            allrows = c.fetchall()
-            c.close()
+        if path == '/admin/events/list':
+
+            sql = f"SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime"
+            rows = d.query(sql)
             template = env.get_template("admin-events-list.html")
-            response = template.render(allrows=allrows)
+            response = template.render(rows=rows)
+            return [response.encode()]
 
 
-        elif environ['PATH_INFO'] == '/admin/orders/list':
+        elif path == '/admin/orders/list':
 
-            base_sql = "select a.cart_order_id, a.checkout_date, a.paypal_order_id, a.total, a.ship_date, b.quantity, \
+            base_sql = "select a.cart_order_id, a.create_date, a.checkout_date, \
+                a.paypal_order_id, a.total, a.ship_date, a.session_id, b.quantity, \
                 c.pid, c.name, c.image_path_array, c.inventory, c.price \
                 from cart_order a, cart_order_product b, products c \
                 where a.cart_order_id = b.cart_order_id \
-                and b.product_id = c.pid \
-                and checkout_date >= '2023-09-23' \
-                and status = 'complete'"
+                and b.product_id = c.pid"
 
-            db.query(f"{base_sql} and ship_date is NULL")
+            db.query(f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is NULL")
             r = db.store_result()
             unshipped = r.fetch_row(maxrows=100, how=1)
 
-            db.query(f"{base_sql} and ship_date is not NULL")
+            shipping_info = {}
+            for d in unshipped:
+                order_id = d["paypal_order_id"]
+                try:
+                    webhook_metada = json.loads(read_file(f"../store-checkout/purchases/{order_id}.json"))
+                    shipping_info[order_id] = webhook_metada
+                except:
+                    pass
+
+            db.query(f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is not NULL")
             r = db.store_result()
             shipped = r.fetch_row(maxrows=100, how=1)
 
+            db.query(f"{base_sql} and create_date >= '2023-09-23' and status is NULL order by a.create_date desc")
+            r = db.store_result()
+            unpurchased = r.fetch_row(maxrows=100, how=1)
+
             template = env.get_template("admin-orders-list.html")
-            response = template.render(unshipped=unshipped, shipped=shipped)
+            response = template.render(unshipped=unshipped, shipped=shipped, unpurchased=unpurchased, shipping_info=shipping_info)
 
 
         elif environ['PATH_INFO'] == '/admin/events/add-edit':
@@ -162,6 +166,18 @@ def app(environ, start_response):
                 children = None
             template = env.get_template("admin-events-add-edit.html")
             response = template.render(form=form, children=children)
+
+
+        elif environ['PATH_INFO'] == '/admin/registration/add-edit':
+            if len(environ['QUERY_STRING']) > 1:
+                rid = environ['QUERY_STRING'].split("=")[1]
+                config_file_contents = json.loads(read_file(f"../registration/config/{rid}.json"))
+                form = SignupForm(**config_file_contents)
+            else:
+                form = SignupForm()
+            template = env.get_template("admin-registration-add-edit.html")
+            response = template.render(form=form)
+
 
 
         elif environ['PATH_INFO'] == "/admin/events/delete":
@@ -307,6 +323,16 @@ def app(environ, start_response):
             response = template.render(events=allrows, 
                 orders_count=orders_count_object, 
                 events_object=events_object)
+
+        ####
+
+
+        elif environ['PATH_INFO'] == '/community-events':
+            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags LIKE '%community-event%' ORDER BY edatetime ASC")
+            r = db.store_result()
+            allrows = r.fetch_row(maxrows=1000, how=1)
+            template = env.get_template("community-events.html")
+            response = template.render(events=allrows)
 
         ####
 
@@ -541,28 +567,32 @@ def app(environ, start_response):
             year = int(this_now.strftime("%Y"))
             html_cal = make_cal(db, month, year)
 
-            #print(html_cal)
-
-            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() \
+            sql = f"SELECT * FROM events WHERE edatetime > CURTIME() \
                 and (tags <> 'invisible' or tags is null) \
                 and title != 'Private Event' \
                 and description not like '%Private Event%' \
                 and title not like '%Studio Closed%' \
                 and title != 'Studio Closed' \
                 and tags NOT LIKE '%pottery-lesson%' \
-                ORDER BY edatetime limit 1")
+                ORDER BY edatetime limit 1"
+            db.query(sql)
             r = db.store_result()
             next_event = r.fetch_row(maxrows=1, how=1)[0]
-            #html_cal = ""
-            #next_event = ""
 
             # FEATURED / PINNED EVENTS
-            db.query(f"SELECT * FROM events WHERE edatetime > CURTIME() and tags = 'home' and tags NOT LIKE '%pottery-lesson%' ORDER BY edatetime limit 10")
+            sql = f"SELECT * FROM events \
+                WHERE edatetime > CURTIME() \
+                and tags = 'home' and tags NOT LIKE '%pottery-lesson%' \
+                ORDER BY edatetime limit 10"
+            db.query(sql)
             r = db.store_result()
             events_tagged_home = r.fetch_row(maxrows=10, how=1)
 
             # RANDOM PRODUCT
-            db.query(f"select pid, name, image_path_array, price from products where inventory > 0 and active = 1 ORDER BY RAND() LIMIT 1")
+            sql = f"select pid, name, image_path_array, price \
+                from products where inventory > 0 \
+                and active = 1 ORDER BY RAND() LIMIT 1"
+            db.query(sql)
             r = db.store_result()
             random_product = r.fetch_row(maxrows=10, how=1)[0]
 
@@ -576,11 +606,39 @@ def app(environ, start_response):
             # Event List:
             event_list_html = make_list(db)
 
+            # RANDOM CRAFTS GALLERY
+            good_cats = '"Acrylic Painting", "Artist Guided Family Painting", \
+                "Fluid Art", "Handbuilt Pottery", "Fused Glass", "Leathercraft", \
+                "Resin Crafts", "Water Marbling", "Pottery Painting"'
+
+            sql = f"select a.path, c.name \
+                from piwigz_images a, piwigz_image_category b, piwigz_categories c \
+                where a.id = b.image_id \
+                and b.category_id = c.id \
+                and c.name in ({good_cats}) \
+                ORDER BY RAND() \
+                LIMIT 1"
+            db2.query(sql)
+            r = db2.store_result()
+            random_gallery = r.fetch_row(maxrows=1, how=1)[0]
+
+            rg_img_path = random_gallery["path"]
+            rg_category = random_gallery["name"]
+
+            rg_img_path = rg_img_path.replace("./", "/gallery/")
+            rg_img_path = rg_img_path.replace(".", "_small.")
+
+            rg_category = rg_category.lower()
+            rg_category = rg_category.replace(" ", "-")
+
+            random_gallery["image_file"] = rg_img_path
+            random_gallery["category_path"] = rg_category
+
             template = env.get_template("home.html")
             response = template.render(next_event=next_event, calendar={"html": html_cal}, 
                 events_tagged_home=events_tagged_home, gallery=gallery, images=images, 
                 event_list_html=event_list_html, random_product=random_product,
-                global_settings=global_settings)
+                global_settings=global_settings, random_gallery=random_gallery)
 
 
         elif environ['PATH_INFO'] == '/admin/pages':
@@ -596,11 +654,28 @@ def app(environ, start_response):
                 response = template.render(pages=pages)
 
 
+        elif environ['PATH_INFO'] == '/admin/signups':
+            signup_path = "../registration/data/"
+            signup_data = {}
+            signup_files = [f for f in listdir(signup_path) if isfile(join(signup_path, f))]
+            for signup_file in signup_files:
+                if not signup_file.endswith("json"):
+                    continue
+                signup_contents = json.loads(read_file(f"{signup_path}{signup_file}"))
+                signup_key = signup_file.replace(".json", "")
+                signup_data[signup_key] = signup_contents
+            template = env.get_template("admin-signups-list.html")
+            response = template.render(signup_data=signup_data)
+
+
         elif environ['PATH_INFO'] == '/admin/registration':
-            #c = db.cursor()
-            #c.execute("SELECT * FROM registration ORDER BY session_detail")
-            #allrows = c.fetchall()
-            #c.close()
+
+            registration_config_data = {}
+            registration_config_files = [f for f in listdir("../registration/config/") if isfile(join("../registration/config/", f))]
+            for config_file in registration_config_files:
+                config_file_contents = json.loads(read_file(f"../registration/config/{config_file}"))
+                epoch_date = config_file_contents["create_date_epoch"]
+                registration_config_data[epoch_date] = config_file_contents
 
             view = ""
             if environ['QUERY_STRING'] and "view" in environ['QUERY_STRING']:
@@ -617,28 +692,30 @@ def app(environ, start_response):
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
-            #data = json.loads(read_file("../registration/data/wheel-wars.json"))
-            data = json.loads(read_file("../registration/data/paint-wars.json"))
+            reg_data = json.loads(read_file("../registration/data/wheel-wars.json"))
 
 
             # GROUP BY CAMP:
             new_reg_dict = {}
-
             for row in allrows:
-
                 sd = row["session_detail"]
-
                 try:
                     # REG EXISTS IN DICT ALREADY:
                     new_reg_dict[sd].append(row)
-
                 except:
                     # REG DOES NOT YET EXIST IN DICT:
                     new_reg_dict[sd] = []
                     new_reg_dict[sd].append(row)
 
+            signup_files = [f for f in listdir("../signup/data/") if isfile(join("../signup/data/", f))]
+
+            file_data_dict = {}
+            for f in signup_files:
+                file_data = json.loads(read_file(f"../signup/data/{f}"))
+                file_data_dict[f.replace(".json", "")] = file_data
+
             template = env.get_template("admin-registration.html")
-            response = template.render(allrows=allrows, data=data, new_reg_dict=new_reg_dict)
+            response = template.render(registration_config_data=registration_config_data, allrows=allrows, reg_data=reg_data, new_reg_dict=new_reg_dict, file_data_dict=file_data_dict)
 
 
         #elif environ['PATH_INFO'] == '/admin/registration2':
@@ -853,6 +930,24 @@ def app(environ, start_response):
             response = "ERROR WRITING PAGE <a href='/app/admin/pages'>Go back</a>"
 
         scrape_and_write(page_name)
+
+
+    ####
+    ####
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/registration/add-edit":
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+        data_object = manage_post_input(post_input)
+        if len(data_object["create_date"]) == 0:
+            data_object["create_date"] = iso_now
+            data_object["create_date_epoch"] = epoch_now
+
+        data_object["page_path"] = data_object["page_path"].lower().replace(" ", "_")
+        page_path = data_object["page_path"]
+        create_date_epoch = data_object["create_date_epoch"]
+
+        write_file(f"../registration/config/{page_path}_{create_date_epoch}.json", json.dumps(data_object, indent=4))
+        response = '<meta http-equiv="refresh" content="0; url=/app/admin/registration" />'
 
 
     ####

@@ -1,0 +1,41 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin View Registration Signups{% endblock %}
+
+{% block html_head %}
+<style>
+td {
+  padding: 10px;
+  border: 1px dashed LightGray;
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h1>Registration sign-ups</h1>
+
+{% for reg_name, signups_dict in signup_data.items() %}
+<h2>{{ reg_name }}</h2>
+<table>
+{% for create_date_epoch, signup_dict in signups_dict.items() %}
+  {# create_date_epoch #}
+  {% if loop.index == 1 %}
+    <tr>
+    {% for k, v in signup_dict.items() %}
+      {% if k not in ["status", "registration_name", "event_date", "submit"] %}
+        <td>{{ k }}</td>
+      {% endif %}
+    {% endfor %}
+    </tr>
+  {% endif %}
+  <tr>
+  {% for k, v in signup_dict.items() %}
+    {% if k not in ["status", "registration_name", "event_date", "submit"] %}
+      <td>{{ v }}</td>
+    {% endif %}
+  {% endfor %}
+  </tr>
+{% endfor %}
+</table>
+{% endfor %}
+
+{% endblock %}

@@ -122,7 +122,9 @@ select, input {
     </p>
 
 
-    <form id="quantity_form" class="form-group" action="/checkout/" method="POST">
+    <form id="quantity_form" name="quantity_form" class="form-group" action="/checkout/" method="POST">
+
+    <input type="hidden" name="tags" value="{{ event.tags }}">
 
 
     {# VARIABLE TIME #}
@@ -188,7 +190,7 @@ select, input {
     {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
     {% else %}
 
-    {% if event.eid == 964 or "gift card" in event.title.lower() %}
+    {% if event.eid == 964 or "gift card" in event.title.lower() or "community-event" in event.tags %}
 
       <input type="hidden" id="guest_quantity" name="guest_quantity" value="1">
 
@@ -203,9 +205,16 @@ select, input {
     {% endif %}
     {# REGULAR EVENT END #}
 
+    {% if "Wheel Wars" not in event.title %}
     <input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control">
     <input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control">
+
+      {% if "community-event" in event.tags and "final friday" in event.title.lower() %}
+        <input type="text" id="customer_email" name="customer_email" placeholder="Your email" required class="form-control">
+      {% endif %}
+
     <!-- pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" -->
+    {% endif %}
 
     {# SCARF SPECIALS #}
     {% if "scarf" in event.title.lower() %}
@@ -242,7 +251,9 @@ select, input {
     {# EVENT SERIES END #}
 
 
-    <p id="total">Total: $<span id="subtotal">0</span></p>
+    {% if "community-event" not in event.tags %}
+      <p id="total">Total: $<span id="subtotal">0</span></p>
+    {% endif %}
 
     <div id="thanks"></div>
 
@@ -255,7 +266,16 @@ select, input {
 
     <input type="hidden" name="event_id" id="event_id" value="{{ event.eid }}">
 
-    <input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning" onclick="spin();">
+
+    {% if "community-event" in event.tags %}
+      {% if "Wheel Wars" in event.title %}
+        <input type="submit" name="submit" id="register" value="Get details & register" class="btn btn-warning" onclick="register();">
+      {% else %}
+        <input type="submit" name="submit" id="signup" value="Sign Up" class="btn btn-warning" onclick="signup();">
+      {% endif %}
+    {% else %}
+      <input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning" onclick="spin();">
+    {% endif %}
 
     </form>
 
@@ -269,6 +289,24 @@ select, input {
 </div>
 
 <script>
+{% if "community-event" in event.tags %}
+  {% if "Wheel Wars" in event.title %}
+    document.quantity_form.action = "/wheel-wars.html";
+  {% else %}
+    document.quantity_form.action = "/signup/{{ event.eid }}";
+  {% endif %}
+{% endif %}
+
+function signup() {
+  //alert("in progress: signup");
+  return true;
+}
+
+function register() {
+  //alert("in progress: register");
+  return true;
+}
+
 function spin() {
   document.getElementById("submit").value = "Processing...";
   document.getElementById("submit").style.backgroundColor = "yellow";

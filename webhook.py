@@ -148,7 +148,7 @@ def webhook(environ, start_response):
 
             print("Handle the event: event_title", event_title)
 
-            if event_title == "Art Camp Registration 2023":
+            if "Art Camp Registration" in event_title:
                 insert_reg_db(payment_intent)
             else:
                 insert_event_db(payment_intent)

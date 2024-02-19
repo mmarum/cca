@@ -1,6 +1,6 @@
 {% extends "base-site.html" %}
 
-{% block title %}Catalyst Creative Arts: Art Camp 2023 Registration{% endblock %}
+{% block title %}Catalyst Creative Arts: Art Camp 2024 Registration{% endblock %}
 
 {% block html_head %}
 <style>
@@ -33,7 +33,7 @@ h3, h5 {
 {% block content %}
 
 <center>
-<h3>Art Camp 2023 Registration & Release Form</h3>
+<h3>Art Camp 2024 Registration & Release Form</h3>
 </center>
 
 {% if form %}
@@ -62,36 +62,38 @@ h3, h5 {
 
 <div id="session_detail_box">
 
-{% if camper_count and camper_count >= 15 %}
+{% if camper_count and camper_count >= 16 %}
   CLASS IS FULL
   <script>var class_full = true;</script>
-{% elif session_name == "art_camp_2023_1" or session_name == "art_camp_2023_2"%}
+{% elif session_name == "art_camp_2024_XXX" or session_name == "art_camp_2024_XXX"%}
   CLASS IS CLOSED
   <script>var class_full = true;</script>
 {% else %}
-  <p><b>"Art Camp {{ session_name|replace("art_camp_2023_", "") }}"
-  {% if session_name == "art_camp_2023_3" or session_name == "art_camp_2023_7" %}Ages 11 thru 15{% else %}Ages 6 thru 11{% endif %}</b></p>
+  <p><b>"Art Camp {{ session_name|replace("art_camp_2024_", "") }}"
+  {% if session_name == "art_camp_2024_2" or session_name == "art_camp_2024_5" or session_name == "art_camp_2024_8" %}Ages 11 and up{% else %}Ages 6 and up{% endif %}</b></p>
   <p>Begins
-    {% if session_name == "art_camp_2023_1" %}
-    June 5-9
-    {% elif session_name == "art_camp_2023_2" %}
-    June 12-16
-    {% elif session_name == "art_camp_2023_3" %}
-    June 19-23
-    {% elif session_name == "art_camp_2023_4" %}
-    June 26-30
-    {% elif session_name == "art_camp_2023_5" %}
-    July 10-14
-    {% elif session_name == "art_camp_2023_6" %}
-    July 17-21
-    {% elif session_name == "art_camp_2023_7" %}
-    July 24-28
-    {% elif session_name == "art_camp_2023_8" %}
-    July 31 - Aug 4
+    {% if session_name == "art_camp_2024_1" %}
+    June 3-7
+    {% elif session_name == "art_camp_2024_2" %}
+    June 10-14
+    {% elif session_name == "art_camp_2024_3" %}
+    June 17-21
+    {% elif session_name == "art_camp_2024_4" %}
+    June 24-28
+    {% elif session_name == "art_camp_2024_5" %}
+    July 8-12
+    {% elif session_name == "art_camp_2024_6" %}
+    July 15-19
+    {% elif session_name == "art_camp_2024_7" %}
+    July 22-26
+    {% elif session_name == "art_camp_2024_8" %}
+    July 29 - Aug 2
     {% endif %}
-  2023 9am-12pm</p>
+  </p>
+  <p>DAILY 8:30am-9am drop off, 9am Start, 12pm Finish, 12pm-12:30pm pick up</p>
   <p><span style="background-color: Beige; padding: 10px;">{% if camper_count %}{{ 15 - camper_count }}{% else %}15{% endif %} (of 15) spots left</span></p>
-  <p>$200 per camper. $180 per additional sibling.</p>
+  <p>Price: $230</p>
+  <p>$210 for 2nd family registrant</p>
 {% endif %}
 
 </div>
@@ -110,24 +112,24 @@ h3, h5 {
 
 <input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
 
-<input type="hidden" name="event_title" value="Art Camp Registration 2023">
+<input type="hidden" name="event_title" value="Art Camp Registration 2024">
 
-{% if session_name == "art_camp_2023_1" %}
-  <input type="hidden" name="event_date" value="June 5-9 2023">
-{% elif session_name == "art_camp_2023_2" %}
-  <input type="hidden" name="event_date" value="June 12-16 2023">
-{% elif session_name == "art_camp_2023_3" %}
-  <input type="hidden" name="event_date" value="June 19-23 2023">
-{% elif session_name == "art_camp_2023_4" %}
-  <input type="hidden" name="event_date" value="June 26-30 2023">
-{% elif session_name == "art_camp_2023_5" %}
-  <input type="hidden" name="event_date" value="July 10-14 2023">
-{% elif session_name == "art_camp_2023_6" %}
-  <input type="hidden" name="event_date" value="July 17-21 2023">
-{% elif session_name == "art_camp_2023_7" %}
-  <input type="hidden" name="event_date" value="July 24-28 2023">
-{% elif session_name == "art_camp_2023_8" %}
-  <input type="hidden" name="event_date" value="July 31 - Aug 4 2023">
+{% if session_name == "art_camp_2024_1" %}
+  <input type="hidden" name="event_date" value="June 3-7 2024">
+{% elif session_name == "art_camp_2024_2" %}
+  <input type="hidden" name="event_date" value="June 10-14 2024">
+{% elif session_name == "art_camp_2024_3" %}
+  <input type="hidden" name="event_date" value="June 17-21 2024">
+{% elif session_name == "art_camp_2024_4" %}
+  <input type="hidden" name="event_date" value="June 24-28 2024">
+{% elif session_name == "art_camp_2024_5" %}
+  <input type="hidden" name="event_date" value="July 8-12 2024">
+{% elif session_name == "art_camp_2024_6" %}
+  <input type="hidden" name="event_date" value="July 15-19 2024">
+{% elif session_name == "art_camp_2024_7" %}
+  <input type="hidden" name="event_date" value="July 22-26 2024">
+{% elif session_name == "art_camp_2024_8" %}
+  <input type="hidden" name="event_date" value="July 29 - Aug 2 2024">
 {% endif %}
 
 <!-- TAKE EMAIL OFF THE PAGE CUZ CC PAGE COLLECTS IT -->
@@ -372,8 +374,8 @@ function calculate() {
   var camperNameLen = {};
   var total = 0;
   var number_of_campers = 0;
-  var first_camper_price = 200;
-  var more_camper_price = 180;
+  var first_camper_price = 230;
+  var more_camper_price = 210;
   for (i = 1; i <= 3; i++) {
     try {
       camperNameLen[i] = document.getElementById("camper"+i+"_name").innerHTML.length;
@@ -392,6 +394,7 @@ function calculate() {
       console.log("total: " + total);
     }
   }
+
   document.getElementById("total").innerHTML = total;
   document.getElementById("number_of_campers").innerHTML = number_of_campers;
   document.getElementById("total_cost").value = total;

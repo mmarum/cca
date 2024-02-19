@@ -80,7 +80,7 @@ def registration(environ, start_response):
 
     #camps = ["art_camp_1", "art_camp_2", "art_camp_3", "art_camp_4", "pottery_camp_1"]
 
-    camps = ["art_camp_2023_1", "art_camp_2023_2", "art_camp_2023_3", "art_camp_2023_4", "art_camp_2023_5", "art_camp_2023_6", "art_camp_2023_7", "art_camp_2023_8"]
+    camps = ["art_camp_2024_1", "art_camp_2024_2", "art_camp_2024_3", "art_camp_2024_4", "art_camp_2024_5", "art_camp_2024_6", "art_camp_2024_7", "art_camp_2024_8"]
 
     #if "summer-camp" in path and path.split("/")[2] in camps:
     if "art-camp" in path and path.split("/")[2] in camps:
@@ -236,7 +236,7 @@ def registration(environ, start_response):
             elif registration_name == "wheel-wars":
 
                 post_input_dict["registration_name"] = "Wheel Wars"
-                post_input_dict["event_date"] = "Saturday, March 25, 2023 3-5PM"
+                post_input_dict["event_date"] = "Saturday, March 30, 2024 2-4PM"
 
                 if post_input_dict["rid"] == "":
 
@@ -261,7 +261,7 @@ def registration(environ, start_response):
             elif registration_name == "paint-wars":
 
                 post_input_dict["registration_name"] = "Paint Wars"
-                post_input_dict["event_date"] = "Saturday Oct 28, 2023, 7-9 PM"
+                post_input_dict["event_date"] = "Saturday Oct 28, 2024, 7-9 PM"
 
                 if post_input_dict["rid"] == "":
 

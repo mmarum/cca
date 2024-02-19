@@ -26,7 +26,7 @@ img {
   <td>order_id</td>
   <td>total</td>
   <td>quantity</td>
-  <td>name</td>
+  <td>product name</td>
   <td>image</td>
   <td>inventory</td>
   <td>price</td>
@@ -34,13 +34,30 @@ img {
 </tr>
 
 {% for d in unshipped %}
+
+{% set order_id = d["paypal_order_id"] %}
+
 <tr id="row_{{ d["cart_order_id"] }}">
   <td>{{ d["checkout_date"] }}</td>
-  <td><a href="https://dashboard.stripe.com/payments/{{ d["paypal_order_id"] }}">{{ d["paypal_order_id"] }}</a></td>
+  <td>
+    <a href="https://dashboard.stripe.com/payments/{{ order_id }}">{{ order_id }}</a><br>
+    {% if shipping_info %}
+      {% if shipping_info[order_id] %}
+        {% if shipping_info[order_id]["name"] %}{{ shipping_info[order_id]["name"] }}<br>{% endif %}
+        {% if shipping_info[order_id]["phone"] %}{{ shipping_info[order_id]["phone"] }}<br>{% endif %}
+        {% if shipping_info[order_id]["line1"] %}{{ shipping_info[order_id]["line1"] }}<br>{% endif %}
+        {% if shipping_info[order_id]["line2"] %}{{ shipping_info[order_id]["line2"] }}<br>{% endif %}
+        {% if shipping_info[order_id]["city"] %}{{ shipping_info[order_id]["city"] }}<br>{% endif %}
+        {% if shipping_info[order_id]["state"] %}{{ shipping_info[order_id]["state"] }}{% endif %}
+        {% if shipping_info[order_id]["postal_code"] %}{{ shipping_info[order_id]["postal_code"] }}<br>{% endif %}
+        {% if shipping_info[order_id]["country"] %}{{ shipping_info[order_id]["country"] }}{% endif %}
+      {% endif %}
+    {% endif %}
+  </td>
   <td>{{ d["total"] }}</td>
   <td>{{ d["quantity"] }}</td>
   <td><a href="{{ d["pid"] }}">{{ d["name"] }}</a></td>
-  <td><a href="{{ d["pid"] }}"><img src="/img/small/{{ d["image_path_array"][1] }}"></a></td>
+  <td><a href="{{ d["pid"] }}"><img src="/img/small/{{ d["image_path_array"].split(',')[1] }}"></a></td>
   <td>{{ d["inventory"] }}</td>
   <td>{{ d["price"] }}</td>
   <td><button type="button" class="btn btn-info" onclick="if(confirm('Are you sure?')) markAsShipped({{ d["cart_order_id"] }});">Mark as shipped</button></td>
@@ -59,7 +76,7 @@ img {
   <td>order_id</td>
   <td>total</td>
   <td>quantity</td>
-  <td>name</td>
+  <td>product name</td>
   <td>image</td>
   <td>inventory</td>
   <td>price</td>
@@ -73,7 +90,7 @@ img {
   <td>{{ d["total"] }}</td>
   <td>{{ d["quantity"] }}</td>
   <td><a href="{{ d["pid"] }}">{{ d["name"] }}</a></td>
-  <td><a href="{{ d["pid"] }}"><img src="/img/small/{{ d["image_path_array"][1] }}"></td>
+  <td><a href="{{ d["pid"] }}"><img src="/img/small/{{ d["image_path_array"].split(',')[1] }}"></a></td>
   <td>{{ d["inventory"] }}</td>
   <td>{{ d["price"] }}</td>
   <td>{{ d["ship_date"] }}</td>
@@ -82,7 +99,38 @@ img {
 
 </table>
 
+<hr>
 
+<p><span style="padding: 10px; background-color: lightyellow;">UNPURCHASED</span></p>
+
+<p>(Still sitting in potential customer's cart)</p>
+
+<table border="1" cellpadding="10">
+<tr>
+  <td>cart_order_id</td>
+  <td>session_id</td>
+  <td>create_date</td>
+  <td>quantity</td>
+  <td>product name</td>
+  <td>image</td>
+  <td>inventory</td>
+  <td>price</td>
+</tr>
+
+{% for d in unpurchased %}
+<tr>
+  <td>{{ d["cart_order_id"] }}</td>
+  <td>{{ d["session_id"] }}</td>
+  <td>{{ d["create_date"] }}</td>
+  <td>{{ d["quantity"] }}</td>
+  <td><a href="{{ d["pid"] }}">{{ d["name"] }}</a></td>
+  <td><a href="{{ d["pid"] }}"><img src="/img/small/{{ d["image_path_array"].split(',')[1] }}"></td>
+  <td>{{ d["inventory"] }}</td>
+  <td>{{ d["price"] }}</td>
+</tr>
+{% endfor %}
+
+</table>
 
 <script>
 function markAsShipped(cart_order_id) {

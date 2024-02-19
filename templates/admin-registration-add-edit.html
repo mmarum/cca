@@ -1,0 +1,94 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin Add/Edit Registration{% endblock %}
+
+{% block html_head %}
+
+<style>
+#submit {
+  margin-top: 25px;
+  color: #fff;
+  background-color: #28a745;
+  border-color: #28a745;
+}
+.fields_indiv {
+  margin-bottom: 25px;
+}
+.fields_indiv:last-of-type {
+  margin-bottom: 0px;
+}
+label {
+  margin-top: 25px;
+}
+#fields_div {
+  margin-bottom: 25px;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<form action="/app/admin/registration/add-edit" method="POST" enctype="multipart/form-data" name="add_edit_form" id="this_form">
+
+{% for field in form %}
+
+  {% if "create_date" not in field.name and field.name != "submit" %}
+
+    <label for="{{ field.name }}">{{ field.name }}</label>
+
+  {% endif %}
+
+  {% if field.name == "fields" %}
+
+    <div id="fields_div"></div>
+    <div id="plus_field"><a href="#" onclick="add_field(); return false;">+</a></div>
+
+  {% else %}
+
+    {% if form.create_date.data and field.name == "page_path" %}
+      {{ field(class="form-control", readonly="true") }}
+    {% else %}
+      {{ field(class="form-control") }}
+    {% endif %}
+
+  {% endif %}
+
+{% endfor %}
+
+<div style="display: none;" id="field_count">0</div>
+
+</form>
+
+<hr>
+
+<script>
+const fields = {% if form.fields.data %}{{ form.fields.data|safe }}{% else %}[""]{% endif %};
+text = "";
+for (let i = 0; i < fields.length; i++) {
+  text += "<input type='text' name='fields_indiv[]' value='" + fields[i] + "' class='form-control fields_indiv'>\n";
+  text += "<div id='fields_div_" + i + "'></div>\n"
+}
+document.getElementById("fields_div").innerHTML = text;
+function add_field() {
+
+  field_count = document.getElementById("field_count").innerHTML;
+
+  console.log("field_count " + field_count);
+
+  more_text = "<input type='text' name='fields_indiv[]' value='' class='form-control fields_indiv'>\n";
+
+  next_field = Number(field_count) + 1;
+
+  console.log("next_field " + next_field);
+
+  more_text += "<div id='fields_div_" + next_field + "'></div>\n"
+
+  document.getElementById("fields_div_" + field_count).innerHTML += more_text;
+
+  document.getElementById("field_count").innerHTML = next_field;
+
+  return true;
+}
+</script>
+
+{% endblock %}

@@ -215,6 +215,7 @@ mark {
   {% endif %}
 
 
+    <!--
     <div class="home_caption">
     <h2>
     <a href="/paint-wars.html">
@@ -228,8 +229,10 @@ mark {
       <img src="/img/paint-wars-2023-promo.jpg" class="event_image">
     </a>
     <hr>
+    -->
 
 
+    <!--
     <div class="home_caption">
     <h2>
     <a href="/event/1019.html">
@@ -239,10 +242,28 @@ mark {
     </a>
     </h2>
     </div>
-        <!-- ORIG: width="373" height="663" -->
-        <iframe class="youtube_embed" src="https://www.youtube.com/embed/ycTQr45zFII"
-            title="handbuilt pottery vase"
-            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <a href="/event/1019.html">
+        <img src="/img/handbuilt-pottery-vase.gif" class="event_image">
+        </a>
+        <center class="home_event_title"><a href="https://www.youtube.com/embed/ycTQr45zFII">See more on YouTube</a></center>
+    <hr>
+    -->
+
+
+    {% if next_event %}
+    <div class="home_caption">
+    <h2>
+    <a href="/event/{{ next_event.eid }}.html">
+    <div class="home_section_label">Next Event</div>
+    <div class="home_event_date">{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</div>
+    <div class="home_event_title">{{ next_event.title }}</div>
+    </a>
+    </h2>
+    </div>
+    <a href="/event/{{ next_event.eid }}.html">
+      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
+    </a>
+    {% endif %}
     <hr>
 
 
@@ -264,6 +285,24 @@ mark {
     -->
 
 
+    <div class="home_caption">
+    <h2>
+    <a href="/wheel-wars.html">
+    <div class="home_section_label">Wheel Wars!</div>
+    <div class="home_event_date">Sat Mar 30, 2024</div>
+    <div class="home_event_title">2-4PM</div>
+    </a>
+    </h2>
+    </div>
+    <a href='/wheel-wars.html'>
+    <!-- <img src='/img/wheel-wars-2023-1.jpg' class='event_image'> -->
+    <img src="/img/wheel-wars-trophy.gif" class="event_image">
+    </a>
+
+
+    <hr>
+
+
     <!-- first column end -->
 
   </div>
@@ -271,33 +310,16 @@ mark {
 
     <!-- second column start -->
 
-    <!--
     <div class="home_caption">
     <h2>
     <a href="/art-camp.html">
-    <div class="home_section_label">Art Camp 2023</div>
+    <div class="home_section_label">Art Camp 2024</div>
     <div class="home_event_date">Registration open</div>
-    <div class="home_event_title">At our NEW location 300 W Main St</div>
     </a>
     </h2>
     </div>
     <a href='/art-camp.html'>
-      <img src='/img/small/art-camp-2023.jpg' class='event_image'>
-    </a>
-    <hr>
-    -->
-
-    <div class="home_caption">
-    <h2>
-    <a href="/event/1022.html">
-    <div class="home_section_label">5th Annual Art Market</div>
-    <div class="home_event_date">Sat Nov 4, 2023 at 12 PM</div>
-    <div class="home_event_title"></div>
-    </a>
-    </h2>
-    </div>
-    <a href="/event/1022.html">
-      <img src="/img/art-market-2023.jpg" class="event_image">
+      <img src='/img/art-camp/2023/art-camp-2023-07.jpg' class='event_image'>
     </a>
     <hr>
 
@@ -311,11 +333,12 @@ mark {
     </h2>
     </div>
     <a href="/pottery-lessons.html">
-      <img alt="pottery lessons" src="/img/pottery-lessons-kid.jpg" class="event_image"/>
+      <img alt="pottery lessons" src="/img/small/Resized_20200418_125357-01.jpeg" class="event_image"/>
     </a>
     <hr>
 
 
+    <!--
     <div class="home_caption">
     <h2>
     <a href="/shop/">
@@ -327,6 +350,21 @@ mark {
     <a href='/shop'>
       <img src='/img/scarves-shop-ig.jpg' class='event_image'>
     </a>
+    <hr>
+    -->
+
+
+    {% if random_product %}
+    <div class="home_caption">
+    <h2>
+    <a href="/shop/product/{{ random_product.pid }}">
+    <div class="home_section_label">Shop the Online store</div>
+    <div class="home_event_date">{{ random_product.name }} ${{ random_product.price }}</div>
+    <img src="/img/small/{{ random_product.image_path_array.split(",")[1] }}" class='event_image'>
+    </h2>
+    </a>
+    </div>
+    {% endif %}
     <hr>
 
 
@@ -354,48 +392,20 @@ mark {
     <hr>
     -->
 
-    <!--
-    <div class="home_caption">
-    <h2>
-    <a href="/paint-wars.html">
-    <div class="home_section_label">Paint Wars!</div>
-    <div class="home_event_date">Sat Jun 17, 2023</div>
-    </a>
-    </h2>
-    </div>
-    <a href='/paint-wars.html'>
-      <img src='/img/small/paint-wars-2023.jpg' class='event_image'>
-    </a>
-    <hr>
-    -->
-
-    {% if next_event %}
-    <div class="home_caption">
-    <h2>
-    <a href="/event/{{ next_event.eid }}.html">
-    <div class="home_section_label">Next Event</div>
-    <div class="home_event_date">{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</div>
-    <div class="home_event_title">{{ next_event.title }}</div>
-    </a>
-    </h2>
-    </div>
-    <a href="/event/{{ next_event.eid }}.html">
-      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
-    </a>
-    {% endif %}
-    <hr>
-
 
     <div class="home_caption">
     <h2>
-    <a href="/event/964.html">
-    <div class="home_section_label">Gift Cards Now Available</div>
-    <div class="home_event_title">Purchase a Catalyst Creative Arts gift card to be used at any regularly scheculed class.</div>
+    <div class="home_section_label">Crafts Gallery Spotlight</div>
+    <div class="home_event_title"><a href="/{{ random_gallery["category_path"] }}.html">{{ random_gallery["name"] }}</a></div>
+    </h2>
+    <a href="/{{ random_gallery["category_path"] }}.html">
+      <img src="{{ random_gallery["image_file"] }}" class='event_image'>
+    </a>
+    <h2>
+    <a href="/crafts-gallery.html">
+    <div class="home_event_title" style="padding-top: 10px;">See all crafts galleries</div>
     </a>
     </h2>
-    <a href='/event/964.html'>
-      <img src='/img/small/CCA_DOTS-02.jpeg' class='event_image'>
-    </a>
     </div>
     <hr>
 
@@ -410,6 +420,7 @@ mark {
             title="EBRU Water Marbling on Silk Scarf Large Flower Design" 
             frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     <hr>
+
 
     <!-- third column end -->
 
@@ -430,17 +441,17 @@ mark {
     <hr>
 
 
-    {% if random_product %}
     <div class="home_caption">
     <h2>
-    <a href="/shop/product/{{ random_product.pid }}">
-    <div class="home_section_label">Shop the Online store</div>
-    <div class="home_event_date">{{ random_product.name }} ${{ random_product.price }}</div>
-    <img src="/img/small/{{ random_product.image_path_array.split(",")[1] }}" class='event_image'>
+    <a href="/event/964.html">
+    <div class="home_section_label">Gift Cards Now Available</div>
+    <div class="home_event_title">Purchase a Catalyst Creative Arts gift card to be used at any regularly scheculed class.</div>
+    </a>
     </h2>
+    <a href='/event/964.html'>
+      <img src='/img/small/CCA_DOTS-02.jpeg' class='event_image'>
     </a>
     </div>
-    {% endif %}
     <hr>
 
 

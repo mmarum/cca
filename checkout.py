@@ -42,7 +42,7 @@ def get_intent(form_data):
     event_date = form_data["event_date"]
     description = f"{event_title} {event_date}"
 
-    if event_title == "Art Camp Registration 2023":
+    if "Art Camp Registration" in event_title:
         calculated_amount = calculate_reg_amount(form_data)
     else:
         calculated_amount = calculate_order_amount(form_data)
@@ -63,7 +63,7 @@ def clean_text(text):
 
 def calculate_reg_amount(form_data):
     """
-    $200 per camper. $180 per additional sibling.
+    $230 per camper. $210 per additional sibling.
     """
 
     guest_quantity = int(form_data["guest_quantity"])
@@ -72,13 +72,13 @@ def calculate_reg_amount(form_data):
     print("total_cost", total_cost)
 
     if guest_quantity == 1:
-        return int(200 * 100) # Stripe counts by cents
+        return int(230 * 100) # Stripe counts by cents
 
     elif guest_quantity == 2:
-        return int(380 * 100)
+        return int(440 * 100)
 
     elif guest_quantity == 3:
-        return int(560 * 100)
+        return int(650 * 100)
 
 
 

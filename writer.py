@@ -40,7 +40,8 @@ groups = {
     "build-individual-event",
     "crafts-gallery",
     "listening-room",
-    "pottery-lessons"
+    "pottery-lessons",
+    "community-events"
   ],
 "galleries": [
     "commissioned-art",

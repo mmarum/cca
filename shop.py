@@ -53,10 +53,10 @@ def shop(environ, start_response):
         r = db.store_result()
         try:
             row = r.fetch_row(maxrows=1, how=1)[0]
-            template = env.get_template("product-detail.html")
-            response = template.render(row=row)
         except:
-            raise ValueError(f"Could not fetch row for pid: {pid}")
+            row = ""
+        template = env.get_template("product-detail.html")
+        response = template.render(row=row)
 
 
     elif path.startswith("/filter"):
@@ -71,7 +71,8 @@ def shop(environ, start_response):
         response = template.render(products=allrows, allowed_filter_words=allowed_filter_words)
 
     else:
-        db.query("SELECT *, CEILING(inventory / 100) as invt FROM products WHERE active = 1 order by invt desc, name desc")
+        #db.query("SELECT *, CEILING(inventory / 100) as invt FROM products WHERE active = 1 order by invt desc, name desc")
+        db.query("SELECT * FROM products WHERE active = 1 and inventory >= 1 order by keywords_array, name desc")
         r = db.store_result()
         allrows = r.fetch_row(maxrows=100, how=1)
         template = env.get_template("list-products.html")

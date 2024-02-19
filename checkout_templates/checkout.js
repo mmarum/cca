@@ -1,4 +1,6 @@
+// DEV:
 //const stripe = Stripe("pk_test_51M9UNULZJMPC73VNrRQlA8tpL189HXupEgB5TrkLSvUqWqBKtKowbBkDCAhq8w9bZz9vVnp6ZHSEY72acHlA0310007PALvgBC");
+// PROD:
 const stripe = Stripe("pk_live_51M9UNULZJMPC73VNhe30nkcTsYV4or05Vudl3ie1SzX6lkJsRRxHm0Z6cOzhHzvd2OGvoPxP8OzJwQ42jdDwHaFa00GkGa9kDa");
 
 console.log(stripe);
@@ -16,7 +18,7 @@ for (let i = 0; i < common_field_names.length; i++) {
   }
 }
 
-if (items["event_title"] == "Art Camp Registration 2023") {
+if (items["event_title"].includes("Art Camp Registration")) {
   // set registration-related variables:
   var reg_field_names = ["camper1_name", "camper2_name", "camper3_name", "camper1_age", "camper2_age", "camper3_age", 
     "parent_address", "parent_city", "parent_state", "parent_zip", "parent_em_name", "parent_em_phone", "pickup1_name", 

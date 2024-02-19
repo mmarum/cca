@@ -80,43 +80,38 @@ function appendTime() {
 
 {% for field in form %}
 
-  <!-- <div style="width: 100%; overflow: hidden;"> -->
-
   {% if field.name != "eid" and field.name != "submit" and field.name != "image" %}
+    <!--
     {% if form.eid.data %}
-      <!-- <div style="width: 80px; float: left;"> -->
       {{ field.label(class="form-text text-muted") }}
-      <!-- </div> -->
     {% endif %}
+    -->
   {% endif %}
   {% if field.name == "edatetime" %}
+    <div class="form-group">
+    <label for="{{ field.name }}">{{ field.name }}</label>
     {{ field(autocomplete="off", class="form-control") }}
+    </div>
+    <!--
     {% if form.eid.data %}
       <label class="form-text text-muted" for="time">Time</label>
     {% endif %}
+    -->
+    <div class="form-group">
+    <label for="append_time">Time (hour:minute:second)</label>
     <input id="append_time" name="append_time" autocomplete="off" type="text" placeholder="00:00:00" onblur="appendTime()" class="form-control"/>
+    </div>
   {% elif field.name == "submit" %}
     {# field(autocomplete="off", class="form-control btn btn-success") #}
     <input autocomplete="off" class="form-control btn btn-success" id="submit" name="submit" type="submit" value="Next">
   {% else %}
-    <!-- <div style="margin-left: 100px;"> -->
+    <div class="form-group">
+    {% if field.name != "eid" and field.name != "submit" and field.name != "image" and field.name != "extra_data" %}
+    <label for="{{field.name }}">{{field.name }}</label>
+    {% endif %}
     {{ field(autocomplete="off", class="form-control", placeholder="") }}
-    <!-- </div> -->
-  {% endif %}
-
-  <!-- </div> -->
-
-  {#
-  {% if field.name == "duration" %}
-    <div><input type="checkbox" name="is_series" id="is_series" value="n" onClick="isSeries();"><label for="is_series">is series?</label></div>
-    <div id="series_all">
-    <div id="series_2_box"><input type="text" name="series_2" id="series_2" placeholder="2nd date & time of this event series" autocomplete="off" class="form-control"> &nbsp; &nbsp; <a href="#" onclick="add_another(3); return false;">add a third date in this series</a></div>
-    <div id="series_3_box"><input type="text" name="series_3" id="series_3" placeholder="3rd date & time of this event series" autocomplete="off" class="form-control"> &nbsp; &nbsp; <a href="#" onclick="add_another(4); return false;">add a fourth date in this series</a></div>
-    <div id="series_4_box"><input type="text" name="series_4" id="series_4" placeholder="4th date & time of this event series" autocomplete="off" class="form-control"> &nbsp; &nbsp; <a href="#" onclick="add_another(5); return false;">add fifth date in this series</a></div>
-    <div id="series_5_box"><input type="text" name="series_5" id="series_5" placeholder="5th date & time of this event series" autocomplete="off" class="form-control"></div>
     </div>
   {% endif %}
-  #}
 
 {% endfor %}
 

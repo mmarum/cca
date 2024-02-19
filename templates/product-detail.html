@@ -80,6 +80,14 @@ img.check {
   <div class="col-sm-1">
   </div>
 
+  {% if row == "" %}
+
+    <div class="col-sm-10">
+      Product does not exist
+    </div>
+
+  {% else %}
+
   <div class="col-md-2">
     <small style="padding-left: 10px">click to enlarge</small>
     {% set image_array = row.image_path_array.split(',') %}
@@ -137,6 +145,8 @@ img.check {
       <div>Keywords: {{ row.keywords_array }}</div>
     {% endif %}
   </div>
+
+  {% endif %}
 
   <div class="col-sm-3">
   </div>

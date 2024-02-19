@@ -91,3 +91,13 @@ class BookingForm(Form):
     buyer_phone = StringField("buyer_phone", description="Buyer phone optional")
     submit = SubmitField("Next", description="Next")
 
+class SignupForm(Form):
+    title = StringField("title", description="title")
+    page_path = StringField("page_path", description="page_path")
+    create_date = HiddenField("create_date", description="create_date")
+    create_date_epoch = HiddenField("create_date_epoch", description="create_date_epoch")
+    #rid = f"{page_path}_create_date_epoch{}"
+    fields = StringField("fields", description="fields")
+    status = StringField("status", description="status")
+    submit = SubmitField("submit", description="submit")
+

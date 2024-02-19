@@ -88,7 +88,7 @@
       </span>
 
 
-      {% if form_data["event_title"] == "Art Camp Registration 2023" %}
+      {% if "Art Camp Registration" in form_data["event_title"] %}
 
         {% if form_data["camper1_name"] %}<span class="hide" id="camper1_name">{{ form_data["camper1_name"] }}</span>{% endif %}
         {% if form_data["camper2_name"] %}<span class="hide" id="camper2_name">{{ form_data["camper2_name"] }}</span>{% endif %}

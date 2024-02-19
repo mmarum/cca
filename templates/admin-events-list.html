@@ -23,8 +23,7 @@ img {
 </tr>
 
 
-{% for row in allrows %}
-<!-- {{ row|safe }} -->
+{% for row in rows %}
   <tr>
     <td>
       <a class="event_id" href="/app/admin/events/add-edit?eid={{ row[0] }}">
