@@ -3,14 +3,35 @@
 {% block html_head %}
 
 <style>
+.PL_col1 {
+  float: left;
+  width: 5%;
+}
+.PL_col2 {
+  float: left;
+  width: 95%;
+}
+.PL_row:after {
+  padding-top: 20px;
+  content: "";
+  display: table;
+  clear: both;
+}
 .h2, h2 {
   font-size: 1.6rem;
 }
-#class-option-box, #submit, #total {
+#choose_date, #proceed_to_checkout, #select_guest_quantity {
   display: none;
 }
-#total {
-  padding: 10px;
+#select_guest_quantity {
+  margin: 10px 0 10px 0;
+  width: 50%;
+}
+#subtotal_container {
+  background-color: LightBlue;
+  padding: 10px 0 10px 10px;
+  margin: 10px 0 10px 0;
+  width: 50%;
 }
 #pottery-images {
   overflow-x: scroll;
@@ -31,6 +52,9 @@
 ul {
   line-height: 180%;
 }
+.pottery-lessons-img {
+  max-width: 200px;
+}
 </style>
 
 {% endblock %}
@@ -42,83 +66,141 @@ ul {
 </center>
 
 <div id="pottery-images">
+<img src="/img/pottery-promo-2024-1.jpg" class="pottery-lessons-img">
+<img src="/img/pottery-promo-2024-2.jpg" class="pottery-lessons-img">
+<img src="/img/pottery-promo-2024-3.jpg" class="pottery-lessons-img">
+<img src="/img/pottery-lessons-2024-1.jpg" class="pottery-lessons-img">
+<img src="/img/pottery-lessons-2024-2.jpg" class="pottery-lessons-img">
+<img src="/img/pottery-lessons-2024-3.jpg" class="pottery-lessons-img">
+<!--
+<img src="/img/small/Resized_20200418_125357-01.jpeg" class="pottery-lessons-img">
 <img src="/img/small/Resized_20200418_125357-01.jpeg">
 <img src="/img/small/20200624_110444-2.jpg">
 <img src="/img/small/20210424_154335-01.jpeg">
 <img src="/img/small/20210622_115227.jpg">
+-->
 </div>
 
 <div class="row">
 
 <div class="col-md-6">
-<h3>Private Pottery Wheel Lesson</h3>
-<ul style="padding-left: 12px;">
-<li>Private pottery wheel lessons can be purchased for $100 for a single 90 minute lesson. </li>
-<li>Or $250 for a 6 hour lesson package (split up into 4 days). Lesson 2 thru 4 will be scheduled at the first lesson.</li>
-<li>Lesson choices are designed for 1 person or for 2 people that want to share the lesson. </li>
-<li><span style="color: green; font-weight: bold; background-color: LightGray;">Book one time for up to 2 people</span></li>
-<li>Pottery projects made at lessons will be glazed (painted) at a scheduled date about 2 weeks after the original lesson. </li>
-<li>Students need to wear clothes that can get dirty and <span style="background-color: Yellow;">fingernails must be trimmed no longer than the end of the finger tip.</span></li>
-<li>Recommended for ages 8 and up. </li>
-<li><span style="color: green; font-weight: bold; background-color: LightGray;">24 hour notice required for lesson cancelation or reschedule</span></li>
-</ul>
+
+
+
+
+<form name="pottery_form" id="pottery_form" action="/checkout/" method="POST">
+
+
+
+<div>
+<h3>Step 1: Choose a class:</h3>
+
+
+<div class="PL_row">
+<div class="PL_col1">
+<input type="radio" class="PL_radio" id="PL1" name="pottery_lesson_type" value="PL1" onClick="chooseClassType('PL1')">
+</div>
+<div class="PL_col2">
+<label for="PL1" id="PL1_label">
+	<b>Private Pottery Lesson</b> - 90 minutes, one-on-one instruction, learn beginner wheel skills, make several forms,
+	return 1-2 weeks to apply choice of glaze to forms @ $115 
+</label>
+</div>
+</div>
+
+<div class="PL_row">
+<div class="PL_col1">
+<input type="radio" class="PL_radio" id="PL2" name="pottery_lesson_type" value="PL2" onClick="chooseClassType('PL2')">
+</div>
+<div class="PL_col2">
+<label for="PL2" id="PL2_label">
+	<b>Private Pottery Lesson for 2 students on 2 wheels</b> - 90 minutes, 2 wheels - 1 instructor, learn beginner wheel skills,
+	make several forms, return 1-2 weeks to apply choice of glaze to forms @ $165
+</label>
+</div>
+</div>
+
+<div class="PL_row">
+<div class="PL_col1">
+<input type="radio" class="PL_radio" id="PL3" name="pottery_lesson_type" value="PL3" onClick="chooseClassType('PL3')">
+</div>
+<div class="PL_col2">
+<label for="PL3" id="PL3_label">
+	<b>Private Pottery 6 Hour Lesson Package for 1 Person</b> - customizable package based on learning interests,
+	typically split into four 90 minute lessons, still beginner friendly, but much more technical
+	and intensive one-on-one instruction and learning opportunity, return 1-2
+	weeks after 4th lesson to apply choice of glaze to forms @ $265
+</label>
+</div>
+</div>
+
+<div class="PL_row">
+<div class="PL_col1">
+<input type="radio" class="PL_radio" id="PL4" name="pottery_lesson_type" value="PL4" onClick="chooseClassType('PL4')">
+</div>
+<div class="PL_col2">
+<label for="PL4" id="PL4_label">
+	<b>Date Night/Group Pottery Lesson: Up to 4 students on 4 wheels</b> - 90 minutes - 4 students on 4 wheels, 1 instructor,
+	learn beginner wheel skills, make several forms, each student will keep the best 2
+	forms and the choose a glaze color to be applied to each by studio staff, return
+	1-2 weeks to pick up completed pottery @ $100ea
+</label>
+</div>
+</div>
+
+
+
+</div>
+
+
 </div>
 
 <div class="col-md-6">
 
-<form name="pottery_form" id="pottery_form" action="/checkout/" method="POST">
-
-<div>
-<h3>Choose a date:</h3>
+<div id="choose_date">
+<h3>Step 2: Choose a date:</h3>
 {% for event in events %}
   {% if orders_count[event.eid] and orders_count[event.eid] >= event.elimit %}
     <!-- class purchased already -->
   {% else %}
-      <div>
-      <input type="radio" id="eid_{{ event.eid }}" name="pottery_lesson" value="{{ event.eid }}" onClick="chooseDate({{ event.eid }})">
+  <div class={% if event.tags == "PL4" %}PL4_event{% else %}pottery-lesson-event{% endif %}>
+      <input type="radio" id="eid_{{ event.eid }}" name="pottery_lesson_date" value="{{ event.eid }}" onClick="chooseDate({{ event.eid }})">
       <label for="eid_{{ event.eid }}" id="eid_{{ event.eid }}_label">{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</label>
       </div>
   {% endif %}
 {% endfor %}
+
 </div>
 
-<div id="class-option-box">
-  <h3>Choose a class type:</h3>
-  <div>
-    <input type="radio" id="class_option_1" name="class_option" value="90 minute lesson @ $100" onClick="chooseType('class_option_1')">
-    <label for="class_option_1" id="class_option_1_id">90 minute lesson @ $100</label>
-  </div>
-  <div>
-    <input type="radio" id="class_option_2" name="class_option" value="6 hour lesson package @ $250" onClick="chooseType('class_option_2')">
-    <label for="class_option_2" id="class_option_2_id">6 hour lesson package @ $250</label>
+<div id="proceed_to_checkout">
+  <h3>Step 3: Basic info:</h3>
 
-    <div style="padding-left: 40px; font-size: 11px; margin-top: -10px">
-      6 hour lesson package: <br> Date chosen above will be the first of 4 lessons. <br> The other 3 will be scheduled on first visit.
-    </div>
+  <select id="select_guest_quantity" name="select_guest_quantity" class="form-control" onchange="changeGuestQuantity();">
+    <option value="0">Select number of guests</option>
+    <option value="1">1 guest</option>
+    <option value="2">2 guests</option>
+    <option value="3">3 guests</option>
+    <option value="4">4 guests</option>
+  </select>
 
-  </div>
-</div>
+  <input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control">
+  <input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control">
 
-<div>
-    <div id="total">
-      <div>
-        <input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control">
-      </div>
-      <div>
-        <input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control">
-      </div>
-      <div>
-        Total: $<span id="subtotal">0</span>
-      </div>
-    </div>
-    <input type="hidden" name="event_title" id="event_title" value="Private Pottery Wheel Lesson">
-    <input type="hidden" name="event_date" id="event_date" value="">
-    <input type="hidden" name="guest_quantity" id="guest_quantity" value="1">
-    <input type="hidden" name="total_cost" id="total_cost" value="">
-    <input type="hidden" name="event_id" id="event_id" value="">
-    <input type="hidden" name="variable_price" id="variable_price" value="">
-    <input type="hidden" name="additional_scarf" id="additional_scarf" value="">
-    <input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning" onclick="spin();">
+  <h3>Step 4:</h3>
+  Please arrive to class wearing clothes that can get dirty and fingernails trimmed no longer than the end of the finger tip.
+
+  <div> <div id="subtotal_container"> Total: $<span id="subtotal">0</span> </div> </div>
+
+  <input type="hidden" name="event_title" id="event_title" value="Private Pottery Wheel Lesson">
+  <input type="hidden" name="event_date" id="event_date" value="">
+  <input type="hidden" name="class_type" id="class_type" value="">
+  <input type="hidden" name="guest_quantity" id="guest_quantity" value="1">
+  <input type="hidden" name="total_cost" id="total_cost" value="">
+  <input type="hidden" name="event_id" id="event_id" value="">
+  <input type="hidden" name="variable_price" id="variable_price" value="">
+  <input type="hidden" name="additional_scarf" id="additional_scarf" value="">
+  <input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning" onclick="spin();">
+
 </div>
 
 </form>
@@ -133,36 +215,88 @@ function spin() {
   return true;
 }
 
+function chooseClassType(class_type) {
+
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById("PL" + i + "_label").style.backgroundColor = "White";
+  }
+
+  if (class_type == "PL4") {
+    pl4_display = "block";
+    pl1_3_display = "none";
+    document.getElementById("select_guest_quantity").style.display = "block";
+  } else {
+    pl4_display = "none";
+    pl1_3_display = "block";
+    document.getElementById("select_guest_quantity").style.display = "none";
+    //document.getElementById("guest_quantity").value = 1;
+  }
+
+  const PL4_collection = document.getElementsByClassName("PL4_event");
+  for (let i = 0; i < PL4_collection.length; i++) {
+    PL4_collection[i].style.display = pl4_display;
+  }
+
+  const PL1_3_collection = document.getElementsByClassName("pottery-lesson-event");
+  for (let i = 0; i < PL1_3_collection.length; i++) {
+    PL1_3_collection[i].style.display = pl1_3_display;
+  }
+
+  document.getElementById(class_type + "_label").style.backgroundColor = "WhiteSmoke";
+  document.getElementById("choose_date").style.display = "block";
+  document.getElementById("class_type").value = class_type;
+
+  const class_prices = {
+    "PL1": 115,
+    "PL2": 165,
+    "PL3": 265,
+    "PL4": 100
+  }
+
+  const variable_prices = {
+    "PL1": "1 person 90 minute lesson @ $115",
+    "PL2": "2 people share 90 minute lesson @ $ 165",
+    "PL3": "6 hour lesson package @ $265",
+    "PL4": "PL4" 
+  }
+
+  document.getElementById("total_cost").value = class_prices[class_type];
+  console.log("total_cost", document.getElementById("total_cost").value);
+  document.getElementById("variable_price").value = variable_prices[class_type];
+  console.log("variable_price", document.getElementById("variable_price").value);
+  document.getElementById("subtotal").innerHTML = class_prices[class_type];
+  console.log("subtotal", document.getElementById("subtotal").innerHTML);
+
+  //changeGuestQuantity();
+  if (class_type != "PL4") {
+    document.getElementById("select_guest_quantity").value = 1;
+  }
+}
+
 function chooseDate(eid) {
-  document.getElementById("class-option-box").style.display = "block";
-  location.href='#class-option-box';
-  document.getElementById("event_id").value = eid;
+  document.getElementById("proceed_to_checkout").style.display = "block";
   event_date = document.getElementById("eid_" + eid + "_label").innerHTML;
   document.getElementById("event_date").value = event_date;
-}
+  console.log("event_date", document.getElementById("event_date").value);
+  document.getElementById("event_id").value = eid;
+  console.log("event_id", document.getElementById("event_id").value);
+  class_type = document.getElementById("class_type").value;
 
-function chooseType(choice) {
-  document.getElementById("submit").style.display = "block";
-  document.getElementById("total").style.display = "block";
-  var class_price = getFormChoices()["class_price"];
-  document.getElementById("subtotal").innerHTML = class_price;
-  document.getElementById("total_cost").value = class_price;
-  class_option = document.getElementById(choice + "_id").innerHTML;
-  document.getElementById("variable_price").value = class_option;
-  location.href='#submit';
-}
-
-function getFormChoices() {
-  var event_id = document.getElementById("pottery_form").pottery_lesson.value;
-  var class_option = document.getElementById("pottery_form").class_option.value;
-  var customer_name = document.getElementById("pottery_form").customer_name.value;
-  var customer_phone = document.getElementById("pottery_form").customer_phone.value;
-  if (class_option == '90 minute lesson @ $100') {
-    var class_price = 100;
-  } else {
-    var class_price = 250;
+  if (class_type == "PL4") {
+    document.getElementById("select_guest_quantity").style.display = "block";
   }
-  return { "event_id": event_id, "class_price": class_price, "customer_name": customer_name, "customer_phone": customer_phone }
+
+}
+
+function changeGuestQuantity() {
+  new_guest_amount = document.getElementById("select_guest_quantity").value;
+  document.getElementById("guest_quantity").value = new_guest_amount;
+  console.log("new_guest_amount", new_guest_amount);
+  let current_total_cost = 100;
+  let new_total_cost = current_total_cost * Number(new_guest_amount);
+  document.getElementById("total_cost").value = new_total_cost;
+  console.log("new_total_cost", new_total_cost);
+  document.getElementById("subtotal").innerHTML = new_total_cost;
 }
 
 function getCcaOrderId() {

@@ -110,6 +110,15 @@ function appendTime() {
     <label for="{{field.name }}">{{field.name }}</label>
     {% endif %}
     {{ field(autocomplete="off", class="form-control", placeholder="") }}
+
+    {% if field.name == "title" %}
+      <small id="title_note" class="form-text text-muted">Add "private event" anywhere in title for unlisted events; Other keywords: Studio closed, scarf, gift card, wheel wars</small>
+    {% elif field.name == "price_text" %}
+      <small id="price_text_notes" class="form-text-muted">Example price_text: 16 x 20 inch canvas @ $45, 18 x 24 inch canvas @ $65</small>
+    {% elif field.name == "tags" %}
+      <small id="tags_notes" class="form-text-muted">Example tags: pottery-lesson, invisible, community events, series=1220</small>
+    {% endif %}
+
     </div>
   {% endif %}
 

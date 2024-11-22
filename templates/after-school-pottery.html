@@ -1,0 +1,248 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts After School Pottery{% endblock %}
+{% block html_head %}
+
+<style>
+.PL_col1 {
+  float: left;
+  width: 5%;
+}
+.PL_col2 {
+  float: left;
+  width: 95%;
+}
+.PL_row:after {
+  padding-top: 20px;
+  content: "";
+  display: table;
+  clear: both;
+}
+.h2, h2 {
+  font-size: 1.6rem;
+}
+#choose_date, #proceed_to_checkout, #select_guest_quantity {
+  display: none;
+}
+#select_guest_quantity {
+  margin: 10px 0 10px 0;
+  width: 50%;
+}
+#subtotal-container {
+    background-color: LightBlue;
+    padding: 10px 0 10px 10px;
+    margin: 10px 0 10px 0;
+    width: 50%;
+}
+#recap {
+    background-color: LightGray;
+    padding: 10px 0 10px 10px;
+    margin: 10px 0 10px 0;
+    display: none;
+}
+#pottery-images {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+@media only screen and (max-width: 600px) {
+  #pottery-images img {
+    width: 200px;
+  }
+}
+#customer_name, #customer_phone {
+  max-width: 400px;
+  margin-bottom: 10px;
+}
+ul {
+  line-height: 180%;
+}
+.pottery-lessons-img {
+  max-width: 200px;
+}
+.class_rows {
+  padding: 10px;
+}
+.glazing {
+  border: 1px solid #E8E8E8;
+  padding: 10px;
+  background-color: #F8F8F8;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<center id="upcoming_events">
+<h1 class="art-brew">After School Pottery</h1>
+</center>
+
+<div id="pottery-images">
+	<!--
+<img src="/img/small/20210424_154335-01.jpeg">
+<img src="/img/small/20210622_115227.jpg">
+	-->
+</div>
+
+<div class="row">
+
+<div class="col-md-12">
+
+<form name="pottery_form" id="pottery_form" action="/checkout/" method="POST">
+
+	<!-- the following three are to satisfy the /checkout/ requirement -->
+	<input type="hidden" name="event_id" id="event_id" value="N/A">
+	<input type="hidden" name="event_date" id="event_date" value="N/A">
+	<input type="hidden" name="event_title" id="event_title" value="After School Pottery">
+        <input type="hidden" id="guest_quantity" name="guest_quantity" value="0">
+        <input type="hidden" id="event_details_string" name="event_details_string" value="">
+
+	<p>Price: $35 per guest.</p>
+	<p>Choose at least one class from the following list:</p>
+
+{% for event in events %}
+
+  {% if orders_count[event.eid] and orders_count[event.eid] >= event.elimit %}
+    <!-- class reached limit already -->
+
+  {% else %}
+
+  <div class="class_rows">
+
+    {% if "Glazing" in event.title %}
+
+      <div class="glazing">{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }} {{ event.title }}</div>
+
+    {% else %}
+
+      <input type="checkbox" id="eid_{{ event.eid }}" name="pottery_lesson_date" value="{{ event.eid }}" onClick="chooseWeek({{ event.eid }})">
+      <label for="eid_{{ event.eid }}" id="eid_{{ event.eid }}_label">{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }} {{ event.title }}</label>
+      <input type="hidden" id="eid_{{ event.eid }}_event_id" value="{{ event.eid }}" class="event-id">
+      <input type="hidden" id="eid_{{ event.eid }}_event_date" value="{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}" class="event-date">
+      <input type="hidden" id="eid_{{ event.eid }}_event_title" value="{{ event.title }}" class="event-title">
+
+      <div id="choose-guests-container-{{ event.eid }}" style="display: none; padding: 0 20px 20px 0;">
+
+      <select onchange="chooseGuests({{ event.eid }})" id="choose-guests-select-{{ event.eid }}" class="choose-guests-select">
+	      <option value="0">Choose number of guests for this class</option>
+	      <option value="1">1</option>
+	      <option value="2">2</option>
+	      <option value="3">3</option>
+	      <option value="4">4</option>
+      </select>
+
+      </div>
+
+      <!--
+      <div id="week-subtotal-container-{{ event.eid }}" style="display: none;">
+      Week subtotal: $<span id="week-subtotal-{{ event.eid }}">0</span>
+      </div>
+      -->
+
+    {% endif %}
+
+  </div><!-- close class_rows -->
+
+  {% endif %}
+{% endfor %}
+
+<div>
+  <input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control">
+  <input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control">
+  <input type="hidden" name="multiple_events_details" id="multiple_events_details" value="">
+  <input type="hidden" name="total_cost" id="total_cost" value="">
+  <div id="recap"></div>
+  <div id="subtotal-container">
+    Subtotal: $<span id="subtotal">0</span>
+  </div>
+  <input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning" onclick="spin();">
+</div>
+
+</form>
+
+</div><!-- close div col-md-12 -->
+</div><!-- close row -->
+
+<script>
+
+function spin() {
+  document.getElementById("submit").value = "Processing...";
+  document.getElementById("submit").style.backgroundColor = "yellow";
+  return true;
+}
+
+function continueCheckout() {
+  document.getElementById("proceed_to_checkout").style.display = "block";
+}
+
+function chooseWeek(eid) {
+  is_checked = document.getElementById("eid_" + eid).checked;
+  if (is_checked == true) {
+    document.getElementById("choose-guests-container-" + eid).style.display = "block";
+  } else {
+    document.getElementById("choose-guests-container-" + eid).style.display = "none";
+    document.getElementById("choose-guests-select-" + eid).value = 0;
+    calculate_subtotal();
+  }
+}
+
+function chooseGuests(eid) {
+  document.getElementById("recap").style.display = "block";
+  var week_number_of_guests = document.getElementById("choose-guests-select-" + eid).value
+  var week_subtotal = week_number_of_guests * 1; // 35
+  calculate_subtotal();
+}
+
+function calculate_subtotal() {
+  const event_ids_available = document.getElementsByClassName("event-id");
+  const guests_available = document.getElementsByClassName("choose-guests-select");
+  const event_dates_available = document.getElementsByClassName("event-date");
+  const event_titles_available = document.getElementsByClassName("event-title");
+
+  var overall_guest_count = 0;
+  var event_details_string = "";
+  var event_details_json_str = "[";
+  const event_ids_list = [];
+  const guest_count_list = [];
+  const event_dates_list = [];
+  const event_titles_list = [];
+
+  for (let i = 0; i < guests_available.length; i++) {
+
+    this_event_id = event_ids_available[i].value;
+    this_guest_count = parseInt(guests_available[i].value);
+    this_event_date = event_dates_available[i].value;
+    this_event_title = event_titles_available[i].value;
+
+    overall_guest_count += this_guest_count;
+    console.log(i, this_guest_count, overall_guest_count);
+
+    if (this_guest_count > 0) {
+      event_ids_list.push(this_event_id);
+      guest_count_list.push(this_guest_count);
+      event_dates_list.push(this_event_date);
+      event_titles_list.push(this_event_title);
+      weekly_subtotal = this_guest_count * 1; // 35
+      event_details_json_str += '{"event_id": ' + this_event_id + ', "guest_count": ' + this_guest_count + ', "event_date": "' + this_event_date + '", "event_title": "' + this_event_title + '"},';
+      event_details_string += this_event_date + " " + this_event_title.replace("Weekly Wednesday Afterschool Pottery Class", "") + " " + this_guest_count + " guests week subtotal " + weekly_subtotal + "<br>";
+    }
+
+  }
+
+  var event_details_json_str =  event_details_json_str.replace(/,$/, "") + "]";
+
+  console.log(event_details_json_str);
+  var subtotal = overall_guest_count * 1; // 35
+  document.getElementById("multiple_events_details").value = event_details_json_str;
+  document.getElementById("subtotal").innerHTML = subtotal;
+  document.getElementById("total_cost").value= subtotal;
+  document.getElementById("recap").innerHTML = event_details_string;
+  document.getElementById("event_details_string").value = event_details_string;
+  document.getElementById("guest_quantity").value = overall_guest_count;
+  
+}
+
+</script>
+{% endblock %}

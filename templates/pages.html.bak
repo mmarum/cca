@@ -28,9 +28,13 @@ h5 {
 
 {% block content %}
 
-<div class="row">
+<div class="row"
+{% if page_name == "mural-2024" %}
+style="background-image: url('/img/mural-2024-background-3.jpg'); background-repeat: no-repeat; background-attachment: fixed; background-size: 100% 500px;"
+{% endif %}
+>
 
-{% if page_name in ["about-us"] %}
+{% if page_name in ["about-us", "mural-2024"] %}
 
   {% set page_name_html = "include-" + page_name + ".html" %}
 

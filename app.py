@@ -7,6 +7,7 @@ import base64
 import random
 import datetime
 
+from urllib.parse import unquote
 from database import Database
 
 from os import listdir
@@ -14,7 +15,7 @@ from gallery import Gallery
 from os.path import isfile, join
 from writer import scrape_and_write
 from update_extra import UpdateExtra
-from custom_filters import get_inventory
+from custom_filters import get_inventory, slugify
 from paper_calendar import make_cal, make_list
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -36,6 +37,7 @@ env = Environment(
 )
 
 env.filters["get_inventory"] = get_inventory
+env.filters["slugify"] = slugify
 
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -95,7 +97,6 @@ def app(environ, start_response):
     galleries_dict_vals = list(galleries_dict.values())
 
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
-    db2 = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_66")
 
     global_settings = json.loads(read_file("data/global_settings.json"))
     path = environ['PATH_INFO']
@@ -294,6 +295,8 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/pottery-lessons':
 
+
+            """
             db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags LIKE '%pottery-lesson%' ORDER BY edatetime ASC")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=1000, how=1)
@@ -324,7 +327,87 @@ def app(environ, start_response):
                 orders_count=orders_count_object, 
                 events_object=events_object)
 
+
         ####
+
+        elif environ['PATH_INFO'] == '/pottery-lessons-test':
+
+            """
+
+            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and (tags LIKE '%pottery-lesson%' OR tags like '%PL4%') ORDER BY edatetime ASC")
+            r = db.store_result()
+            allrows = r.fetch_row(maxrows=1000, how=1)
+
+            db.query("SELECT eid, SUM(quantity) as sum_quantity FROM orders GROUP BY eid")
+            r = db.store_result()
+            orders_count = r.fetch_row(maxrows=1000, how=1)
+
+            orders_count_object = {}
+            for item in orders_count:
+                key = int(item['eid'])
+                val = int(item['sum_quantity'])
+                orders_count_object[key] = val
+
+            events_object = {}
+            for row in allrows:
+                eid = row["eid"]
+                events_object[eid] = {}
+                events_object[eid]["date"] = int(row["edatetime"].timestamp())
+                events_object[eid]["title"] = row["title"]
+                events_object[eid]["price"] = row["price"]
+                events_object[eid]["price_text"] = row["price_text"]
+                events_object[eid]["tags"] = row["tags"]
+
+            events_object = json.dumps(events_object)
+
+            #template = env.get_template("pottery-lessons-test.html")
+            template = env.get_template("pottery-lessons.html")
+            response = template.render(events=allrows, 
+                orders_count=orders_count_object, 
+                events_object=events_object)
+
+
+        ####
+
+
+        elif environ['PATH_INFO'] == '/after-school-pottery':
+
+
+            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and (tags LIKE '%after-school-pottery%') ORDER BY edatetime ASC")
+            r = db.store_result()
+            allrows = r.fetch_row(maxrows=1000, how=1)
+
+            db.query("SELECT eid, SUM(quantity) as sum_quantity FROM orders GROUP BY eid")
+            r = db.store_result()
+            orders_count = r.fetch_row(maxrows=1000, how=1)
+
+            orders_count_object = {}
+            for item in orders_count:
+                key = int(item['eid'])
+                val = int(item['sum_quantity'])
+                orders_count_object[key] = val
+
+            events_object = {}
+            for row in allrows:
+                eid = row["eid"]
+                events_object[eid] = {}
+                events_object[eid]["date"] = int(row["edatetime"].timestamp())
+                events_object[eid]["title"] = row["title"]
+                events_object[eid]["price"] = row["price"]
+                events_object[eid]["price_text"] = row["price_text"]
+                events_object[eid]["tags"] = row["tags"]
+
+            events_object = json.dumps(events_object)
+
+            template = env.get_template("after-school-pottery.html")
+            response = template.render(events=allrows, 
+                orders_count=orders_count_object, 
+                events_object=events_object)
+
+
+        ####
+
+
 
 
         elif environ['PATH_INFO'] == '/community-events':
@@ -333,6 +416,13 @@ def app(environ, start_response):
             allrows = r.fetch_row(maxrows=1000, how=1)
             template = env.get_template("community-events.html")
             response = template.render(events=allrows)
+
+        ####
+
+
+        #elif environ['PATH_INFO'] == '/mural-2024':
+        #    template = env.get_template("mural-2024.html")
+        #    response = template.render()
 
         ####
 
@@ -561,7 +651,7 @@ def app(environ, start_response):
             response = template.render(form=form, allevents=allevents, this_now=this_now)
 
 
-        elif environ['PATH_INFO'] == '/home':
+        elif environ['PATH_INFO'] == '/index':
             # UP-NEXT EVENT
             month = int(this_now.strftime("%m"))
             year = int(this_now.strftime("%Y"))
@@ -594,7 +684,10 @@ def app(environ, start_response):
                 and active = 1 ORDER BY RAND() LIMIT 1"
             db.query(sql)
             r = db.store_result()
-            random_product = r.fetch_row(maxrows=10, how=1)[0]
+            try:
+                random_product = r.fetch_row(maxrows=10, how=1)[0]
+            except:
+                random_product = None
 
             # GALLERY / SLIDESHOW
             #random_number = random.randint(1,len(galleries_dict))
@@ -618,6 +711,11 @@ def app(environ, start_response):
                 and c.name in ({good_cats}) \
                 ORDER BY RAND() \
                 LIMIT 1"
+
+            ####
+            db2 = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_66")
+            ####
+
             db2.query(sql)
             r = db2.store_result()
             random_gallery = r.fetch_row(maxrows=1, how=1)[0]
@@ -712,7 +810,15 @@ def app(environ, start_response):
             file_data_dict = {}
             for f in signup_files:
                 file_data = json.loads(read_file(f"../signup/data/{f}"))
-                file_data_dict[f.replace(".json", "")] = file_data
+
+                new_entry_list = []
+                for entry in file_data:
+                    new_dict = {}
+                    for k, v in entry.items():
+                        new_dict[k] = unquote(v)
+                    new_entry_list.append(new_dict)
+
+                file_data_dict[f.replace(".json", "")] = new_entry_list
 
             template = env.get_template("admin-registration.html")
             response = template.render(registration_config_data=registration_config_data, allrows=allrows, reg_data=reg_data, new_reg_dict=new_reg_dict, file_data_dict=file_data_dict)
@@ -942,11 +1048,17 @@ def app(environ, start_response):
             data_object["create_date"] = iso_now
             data_object["create_date_epoch"] = epoch_now
 
-        data_object["page_path"] = data_object["page_path"].lower().replace(" ", "_")
+        data_object["page_path"] = data_object["page_path"].lower().replace(" ", "-")
         page_path = data_object["page_path"]
         create_date_epoch = data_object["create_date_epoch"]
+        write_file(f"../registration/config/{page_path}-{create_date_epoch}.json", json.dumps(data_object, indent=4))
 
-        write_file(f"../registration/config/{page_path}_{create_date_epoch}.json", json.dumps(data_object, indent=4))
+        fields = data_object["fields"]
+        template = env.get_template("include-signup.html")
+        include_html = template.render(page_path=page_path, fields=fields)
+        #write_file(f"../www/includes/signups/{page_path}_{create_date_epoch}.html", include_html)
+        write_file(f"templates/include-{page_path}.html", include_html)
+
         response = '<meta http-equiv="refresh" content="0; url=/app/admin/registration" />'
 
 

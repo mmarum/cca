@@ -42,23 +42,16 @@ def get_intent_shop(form_data):
     product_names = form_data["product_names"]
     total_cost = form_data["total_cost"]
 
-    try:
-        line2 = form_data["line2"]
-    except:
-        line2 = ""
-
-    # TODO: write data validation
-
     shipping = {
-        "name": form_data["name"],
-        "phone": form_data["phone"],
+        "name": form_data.get("name", ""),
+        "phone": form_data.get("phone", ""),
         "address": {
-            "line1": form_data["line1"],
-            "line2": line2,
-            "city": form_data["city"],
-            "state": form_data["state"],
-            "postal_code": form_data["postal_code"],
-            "country": form_data["country"]
+            "line1": form_data.get("line1", ""),
+            "line2": form_data.get("line2", ""),
+            "city": form_data.get("city", ""),
+            "state": form_data.get("state", ""),
+            "postal_code": form_data.get("postal_code", ""),
+            "country": form_data.get("country", "")
         }
     }
 
@@ -85,8 +78,8 @@ def filter_form_data(environ):
             name = temp[0]
             value = unquote(temp[1].replace("+", " "))
             if value != "":
-                if "a href=" in value:
-                    value = clean_href(value)
+                #if "a href=" in value:
+                #    value = clean_href(value)
                 form_data[name] = value
 
         # HTML FORM REQUIREMENTS:
@@ -107,8 +100,8 @@ def unquote_dict(form_data):
     for k, v in form_data.items():
         v = v.replace("+", " ")
         if v != "":
-            if "a href=" in v:
-                v = clean_href(v)
+            #if "a href=" in v:
+            #    v = clean_href(v)
             new_dict[k] = unquote(v)
     return new_dict
 

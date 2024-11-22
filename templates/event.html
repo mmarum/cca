@@ -190,7 +190,10 @@ select, input {
     {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
     {% else %}
 
-    {% if event.eid == 964 or "gift card" in event.title.lower() or "community-event" in event.tags %}
+    {% if event.eid == 964 or 
+        "gift card" in event.title.lower() or 
+        "still life" in event.title.lower() or
+        "community-event" in event.tags %}
 
       <input type="hidden" id="guest_quantity" name="guest_quantity" value="1">
 
@@ -205,7 +208,7 @@ select, input {
     {% endif %}
     {# REGULAR EVENT END #}
 
-    {% if "Wheel Wars" not in event.title %}
+    {% if "Wheel Wars" not in event.title and "Paint Wars" not in event.title %}
     <input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control">
     <input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control">
 
@@ -229,6 +232,8 @@ select, input {
       <option value=1>1 additional scarf</option>
       <option value=2>2 additional scarves</option>
       <option value=3>3 additional scarves</option>
+      <option value=4>4 additional scarves</option>
+      <option value=5>5 additional scarves</option>
       </select>
     {% endif %}
     {# SCARF SPECIALS END #}
@@ -270,6 +275,8 @@ select, input {
     {% if "community-event" in event.tags %}
       {% if "Wheel Wars" in event.title %}
         <input type="submit" name="submit" id="register" value="Get details & register" class="btn btn-warning" onclick="register();">
+      {% elif "Paint Wars" in event.title %}
+	<button type="button" class="btn btn-success" onclick="location.href='/paint-wars.html'" style="display: block; margin: 20px;">See Paint Wars details and register</button>
       {% else %}
         <input type="submit" name="submit" id="signup" value="Sign Up" class="btn btn-warning" onclick="signup();">
       {% endif %}

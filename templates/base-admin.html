@@ -48,26 +48,23 @@ if (location.protocol !== 'https:') {
   <a href="/app/admin/booking/list">Booking</a> |
   <a href="/app/admin/registration">Registration</a> |
   <a href="/app/admin/signups">Signups</a> |
-  <a href="/app/admin/pages">Pages</a> |
-  <a href="/gallery/admin.php" target="gallery">Gallery</a> |
-  <a href="/home.html" target="site">Site</a>
+  <a href="/app/admin/pages">Pages</a>
+  <!-- <a href="/gallery/admin.php" target="gallery">Gallery</a> | -->
+  <!-- <a href="/home.html" target="site">Site</a> -->
 </div>
 
 <div id="content">
 
 <div class="container">
 
-<div id="content">
 {% block content %}{% endblock %}
-</div>
 
 </div><!-- close container -->
 
 <div id="footer">
 {% block footer %}
-<!-- Footer -->
 {% endblock %}
-</div>
+</div><!-- close footer -->
 
 </div><!-- close content -->
 

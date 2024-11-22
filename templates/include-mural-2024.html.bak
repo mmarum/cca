@@ -1,0 +1,92 @@
+
+
+<style>
+input {
+  padding-bottom: 5px;
+}
+#submit {
+  margin-top: 25px;
+  color: #fff;
+  background-color: #28a745;
+  border-color: #28a745;
+}
+</style>
+
+<div class="column_container column_container_right">
+
+<h3>Sign up</h3>
+
+<p>CLOSED</p>
+
+<!--
+
+<form id="signup_form" name="signup_form" class="form-group" action="/signup/mural-2024" method="POST">
+
+
+
+
+
+<p>
+<label for="first_and_last_name">First and last name</label>
+<input type="text" name="first_and_last_name" id="first_and_last_name" class="form-control">
+</p>
+
+
+
+
+
+<p>
+<label for="email">Email</label>
+<input type="text" name="email" id="email" class="form-control">
+</p>
+
+
+
+
+
+<p>
+<label for="phone_number">Phone number</label>
+<input type="text" name="phone_number" id="phone_number" class="form-control">
+</p>
+
+
+
+
+
+<p>
+<label for="address">Address</label>
+<input type="text" name="address" id="address" class="form-control">
+</p>
+
+
+
+
+
+<p>
+<label for="media_ig_fb_site_other">Media: IG, FB, site, other</label>
+<input type="text" name="media_ig_fb_site_other" id="media_ig_fb_site_other" class="form-control">
+</p>
+
+
+
+
+
+<p style="font-size: small;">By signing this document with your eSignature, you agree to the following: I, the Mural Applicant, hereby confirm that I am a resident of the Dallas/Fort Worth area. I agree to abide by the deadlines listed above. I agree that my mural will NOT contain images of any copyright or trademarked brands, sex, illegal substances or illicit drug paraphernalia, or political issues. I consent to CCA and AMA's use of the images of my mural, artwork, and name for all promotional and marketing purposes including, but not limited to social media, flyers, newspapers, and other mediums.</p>
+
+
+
+<p>
+<label for="esignature">eSignature</label>
+<input type="text" name="esignature" id="esignature" class="form-control">
+</p>
+
+
+
+<input class="form-control" id="submit" name="submit" type="submit" value="submit">
+
+</form>
+
+-->
+
+</div>
+

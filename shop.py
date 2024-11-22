@@ -61,18 +61,24 @@ def shop(environ, start_response):
 
     elif path.startswith("/filter"):
         filter_word = path.replace("/filter/", "")
+
+        filter_word = filter_word.replace("%20", " ")
+
         if filter_word not in allowed_filter_words:
             raise ValueError(f"Attempted filter_word not in allowed_filter_words list: {filter_word}")
 
-        db.query(f"SELECT *, CEILING(inventory / 100) as invt FROM products WHERE active = 1 and keywords_array LIKE '%{filter_word}%' order by invt desc, pid asc")
+        #db.query(f"SELECT *, CEILING(inventory / 100) as invt FROM products WHERE active = 1 and keywords_array LIKE '%{filter_word}%' order by invt desc, pid asc")
+        db.query(f"SELECT *, CEILING(inventory / 100) as invt FROM products WHERE active = 1 and keywords_array LIKE '%{filter_word}%' order by rand()")
         r = db.store_result()
         allrows = r.fetch_row(maxrows=100, how=1)
         template = env.get_template("list-products.html")
-        response = template.render(products=allrows, allowed_filter_words=allowed_filter_words)
+        response = template.render(products=allrows, allowed_filter_words=allowed_filter_words, filter_word=filter_word)
 
     else:
         #db.query("SELECT *, CEILING(inventory / 100) as invt FROM products WHERE active = 1 order by invt desc, name desc")
-        db.query("SELECT * FROM products WHERE active = 1 and inventory >= 1 order by keywords_array, name desc")
+        #db.query("SELECT * FROM products WHERE active = 1 and inventory >= 1 order by keywords_array, name desc")
+        #db.query("SELECT * FROM products WHERE active = 1 and inventory >= 1 order by rand()")
+        db.query("SELECT * FROM products WHERE active = 1 order by rand()")
         r = db.store_result()
         allrows = r.fetch_row(maxrows=100, how=1)
         template = env.get_template("list-products.html")

@@ -3,15 +3,21 @@
 
 {% block html_head %}
 <style>
-td {
+td, th {
   padding: 10px;
   border: 1px dashed LightGray;
+}
+th {
+  background-color: LightGray;
+  border: 1px dashed White;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 
-<h1>Registration sign-ups</h1>
+<h1>Testing new registration sign-ups</h1>
+
 
 {% for reg_name, signups_dict in signup_data.items() %}
 <h2>{{ reg_name }}</h2>
@@ -21,21 +27,22 @@ td {
   {% if loop.index == 1 %}
     <tr>
     {% for k, v in signup_dict.items() %}
-      {% if k not in ["status", "registration_name", "event_date", "submit"] %}
-        <td>{{ k }}</td>
+      {% if k not in ["status", "registration_name", "event_date", "submit", "signature", "photo_release"] %}
+        <th>{{ k.replace("_", " ") }}</th>
       {% endif %}
     {% endfor %}
     </tr>
   {% endif %}
   <tr>
   {% for k, v in signup_dict.items() %}
-    {% if k not in ["status", "registration_name", "event_date", "submit"] %}
-      <td>{{ v }}</td>
+    {% if k not in ["status", "registration_name", "event_date", "submit", "signature", "photo_release"] %}
+      <td>{% if k == "email" %}{{ v.replace("@", "@ ") }}{% else %}{{ v }}{% endif %}</td>
     {% endif %}
   {% endfor %}
   </tr>
 {% endfor %}
 </table>
+<hr>
 {% endfor %}
 
 {% endblock %}

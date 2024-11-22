@@ -1,0 +1,73 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Community Events{% endblock %}
+{% block html_head %}
+
+<style>
+.h2, h2 {
+  font-size: 1.6rem;
+}
+#class-option-box, #submit, #total {
+  display: none;
+}
+#total {
+  padding: 10px;
+}
+#customer_name, #customer_phone {
+  max-width: 400px;
+  margin-bottom: 10px;
+}
+video {
+  width: 400px;
+  background-color: brown;
+}
+@media only screen and (max-width: 400px) {
+  video {
+    width: 100%;
+  }
+}
+</style>
+
+<link rel="preload" as="style" href='/wheel-wars-promo-400.mp4'>
+
+{% endblock %}
+
+{% block content %}
+
+<center id="upcoming_events">
+<h1 class="art-brew">Community Events</h1>
+
+<p> It's our mission to build arts culture in our community through creative experience. </p>
+<p> Arts events are a great way for people to engage with the art community and learn about the artists. </p>
+<p> Here are some upcoming community events: </p>
+
+</center>
+
+{% for event in events %}
+  <div class="row event_row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
+    <div class="col-sm-1">
+    </div>
+    <div class="col-md-2">
+      <a href="/event/{{ event.eid }}.html"><img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/></a>
+    </div>
+    <div class="col-lg-8">
+      <h2>{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</h2>
+      <h3>
+        <a href="/event/{{ event.eid }}.html">{{ event.title }}</a>
+      </h3>
+    </div>
+    <div class="col-sm-1">
+    </div>
+  </div>
+{% endfor %}
+
+<!--
+<center>
+<video controls>
+  <source src="/wheel-wars-promo-400.mp4" type="video/mp4">
+  Your browser does not support the video.
+</video>
+</center>
+-->
+
+
+{% endblock %}

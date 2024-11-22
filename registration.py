@@ -22,11 +22,13 @@ def read_file(file_name):
     f.close()
     return content
 
+
 def write_file(file_name, content):
     f = open(file_name, "w")
     f.write(content)
     f.close()
     return True
+
 
 env = Environment(
     loader=PackageLoader('registration', '../app/templates'),
@@ -65,36 +67,20 @@ def registration(environ, start_response):
     method = environ['REQUEST_METHOD']
     path = environ['PATH_INFO']
 
-    valid_registrations = ["art-camp", "wheel-wars", "paint-wars"] # "after-school", "summer-camp"
+    registration_name = path.split("/")[1]
 
-    if path == "" or path == "/":
-        registration_name = "summer-camp" # set default
-    else:
-        if path.split("/")[1] not in valid_registrations:
-            raise ValueError(f"Error: Path does not represent valid registration name. {path}")
-        registration_name = path.split("/")[1]
+    valid_registrations = json.loads(read_file("data/valid-registrations.json"))
 
-    #print("registration_name", registration_name)
-    #print("path", path)
-    #print("method", method)
+    if registration_name not in valid_registrations:
+        raise ValueError(f"Error: Path does not represent valid registration name. \
+                registration_name: {registration_name}, valid_registrations: {str(valid_registrations)}")
 
-    #camps = ["art_camp_1", "art_camp_2", "art_camp_3", "art_camp_4", "pottery_camp_1"]
+    valid_camps = json.loads(read_file("data/valid-camps.json"))
 
-    camps = ["art_camp_2024_1", "art_camp_2024_2", "art_camp_2024_3", "art_camp_2024_4", "art_camp_2024_5", "art_camp_2024_6", "art_camp_2024_7", "art_camp_2024_8"]
-
-    #if "summer-camp" in path and path.split("/")[2] in camps:
-    if "art-camp" in path and path.split("/")[2] in camps:
+    if "art-camp" in path and path.split("/")[2] in valid_camps:
         session_detail = path.split("/")[2]
-    elif path.endswith("after-school"):
-        session_detail = "After School Pottery Program 2020"
-    else:
-        session_detail = ""
 
-    #print("session_detail", session_detail)
-
-    #if method == "POST" and path.endswith("/confirm"):
     if path.endswith("/confirm"):
-        #print("step: confirm")
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
         key_val_array = post_input.split('\n')
@@ -107,17 +93,19 @@ def registration(environ, start_response):
                 val = key_val.split('=')[1].strip()
                 post_input_dict[key] = val
                 fields.append(key)
+
+                if "'" in val:
+                    val = val.replace("'", "''")
+
                 vals.append(val)
             except:
                 pass
 
-        if registration_name in ["art-camp"]: # "summer-camp", "after-school"
-            # An unchecked checkbox doesn't pass a value so we need this
-            for i in ["treatment_permission", "photo_release"]:
-                if i not in fields:
-                    post_input_dict[i] = '' 
-                    fields.append(i)
-                    vals.append('')
+        for i in ["treatment_permission", "photo_release"]:
+            if i not in fields:
+                post_input_dict[i] = '' 
+                fields.append(i)
+                vals.append('')
 
         try:
             if int(post_input_dict["rid"]) > 0:
@@ -127,79 +115,44 @@ def registration(environ, start_response):
         except:
             action = "insert"
   
-        #print("CONFIRM")
-        #print(f"post_input_dict: {post_input_dict}")
-        #print(f"action: {action}")
 
         # UPDATE
         if action == "update":
 
-            if registration_name in ["art-camp"]: # "summer-camp", "after-school"
-
+            if "art-camp" in registration_name or "after-school" in registration_name:
                 rid = int(post_input_dict["rid"])
-
                 keys_vals = ""
                 for k, v in post_input_dict.items():
+                    if "'" in v:
+                        v = v.replace("'", "''")
                     if k != "submit":
                         keys_vals += str(f"{k}='{v}', ")
                 keys_vals = keys_vals.rstrip(', ')
-
                 sql = f"UPDATE registration SET {keys_vals} WHERE rid = {rid}"
-
-                #print(f"sql: {sql}")
-
                 c = db.cursor()
                 c.execute(sql)
                 c.close()
+                template = env.get_template(f"{registration_name}-registration.html")
 
-                #template = env.get_template("summer-camp.html")
-                template = env.get_template("art-camp-registration.html")
-
-            elif registration_name == "wheel-wars":
-
+            elif "wheel-wars" in registration_name or "paint-wars" in registration_name:
                 rid = str(post_input_dict["rid"])
-
                 if rid and rid != "":
-
-                    reg_file = "data/wheel-wars.json"
-
+                    reg_file = f"data/{registration_name}.json"
                     f = open(reg_file, "r")
                     reg_data = json.loads(f.read())
-
                     reg_data[rid] = post_input_dict
-
                     f = open(reg_file, "w")
                     f.write(json.dumps(reg_data, indent=4))
                     f.close()
-
-                template = env.get_template("wheel-wars.html")
-
-            elif registration_name == "paint-wars":
-
-                rid = str(post_input_dict["rid"])
-
-                if rid and rid != "":
-
-                    reg_file = "data/paint-wars.json"
-
-                    f = open(reg_file, "r")
-                    reg_data = json.loads(f.read())
-
-                    reg_data[rid] = post_input_dict
-
-                    f = open(reg_file, "w")
-                    f.write(json.dumps(reg_data, indent=4))
-                    f.close()
-
-                template = env.get_template("paint-wars.html")
-
+                template = env.get_template(f"{registration_name}-registration.html")
 
             response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
+
 
         # INSERT
         else:
 
-            if registration_name in ["art-camp"]: # "summer-camp", "after-school"
+            if "art-camp" in registration_name or "after-school" in registration_name:
 
                 # Removing rid becuase this is an insert
                 del fields[0]
@@ -212,8 +165,6 @@ def registration(environ, start_response):
                 fields = str(fields).lstrip('[').rstrip(']').replace("'", "")
                 vals = str(vals).lstrip('[').rstrip(']')
                 sql = f"INSERT INTO registration ({fields}) VALUES ({vals})"
-
-                #print(f"sql: {sql}")
 
                 c = db.cursor()
                 c.execute(sql)
@@ -229,14 +180,13 @@ def registration(environ, start_response):
                 rid = int(d.fetchone()[0])
                 d.close()
 
-                #template = env.get_template("summer-camp.html")
-                template = env.get_template("art-camp-registration.html")
+                template = env.get_template(f"{registration_name}-registration.html")
                 response = template.render(data=post_input_dict, rid=rid, registration_name=registration_name)
 
-            elif registration_name == "wheel-wars":
+            elif "wheel-wars" in registration_name or "paint-wars" in registration_name:
 
-                post_input_dict["registration_name"] = "Wheel Wars"
-                post_input_dict["event_date"] = "Saturday, March 30, 2024 2-4PM"
+                post_input_dict["registration_name"] = registration_name
+                post_input_dict["event_date"] = "Event Date TBD"
 
                 if post_input_dict["rid"] == "":
 
@@ -244,7 +194,7 @@ def registration(environ, start_response):
                     rid = epoch_now
                     post_input_dict["rid"] = rid
 
-                    reg_file = "data/wheel-wars.json"
+                    reg_file = f"data/{registration_name}.json"
 
                     f = open(reg_file, "r")
                     reg_data = json.loads(f.read())
@@ -255,39 +205,11 @@ def registration(environ, start_response):
                     f.write(json.dumps(reg_data, indent=4))
                     f.close()
 
-                template = env.get_template("wheel-wars.html")
-                response = template.render(data=post_input_dict, rid=post_input_dict["rid"], registration_name=registration_name)
-
-            elif registration_name == "paint-wars":
-
-                post_input_dict["registration_name"] = "Paint Wars"
-                post_input_dict["event_date"] = "Saturday Oct 28, 2024, 7-9 PM"
-
-                if post_input_dict["rid"] == "":
-
-                    epoch_now = int(time.time())
-                    rid = epoch_now
-                    post_input_dict["rid"] = rid
-
-                    reg_file = "data/paint-wars.json"
-
-                    f = open(reg_file, "r")
-                    reg_data = json.loads(f.read())
-
-                    reg_data[rid] = post_input_dict
-
-                    f = open(reg_file, "w")
-                    f.write(json.dumps(reg_data, indent=4))
-                    f.close()
-
-                template = env.get_template("paint-wars.html")
+                template = env.get_template(f"{registration_name}-registration.html")
                 response = template.render(data=post_input_dict, rid=post_input_dict["rid"], registration_name=registration_name)
 
 
-    ####
-    #elif method == "POST" and path.endswith("/edit"):
     elif path.endswith("/edit"):
-        #print("step: edit")
 
         # DE-DUPE THESE NEXT 17 LINES:
 
@@ -315,43 +237,34 @@ def registration(environ, start_response):
         form_data = filter_form_data(environ)
         rid = form_data["rid"]
 
-        if registration_name == "wheel-wars":
-            reg_data = json.loads(read_file("data/wheel-wars.json"))
+        if "wheel-wars" in registration_name or "paint-wars" in registration_name:
+            reg_data = json.loads(read_file(f"data/{registration_name}.json"))
             this_reg_data = reg_data[rid]
-            form = RegFormWheelWars(**this_reg_data)
-            template = env.get_template("wheel-wars.html")
-        elif registration_name == "paint-wars":
-            reg_data = json.loads(read_file("data/paint-wars.json"))
-            this_reg_data = reg_data[rid]
-            form = RegFormPaintWars(**this_reg_data)
-            template = env.get_template("paint-wars.html")
-        else:
+            if "wheel-wars" in registration_name:
+                form = RegFormWheelWars(**this_reg_data)
+            if "paint-wars" in registration_name:
+                form = RegFormPaintWars(**this_reg_data)
+            template = env.get_template(f"{registration_name}-registration.html")
+
+        elif "art-camp" in registration_name:
             db.query(f"SELECT * FROM registration WHERE rid = {rid}")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
-            #print(f"row: {row}")
             form = RegistrationForm(**row)
-            #template = env.get_template("summer-camp.html")
-            template = env.get_template("art-camp-registration.html")
+            template = env.get_template(f"{registration_name}-registration.html")
 
         response = template.render(form=form, registration_name=registration_name)
 
 
-    ####
-    #elif method == "POST" and path.endswith("/complete"):
     elif path.endswith("/complete"):
 
-        #print("step: complete")
         length = int(environ.get('CONTENT_LENGTH', '0'))
         post_input = environ['wsgi.input'].read(length).decode('UTF-8')
 
-        if registration_name in ["art-camp"]: # "summer-camp", "after-school"
+        if "art-camp" in registration_name or "after-school" in registration_name:
 
             form_registration = json.loads(post_input)
-
             form_orders = form_registration.copy()
-
-            #print("registration form_orders", form_orders)
 
             try:
                 registrations = json.loads(read_file(f"../app/registration/registrations.json"))
@@ -374,8 +287,6 @@ def registration(environ, start_response):
             registration_id = int(form_registration["registration_id"])
             order_id = form_registration["order_id"]
             sql = f"UPDATE registration SET order_id = '{order_id}' WHERE rid = {registration_id}"
-
-            #print(f"registration complete sql: {sql}")
 
             c = db.cursor()
             c.execute(sql)
@@ -404,11 +315,9 @@ def registration(environ, start_response):
             else:
                 generic_response = "ERROR: payer_info type is not dict"
 
-            #print(generic_response)
-
             response = "200"
 
-        elif registration_name == "wheel-wars":
+        elif "wheel-wars" in registration_name or "paint-wars" in registration_name:
 
             key_val_array = post_input.split('\n')
             post_input_dict = {}
@@ -420,6 +329,10 @@ def registration(environ, start_response):
                     val = key_val.split('=')[1].strip()
                     post_input_dict[key] = val
                     fields.append(key)
+
+                    if "'" in val:
+                        val = val.replace("'", "''")
+
                     vals.append(val)
                 except:
                     pass
@@ -428,7 +341,7 @@ def registration(environ, start_response):
 
             if rid and rid != "":
 
-                reg_file = "data/wheel-wars.json"
+                reg_file = f"data/{registration_name}.json"
 
                 f = open(reg_file, "r")
                 reg_data = json.loads(f.read())
@@ -439,44 +352,8 @@ def registration(environ, start_response):
                 f.write(json.dumps(reg_data, indent=4))
                 f.close()
 
-            template = env.get_template("wheel-wars.html")
+            template = env.get_template(f"{registration_name}-registration.html")
             response = template.render(status="complete", registration_name=registration_name)
-
-
-        elif registration_name == "paint-wars":
-
-            key_val_array = post_input.split('\n')
-            post_input_dict = {}
-            fields = []
-            vals = []
-            for key_val in key_val_array:
-                try:
-                    key = key_val.split('=')[0].strip()
-                    val = key_val.split('=')[1].strip()
-                    post_input_dict[key] = val
-                    fields.append(key)
-                    vals.append(val)
-                except:
-                    pass
-
-            rid = str(post_input_dict["rid"])
-
-            if rid and rid != "":
-
-                reg_file = "data/paint-wars.json"
-
-                f = open(reg_file, "r")
-                reg_data = json.loads(f.read())
-
-                reg_data[rid]["status"] = "complete"
-
-                f = open(reg_file, "w")
-                f.write(json.dumps(reg_data, indent=4))
-                f.close()
-
-            template = env.get_template("paint-wars.html")
-            response = template.render(status="complete", registration_name=registration_name)
-
 
 
     ####
@@ -487,18 +364,19 @@ def registration(environ, start_response):
 
     else:
 
-        if registration_name == "wheel-wars":
+        if "wheel-wars" in registration_name:
             form = RegFormWheelWars()
-            template = env.get_template("wheel-wars.html")
+            template = env.get_template(f"{registration_name}-registration.html")
             camper_count = "" # only for summer-school
-        elif registration_name == "paint-wars":
+
+        elif "paint-wars" in registration_name:
             form = RegFormPaintWars()
-            template = env.get_template("paint-wars.html")
+            template = env.get_template(f"{registration_name}-registration.html")
             camper_count = "" # only for summer-school
+
         else:
             form = RegistrationForm()
-            #template = env.get_template("summer-camp.html")
-            template = env.get_template("art-camp-registration.html")
+            template = env.get_template(f"{registration_name}-registration.html")
 
             # CAMPER COUNT:
             query = f"select camper1_name, camper2_name, camper3_name from registration where session_detail = '{session_detail}' and order_id is not NULL"
@@ -523,8 +401,6 @@ def registration(environ, start_response):
             #print("camper_count", camper_count)
 
         response = template.render(form=form, registration_name=registration_name, session_detail=session_detail, camper_count=camper_count)
-
-    #response += f"<hr>{str(environ)}"
 
     return [response.encode()]
 

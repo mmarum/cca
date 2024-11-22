@@ -22,6 +22,15 @@ label {
 #fields_div {
   margin-bottom: 25px;
 }
+ul {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+}
+li {
+  padding-right: 10px;
+}
 </style>
 
 {% endblock %}
@@ -47,6 +56,8 @@ label {
 
     {% if form.create_date.data and field.name == "page_path" %}
       {{ field(class="form-control", readonly="true") }}
+    {% elif field.name == "single_day_event" %}
+      {{ field }}
     {% else %}
       {{ field(class="form-control") }}
     {% endif %}
@@ -70,23 +81,14 @@ for (let i = 0; i < fields.length; i++) {
 }
 document.getElementById("fields_div").innerHTML = text;
 function add_field() {
-
   field_count = document.getElementById("field_count").innerHTML;
-
-  console.log("field_count " + field_count);
-
+  //console.log("field_count " + field_count);
   more_text = "<input type='text' name='fields_indiv[]' value='' class='form-control fields_indiv'>\n";
-
   next_field = Number(field_count) + 1;
-
-  console.log("next_field " + next_field);
-
+  //console.log("next_field " + next_field);
   more_text += "<div id='fields_div_" + next_field + "'></div>\n"
-
   document.getElementById("fields_div_" + field_count).innerHTML += more_text;
-
   document.getElementById("field_count").innerHTML = next_field;
-
   return true;
 }
 </script>

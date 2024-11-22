@@ -27,6 +27,35 @@ td {
 {% endblock %}
 
 {% block content %}
+
+{#
+<h1>Mural 2024</h1>
+<table>
+{% for eid, signups in file_data_dict.items() %} 
+
+  {% if eid == "mural-2024" %}
+
+  {% for signup in signups %}
+
+    {% if "test123" not in signup["first_and_last_name"].lower() and "marum" not in signup["first_and_last_name"].lower() %}
+
+      <tr>
+      {% for k, v in signup.items() %}
+        <td>{{ v }}</td>
+      {% endfor %}
+      </tr>
+
+    {% endif %}
+
+  {% endfor %}
+
+  {% endif %}
+
+{% endfor %}
+</table>
+#}
+
+{#
 <h1>Testing new registration management</h1>
 <table>
 <tr style="background-color: LightGray;">
@@ -34,15 +63,17 @@ td {
   <td>Title</td>
   <td>Path</td>
   <td>Create Date</td>
+  <td>Single day event</td>
   <td>Fields</td>
   <td>Status</td>
 </tr>
 {% for create_date_epoch, signup_data in registration_config_data.items() %}
   <tr>
-  <td><a href='/app/admin/registration/add-edit?rid={{ signup_data["page_path"] }}_{{ signup_data["create_date_epoch"] }}'>{{ create_date_epoch }}</a></td>
+  <td><a href='/app/admin/registration/add-edit?rid={{ signup_data["page_path"] }}-{{ signup_data["create_date_epoch"] }}'>{{ create_date_epoch }}</a></td>
   <td>{{ signup_data["title"] }}</td>
   <td>{{ signup_data["page_path"] }}</td>
   <td>{{ signup_data["create_date"] }} </td>
+  <td>{{ signup_data["single_day_event"] }} </td>
   <td>
   {% for field in signup_data["fields"] %}
     {{ field }}{{ "," if not loop.last }}
@@ -52,10 +83,10 @@ td {
   </tr>
 {% endfor %}
 </table>
-
 <hr>
+#}
 
-<h1>Sign Up</h1>
+<h1>Sign ups</h1>
 
 <table>
 
@@ -72,7 +103,12 @@ td {
 
   {% for signup in signups %}
 
-    {% if " Jan " not in signup["event_date"] %}
+    {% if signup["event_title"] %}
+
+    {% if " Jan " not in signup["event_date"] and 
+          " Feb " not in signup["event_date"] and 
+          " Mar " not in signup["event_date"] and
+          " Apr " not in signup["event_date"] %}
 
     <tr>
     <td><a href="/app/admin/events/add-edit?eid={{ eid }}">{{ eid }}</a></td>
@@ -82,6 +118,8 @@ td {
     <td>{{ signup["event_title"].replace("%28", "(").replace("%29", ")").replace("%40", "@") }}</td>
     <td>{{ signup["event_date"] }}</td>
     </tr>
+
+    {% endif %}
 
     {% endif %}
 
@@ -105,26 +143,28 @@ td {
 
 {% for camp, regs in new_reg_dict.items() %}
 
-{% if camp == "art_camp_2023_1" %}
-  {% set camp_date = "June 5-9" %}
-{% elif camp == "art_camp_2023_2" %}
-  {% set camp_date = "June 12-16" %}
-{% elif camp == "art_camp_2023_3" %}
-  {% set camp_date = "June 19-23" %}
-{% elif camp == "art_camp_2023_4" %}
-  {% set camp_date = "June 26-30" %}
-{% elif camp == "art_camp_2023_5" %}
-  {% set camp_date = "July 10-14" %}
-{% elif camp == "art_camp_2023_6" %}
-  {% set camp_date = "July 17-21" %}
-{% elif camp == "art_camp_2023_7" %}
-  {% set camp_date = "July 24-28" %}
-{% elif camp == "art_camp_2023_8" %}
-  {% set camp_date = "July 31 - Aug 4" %}
-{% endif %}
-
 <tr>
-  <td colspan="3"><span class="new_title"><b>{{ camp_date }}</b> {{ camp }}</a></td>
+  <td colspan="3"><span class="new_title"><b>
+
+    {% if camp == "art_camp_2024_1" %}
+    June 3-7
+    {% elif camp == "art_camp_2024_2" %}
+    June 10-14
+    {% elif camp == "art_camp_2024_3" %}
+    June 17-21
+    {% elif camp == "art_camp_2024_4" %}
+    June 24-28
+    {% elif camp == "art_camp_2024_5" %}
+    July 8-12
+    {% elif camp == "art_camp_2024_6" %}
+    July 15-19
+    {% elif camp == "art_camp_2024_7" %}
+    July 22-26
+    {% elif camp == "art_camp_2024_8" %}
+    July 29 - Aug 2
+    {% endif %}
+
+  </b> {{ camp }}</td>
 </tr>
 
 {% for reg in regs %}
@@ -174,6 +214,7 @@ td {
 {% endfor %}
 </table>
 
+{#
 <hr>
 
 <a name="wheel-wars"><h1>Wheel Wars</h1></a>
@@ -232,7 +273,6 @@ PAINT WARS:
 
 {% endif %}
 
-{# PAINT WARS:
 {% if reg["event_date"] == "Saturday Oct 28, 2023, 7-9 PM" %}
 
 <tr class="tr_regs">
@@ -260,12 +300,13 @@ PAINT WARS:
 </tr>
 
 {% endif %}
-#}
 
 {% endfor %}
 
 </table>
 
-<p>&nbsp;<p>
+#}
+
+<hr>
 
 {% endblock %}

@@ -67,19 +67,15 @@ def email(environ, start_response):
         if "Contact form inquiry" in subject and ("http" in content or "www" in content):
             raise ValueError('Link found in contact form submission. Stopping process.')
 
-        payer_info = json.loads(form_data['payer_info'])
-
-        to_email = payer_info['email']
-
-        if to_email == "mmarum-buyer@gmail.com":
+        try:
+            payer_info = json.loads(form_data['payer_info'])
+            to_email = payer_info['email']
+            content += payer_info["name"] + "\n"
+            content += payer_info["title"] + "\n"
+            content += payer_info["date"] + "\n"
+            content += payer_info["location"] + "\n"
+        except:
             to_email = "mmarum@gmail.com"
-
-        print("email", to_email)
-
-        content += payer_info["name"] + "\n"
-        content += payer_info["title"] + "\n"
-        content += payer_info["date"] + "\n"
-        content += payer_info["location"] + "\n"
 
         try:
             sg = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)

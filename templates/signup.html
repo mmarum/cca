@@ -18,10 +18,9 @@
 
 <div class="col-sm-8 bg-light">
 <p>
-{{ data["customer_name"] }}<br>
-{{ data["customer_phone"] }}<br>
-{{ data["event_title"] }}<br>
-{{ data["event_date"] }}<br>
+{% for k, v in data.items() %}
+{{ k }}: {{ v}}<br>
+{% endfor %}
 </p>
 </div>
 

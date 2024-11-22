@@ -1,0 +1,42 @@
+{% if fields %}
+
+<style>
+input {
+  padding-bottom: 5px;
+}
+#submit {
+  margin-top: 25px;
+  color: #fff;
+  background-color: #28a745;
+  border-color: #28a745;
+}
+</style>
+
+<div class="column_container column_container_right">
+
+<h3>Sign up</h3>
+
+<form id="signup_form" name="signup_form" class="form-group" action="/signup/{{ page_path }}" method="POST">
+
+{% for field in fields %}
+
+{% if field == "eSignature" %}
+
+<p style="font-size: small;">By signing this document with your eSignature, you agree to the following: I, the Mural Applicant, hereby confirm that I am a resident of the Dallas/Fort Worth area. I agree to abide by the deadlines listed above. I agree that my mural will NOT contain images of any copyright or trademarked brands, sex, illegal substances or illicit drug paraphernalia, or political issues. I consent to CCA and AMA's use of the images of my mural, artwork, and name for all promotional and marketing purposes including, but not limited to social media, flyers, newspapers, and other mediums.</p>
+
+{% endif %}
+
+<p>
+<label for="{{ field|slugify() }}">{{ field }}</label>
+<input type="text" name="{{ field|slugify() }}" id="{{ field|slugify() }}" class="form-control">
+</p>
+
+{% endfor %}
+
+<input class="form-control" id="submit" name="submit" type="submit" value="submit">
+
+</form>
+
+</div>
+
+{% endif %}

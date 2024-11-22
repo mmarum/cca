@@ -1,6 +1,6 @@
 {% extends "base-site.html" %}
 
-{% block title %}Catalyst Creative Arts: Art Camp 2024 Registration{% endblock %}
+{% block title %}Catalyst Creative Arts: After School Pottery 2024 Registration{% endblock %}
 
 {% block html_head %}
 <style>
@@ -33,7 +33,7 @@ h3, h5 {
 {% block content %}
 
 <center>
-<h3>Art Camp 2024 Registration & Release Form</h3>
+<h3>After School Pottery 2024 Registration & Release Form</h3>
 </center>
 
 {% if form %}
@@ -43,7 +43,7 @@ h3, h5 {
     {% set session_name = session_detail %}
   {% else %}
     <p style="background-color: red; color: white; padding: 10px; margin: 100px; 0 100px 0;">
-      ERROR: (A) You must <a href="/art-camp.html" style="color: white;">choose a specific art camp</a>
+      ERROR: (A) You must <a href="/after-school.html" style="color: white;">choose a specific after school</a>
     </p>
   {% endif %}
 {% elif data and rid %}
@@ -53,7 +53,7 @@ h3, h5 {
     {% set session_name = session_detail %}
   {% else %}
     <p style="background-color: red; color: white; padding: 10px; margin: 100px; 0 100px 0;">
-      ERROR: (B) You must <a href="/art-camp.html" style="color: white;">choose a specific art camp</a>
+      ERROR: (B) You must <a href="/after-school.html" style="color: white;">choose a specific after school</a>
     </p>
   {% endif %}
 {% endif %}
@@ -62,7 +62,7 @@ h3, h5 {
 
 <div id="session_detail_box">
 
-{% if session_detail == "art_camp_2024_oakridge" %}
+{% if session_detail == "after_school_2024_oakridge" %}
 {% set camper_max = 8 %}
 {% else %}
 {% set camper_max = 16 %}
@@ -71,15 +71,15 @@ h3, h5 {
 {% if camper_count and camper_count >= camper_max %}
   CLASS IS FULL
   <script>var class_full = true;</script>
-{% elif session_name == "art_camp_2024_1" or session_name == "art_camp_2024_2" or session_name == "art_camp_2024_4" or session_name == "art_camp_2024_8" %}
+{% elif session_name == "after_school_2024_1" or session_name == "after_school_2024_2" or session_name == "after_school_2024_4" or session_name == "after_school_2024_8" %}
   CLASS IS CLOSED
   <script>var class_full = true;</script>
 {% else %}
   <p><b>
 
-  "Art Camp {{ session_name|replace("art_camp_2024_", "") }}"
+  "After School Pottery {{ session_name|replace("after_school_2024_", "") }}"
 
-  {% if session_name == "art_camp_2024_2" or session_name == "art_camp_2024_5" or session_name == "art_camp_2024_8" or session_name == "art_camp_2024_oakridge" %}
+  {% if session_name == "after_school_2024_2" or session_name == "after_school_2024_5" or session_name == "after_school_2024_8" or session_name == "after_school_2024_oakridge" %}
     Ages 11 and up
   {% else %}
     Ages 6 and up
@@ -88,28 +88,28 @@ h3, h5 {
   </b></p>
 
   <p>Begins
-    {% if session_name == "art_camp_2024_1" %}
+    {% if session_name == "after_school_2024_1" %}
     June 3-7
-    {% elif session_name == "art_camp_2024_2" %}
+    {% elif session_name == "after_school_2024_2" %}
     June 10-14
-    {% elif session_name == "art_camp_2024_3" %}
+    {% elif session_name == "after_school_2024_3" %}
     June 17-21
-    {% elif session_name == "art_camp_2024_4" %}
+    {% elif session_name == "after_school_2024_4" %}
     June 24-28
-    {% elif session_name == "art_camp_2024_5" %}
+    {% elif session_name == "after_school_2024_5" %}
     July 8-12
-    {% elif session_name == "art_camp_2024_6" %}
+    {% elif session_name == "after_school_2024_6" %}
     July 15-19
-    {% elif session_name == "art_camp_2024_7" %}
+    {% elif session_name == "after_school_2024_7" %}
     July 22-26
-    {% elif session_name == "art_camp_2024_8" %}
+    {% elif session_name == "after_school_2024_8" %}
     July 29 - Aug 2
-    {% elif session_name == "art_camp_2024_oakridge" %}
+    {% elif session_name == "after_school_2024_oakridge" %}
     June 24-28 1:30pm
     {% endif %}
   </p>
 
-  {% if session_name == "art_camp_2024_oakridge" %}
+  {% if session_name == "after_school_2024_oakridge" %}
     <p>DAILY 1:30pm-4:40pm</p>
   {% else %}
     <p>DAILY 8:30am-9am drop off, 9am Start, 12pm Finish, 12pm-12:30pm pick up</p>
@@ -138,25 +138,25 @@ h3, h5 {
 
 <input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
 
-<input type="hidden" name="event_title" value="Art Camp Registration 2024">
+<input type="hidden" name="event_title" value="After School Pottery Registration 2024">
 
-{% if session_name == "art_camp_2024_1" %}
+{% if session_name == "after_school_2024_1" %}
   <input type="hidden" name="event_date" value="June 3-7 2024">
-{% elif session_name == "art_camp_2024_2" %}
+{% elif session_name == "after_school_2024_2" %}
   <input type="hidden" name="event_date" value="June 10-14 2024">
-{% elif session_name == "art_camp_2024_3" %}
+{% elif session_name == "after_school_2024_3" %}
   <input type="hidden" name="event_date" value="June 17-21 2024">
-{% elif session_name == "art_camp_2024_4" %}
+{% elif session_name == "after_school_2024_4" %}
   <input type="hidden" name="event_date" value="June 24-28 2024">
-{% elif session_name == "art_camp_2024_5" %}
+{% elif session_name == "after_school_2024_5" %}
   <input type="hidden" name="event_date" value="July 8-12 2024">
-{% elif session_name == "art_camp_2024_6" %}
+{% elif session_name == "after_school_2024_6" %}
   <input type="hidden" name="event_date" value="July 15-19 2024">
-{% elif session_name == "art_camp_2024_7" %}
+{% elif session_name == "after_school_2024_7" %}
   <input type="hidden" name="event_date" value="July 22-26 2024">
-{% elif session_name == "art_camp_2024_8" %}
+{% elif session_name == "after_school_2024_8" %}
   <input type="hidden" name="event_date" value="July 29 - Aug 2 2024">
-{% elif session_name == "art_camp_2024_oakridge" %}
+{% elif session_name == "after_school_2024_oakridge" %}
   <input type="hidden" name="event_date" value="June 24-28 2024 1:30pm">
 {% endif %}
 

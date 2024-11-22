@@ -32,10 +32,13 @@ if (items["event_title"].includes("Art Camp Registration")) {
     }
   }
 } else {
-  // set events-related variables:
-  var event_field_names = ["event_id", "variable_price", "additional_scarf"];
-  for (let i = 0; i < event_field_names.length; i++) {
-    let field_name = event_field_names[i];
+  if (items["event_title"].includes("After School Pottery")) {
+    var field_names = ["multiple_events_details"];
+  } else {
+    var field_names = ["event_id", "variable_price", "additional_scarf"];
+  }
+  for (let i = 0; i < field_names.length; i++) {
+    let field_name = field_names[i];
     try {
       items[field_name] = document.getElementById(field_name).innerHTML;
     } catch(err) {

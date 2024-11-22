@@ -33,35 +33,66 @@ stripe.api_key = passwords["stripe_api_key_prod"]
 endpoint_secret = passwords["stripe_webhook_secret"]
 
 
-def insert_event_db(data):
-    transaction_id = data["id"]
-    email = data["receipt_email"]
-    amount_received = data["amount_received"]
-    paid = str(int(amount_received / 100)) + ".00"
-    metadata = data["metadata"]
-    event_id = metadata.get("event_id", "")
-    quantity = metadata.get("guest_quantity", "")
-    customer_name = metadata.get("customer_name", "")
-    customer_phone = metadata.get("customer_phone", "")
-    variable_price = metadata.get("variable_price", "")
-    additional_scarf = metadata.get("additional_scarf", "")
-
+def execute_insert(*vals):
     db = MySQLdb.connect(host="localhost", user=dbuser, passwd=dbpass, db=dbname)
-    sql = f"insert into orders (order_id, eid, create_time, email, quantity, paid, variable_time, extra_data, transaction_id, buyer_name, buyer_phone) \
-        values ('{transaction_id}', '{event_id}', NOW(), '{email}', '{quantity}', '{paid}', '{variable_price}', '{additional_scarf}', '{transaction_id}', '{customer_name}', '{customer_phone}')"
+    sql = f"insert into orders (order_id, eid, email, quantity, paid, variable_time, \
+            extra_data, transaction_id, buyer_name, buyer_phone, create_time) values ("
+    for v in vals:
+        sql += f"'{v}',"
+    sql += "NOW())"
     print("sql", sql)
     c = db.cursor()
     c.execute(sql)
     c.close()
 
 
-def insert_reg_db(data):
+def insert_multiple_event(data):
+    print("webhook.py insert_multiple_event()")
+    meta = get_metadata(data["metadata"])
+    multiple_events_details = json.loads(meta["multiple_events_details"])
+    count = 1
+    for item in multiple_events_details:
+        execute_insert(data["id"] + f"-{count}", item["event_id"], data["receipt_email"], item["guest_count"], 
+            get_paid(data["amount_received"]), meta["variable_price"], meta["additional_scarf"], 
+            data["id"], meta["customer_name"], meta["customer_phone"])
+        count += 1
 
+
+def get_paid(amount_received):
+    return str(int(amount_received / 100)) + ".00"
+
+
+def get_metadata(metadata):
+    return {
+        "event_id": metadata.get("event_id", ""),
+        "quantity": metadata.get("guest_quantity", ""),
+        "customer_name": metadata.get("customer_name", "").replace("'", "''"),
+        "customer_phone": metadata.get("customer_phone", ""),
+        "variable_price": metadata.get("variable_price", ""),
+        "additional_scarf": metadata.get("additional_scarf", ""),
+        "multiple_events_details": metadata.get("multiple_events_details", "")
+    }
+
+
+def insert_event_db(data):
+    meta = get_metadata(data["metadata"])
+    execute_insert(data["id"], meta["event_id"], data["receipt_email"], meta["quantity"], 
+            get_paid(data["amount_received"]), meta["variable_price"], meta["additional_scarf"], 
+            data["id"], meta["customer_name"], meta["customer_phone"])
+
+
+def insert_reg_db(data):
     order_id = data["id"]
     parent_email = data["receipt_email"]
     amount_received = data["amount_received"]
     paid = str(int(amount_received / 100)) + ".00"
-    metadata = data["metadata"]
+    unclean_metadata = data["metadata"]
+    metadata = {}
+
+    for k, v in unclean_metadata.items():
+        if "'" in v:
+            v = v.replace("'", "''")
+        metadata[k] = v
 
     event_id = metadata.get("event_id", "")
     quantity = metadata.get("guest_quantity", "")
@@ -113,7 +144,8 @@ def webhook(environ, start_response):
     #### 
     if environ['REQUEST_METHOD'].upper() == "POST" and environ['PATH_INFO'] == "/":
 
-        #print("POST environ", environ)
+        print("POST environ", environ)
+
         length = int(environ.get('CONTENT_LENGTH', '0'))
         payload = environ['wsgi.input'].read(length).decode('UTF-8')
         #print("payload", payload)
@@ -150,6 +182,8 @@ def webhook(environ, start_response):
 
             if "Art Camp Registration" in event_title:
                 insert_reg_db(payment_intent)
+            elif "After School Pottery" in event_title:
+                insert_multiple_event(payment_intent)
             else:
                 insert_event_db(payment_intent)
 

@@ -57,8 +57,14 @@
       <span class="custom-metadata-col" id="custom-metadata-col-1">
 
         <div><span id="event_title">{{ form_data["event_title"] }}</span></div>
+
         <div><span id="event_date">{{ form_data["event_date"] }}</span></div>
 
+        {% if "After School Pottery" in form_data["event_title"] %}
+          {% if form_data["event_details_string"] %}<span id="event_details_string">{{ form_data["event_details_string"]|safe }}</span>{% endif %}
+          {% if form_data["multiple_events_details"] %}<span class="hide" id="multiple_events_details">{{ form_data["multiple_events_details"] }}</span>{% endif %}
+	  <style>#event_date { display: none; }</style>
+        {% endif %}
 
         {% if form_data["variable_price"] %}
           <div><span id="variable_price">{{ form_data["variable_price"] }}</span></div>
@@ -83,7 +89,7 @@
         <div><span id="customer_name">{{ form_data["customer_name"] }}</span></div>
         <div><span id="customer_phone">{{ form_data["customer_phone"] }}</span></div>
 
-        <div><span>Guests: </span><span id="guest_quantity">{{ form_data["guest_quantity"] }}</span></div>
+        <div {% if "After School Pottery" in form_data["event_title"] %} class="hide"{% endif %} ><span>Guests: </span><span id="guest_quantity">{{ form_data["guest_quantity"] }}</span></div>
 
       </span>
 

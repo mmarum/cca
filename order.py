@@ -11,11 +11,13 @@ import MySQLdb
 
 domain = "https://www.catalystcreativearts.com"
 
+
 def read_file(file_name):
     f = open(file_name, "r")
     content = f.read()
     f.close()
     return content
+
 
 def write_file(file_name, content):
     f = open(file_name, "w")
@@ -189,6 +191,8 @@ def order(environ, start_response):
             if k == "create_time":
                 vals += f"NOW(),"
             else:
+                if type(v) == str and "'" in v:
+                    v = v.replace("'", "''")
                 vals += f"'{v}',"
 
         sql = f"INSERT INTO orders ({keys.rstrip(',')}) VALUES ({vals.rstrip(',')})"

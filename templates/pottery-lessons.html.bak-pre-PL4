@@ -1,0 +1,177 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Pottery Lessons{% endblock %}
+{% block html_head %}
+
+<style>
+.h2, h2 {
+  font-size: 1.6rem;
+}
+#class-option-box, #submit, #total {
+  display: none;
+}
+#total {
+  padding: 10px;
+}
+#pottery-images {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+@media only screen and (max-width: 600px) {
+  #pottery-images img {
+    width: 200px;
+  }
+}
+#customer_name, #customer_phone {
+  max-width: 400px;
+  margin-bottom: 10px;
+}
+ul {
+  line-height: 180%;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<center id="upcoming_events">
+<h1 class="art-brew">Pottery Lessons</h1>
+</center>
+
+<div id="pottery-images">
+<img src="/img/small/Resized_20200418_125357-01.jpeg">
+<img src="/img/small/20200624_110444-2.jpg">
+<img src="/img/small/20210424_154335-01.jpeg">
+<img src="/img/small/20210622_115227.jpg">
+</div>
+
+<div class="row">
+
+<div class="col-md-6">
+<h3>Private Pottery Wheel Lesson</h3>
+<ul style="padding-left: 12px;">
+<li>Private pottery wheel lessons can be purchased for $100 for a single 90 minute lesson. </li>
+<li>Or $250 for a 6 hour lesson package (split up into 4 days). Lesson 2 thru 4 will be scheduled at the first lesson.</li>
+<li>Lesson choices are designed for 1 person or for 2 people that want to share the lesson. </li>
+<li><span style="color: green; font-weight: bold; background-color: LightGray;">Book one time for up to 2 people</span></li>
+<li>Pottery projects made at lessons will be glazed (painted) at a scheduled date about 2 weeks after the original lesson. </li>
+<li>Students need to wear clothes that can get dirty and <span style="background-color: Yellow;">fingernails must be trimmed no longer than the end of the finger tip.</span></li>
+<li>Recommended for ages 8 and up. </li>
+<li><span style="color: green; font-weight: bold; background-color: LightGray;">24 hour notice required for lesson cancelation or reschedule</span></li>
+</ul>
+</div>
+
+<div class="col-md-6">
+
+<form name="pottery_form" id="pottery_form" action="/checkout/" method="POST">
+
+<div>
+<h3>Choose a date:</h3>
+{% for event in events %}
+  {% if orders_count[event.eid] and orders_count[event.eid] >= event.elimit %}
+    <!-- class purchased already -->
+  {% else %}
+      <div>
+      <input type="radio" id="eid_{{ event.eid }}" name="pottery_lesson" value="{{ event.eid }}" onClick="chooseDate({{ event.eid }})">
+      <label for="eid_{{ event.eid }}" id="eid_{{ event.eid }}_label">{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</label>
+      </div>
+  {% endif %}
+{% endfor %}
+</div>
+
+<div id="class-option-box">
+  <h3>Choose a class type:</h3>
+  <div>
+    <input type="radio" id="class_option_1" name="class_option" value="90 minute lesson @ $100" onClick="chooseType('class_option_1')">
+    <label for="class_option_1" id="class_option_1_id">90 minute lesson @ $100</label>
+  </div>
+  <div>
+    <input type="radio" id="class_option_2" name="class_option" value="6 hour lesson package @ $250" onClick="chooseType('class_option_2')">
+    <label for="class_option_2" id="class_option_2_id">6 hour lesson package @ $250</label>
+
+    <div style="padding-left: 40px; font-size: 11px; margin-top: -10px">
+      6 hour lesson package: <br> Date chosen above will be the first of 4 lessons. <br> The other 3 will be scheduled on first visit.
+    </div>
+
+  </div>
+</div>
+
+<div>
+    <div id="total">
+      <div>
+        <input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control">
+      </div>
+      <div>
+        <input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control">
+      </div>
+      <div>
+        Total: $<span id="subtotal">0</span>
+      </div>
+    </div>
+    <input type="hidden" name="event_title" id="event_title" value="Private Pottery Wheel Lesson">
+    <input type="hidden" name="event_date" id="event_date" value="">
+    <input type="hidden" name="guest_quantity" id="guest_quantity" value="1">
+    <input type="hidden" name="total_cost" id="total_cost" value="">
+    <input type="hidden" name="event_id" id="event_id" value="">
+    <input type="hidden" name="variable_price" id="variable_price" value="">
+    <input type="hidden" name="additional_scarf" id="additional_scarf" value="">
+    <input type="submit" name="submit" id="submit" value="Proceed to checkout" class="btn btn-warning" onclick="spin();">
+</div>
+
+</form>
+
+</div><!-- close div col-md-6 -->
+</div><!-- close row -->
+
+<script>
+function spin() {
+  document.getElementById("submit").value = "Processing...";
+  document.getElementById("submit").style.backgroundColor = "yellow";
+  return true;
+}
+
+function chooseDate(eid) {
+  document.getElementById("class-option-box").style.display = "block";
+  location.href='#class-option-box';
+  document.getElementById("event_id").value = eid;
+  event_date = document.getElementById("eid_" + eid + "_label").innerHTML;
+  document.getElementById("event_date").value = event_date;
+}
+
+function chooseType(choice) {
+  document.getElementById("submit").style.display = "block";
+  document.getElementById("total").style.display = "block";
+  var class_price = getFormChoices()["class_price"];
+  document.getElementById("subtotal").innerHTML = class_price;
+  document.getElementById("total_cost").value = class_price;
+  class_option = document.getElementById(choice + "_id").innerHTML;
+  document.getElementById("variable_price").value = class_option;
+  location.href='#submit';
+}
+
+function getFormChoices() {
+  var event_id = document.getElementById("pottery_form").pottery_lesson.value;
+  var class_option = document.getElementById("pottery_form").class_option.value;
+  var customer_name = document.getElementById("pottery_form").customer_name.value;
+  var customer_phone = document.getElementById("pottery_form").customer_phone.value;
+  if (class_option == '90 minute lesson @ $100') {
+    var class_price = 100;
+  } else {
+    var class_price = 250;
+  }
+  return { "event_id": event_id, "class_price": class_price, "customer_name": customer_name, "customer_phone": customer_phone }
+}
+
+function getCcaOrderId() {
+  epoch_time = new Date().getTime();
+  random_num = Math.floor((Math.random() * 100000) + 10000);
+  return String(epoch_time) + "_" + String(random_num);
+}
+
+var cca_order_id = getCcaOrderId();
+
+</script>
+{% endblock %}

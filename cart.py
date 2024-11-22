@@ -48,11 +48,14 @@ def cart_api(environ, start_response):
     if environ['PATH_INFO'] == "/add":
         product_id = int(input_list["product_id"])
         quantity = int(input_list["quantity"])
+        print("product_id", product_id)
+        print("quantity", quantity)
         try:
             db.query(f"SELECT cart_order_id FROM cart_order WHERE session_id = '{session_id}' and status is NULL")
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             cart_order_id = row["cart_order_id"]
+            print("part-AAA")
         except:
             fields = "session_id, create_date"
             vals = [session_id, time_now]
@@ -64,17 +67,21 @@ def cart_api(environ, start_response):
             r = db.store_result()
             row = r.fetch_row(maxrows=1, how=1)[0]
             cart_order_id = row["cart_order_id"]
+            print("part-BBB")
+
         db.query(f"SELECT count(quantity) as count from cart_order_product \
             WHERE cart_order_id = {cart_order_id} and product_id = {product_id}")
         r = db.store_result()
         row = r.fetch_row(maxrows=1, how=1)[0]
         count = int(row["count"])
+
         if count > 0:
             sql = f"UPDATE cart_order_product SET quantity = {quantity} \
                 WHERE cart_order_id = {cart_order_id} and product_id = {product_id}"
             c = db.cursor()
             c.execute(sql)
             c.close()
+            print("part-CCC")
         else:
             fields = "cart_order_id, product_id, quantity"
             vals = [cart_order_id, product_id, quantity]
@@ -82,6 +89,8 @@ def cart_api(environ, start_response):
             c = db.cursor()
             c.execute(sql, vals)
             c.close()
+            print("part-DDD")
+
         response = f"{cart_order_id} {session_id} {product_id} {quantity} {time_now}"
 
 

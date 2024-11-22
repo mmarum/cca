@@ -93,6 +93,12 @@
 
 </div>
 
+{% if filter_word %}
+<center>
+	<h2 style="padding-bottom: 20px;">{{ filter_word.title() }}</h2>
+</center>
+{% endif %}
+
 {#
 
 {% for product in products %}
@@ -150,17 +156,15 @@
 
       {% if product.inventory <= 0 %}
 
-      <!--
 
       <div>
           <img src="/img/small/{{ image_array[1] }}" alt="" class="product_image_2"/>
       </div>
 
       <div class="product_name_box">
-          {{ product.name }} Sold out
+          "{{ product.name }}" SOLD
       </div>
 
-      -->
 
       {% else %}
 

@@ -96,7 +96,7 @@ class SignupForm(Form):
     page_path = StringField("page_path", description="page_path")
     create_date = HiddenField("create_date", description="create_date")
     create_date_epoch = HiddenField("create_date_epoch", description="create_date_epoch")
-    #rid = f"{page_path}_create_date_epoch{}"
+    single_day_event = RadioField('single_day_event', choices=[('true','true'),('false','false')], description="single_day_event")
     fields = StringField("fields", description="fields")
     status = StringField("status", description="status")
     submit = SubmitField("submit", description="submit")

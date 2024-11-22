@@ -44,6 +44,8 @@ def get_intent(form_data):
 
     if "Art Camp Registration" in event_title:
         calculated_amount = calculate_reg_amount(form_data)
+    elif "After School Pottery" in event_title:
+        calculated_amount = calculate_asp_amount(form_data)
     else:
         calculated_amount = calculate_order_amount(form_data)
 
@@ -80,6 +82,16 @@ def calculate_reg_amount(form_data):
     elif guest_quantity == 3:
         return int(650 * 100)
 
+
+def calculate_asp_amount(form_data):
+    guest_quantity = int(form_data["guest_quantity"])
+    print("guest_quantity", guest_quantity)
+    total_cost = int(form_data["total_cost"])
+    print("total_cost", total_cost)
+    cost_check = guest_quantity * 1 # 35
+    print("cost_check", cost_check)
+    if cost_check == total_cost:
+        return int(total_cost * 100) # Stripe counts by cents
 
 
 def calculate_order_amount(form_data):
@@ -181,10 +193,13 @@ def filter_form_data(environ):
             temp = item.split("=")
             name = temp[0]
             value = unquote(temp[1].replace("+", " "))
-            if value != "":
-                if "a href=" in value:
-                    value = clean_href(value)
-                form_data[name] = value
+            if value == "":
+                continue
+            if "a href=" in value:
+                value = clean_href(value)
+            #if name == "multiple_events_details":
+            #    print("multiple_events_details", type(value), value)
+            form_data[name] = value
 
         # HTML FORM REQUIREMENTS:
         # event_id, event_title, event_date, guest_quantity

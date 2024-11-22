@@ -21,16 +21,17 @@ upcoming = [f"event/{x}" for x in upcoming_event_ids]
 
 groups = {
 "pages": [
-    "home",
+    "index",
     "calendar",
     "private-events", 
+    "specialty-classes",
     "gift-card", 
     #"about-contact", 
     "about-us", 
     "media",
     #"reviews",
     #"custom-built",
-    #"after-school",
+    "after-school",
     #"summer-camp",
     "art-camp",
     "wheel-wars",
@@ -41,7 +42,10 @@ groups = {
     "crafts-gallery",
     "listening-room",
     "pottery-lessons",
-    "community-events"
+    "after-school-pottery",
+    #"pottery-lessons-test",
+    "community-events",
+    "mural-2024"
   ],
 "galleries": [
     "commissioned-art",
@@ -69,7 +73,7 @@ sitemap_pages = groups["pages"]
 sitemap_galleries = groups["galleries"]
 sitemap_events = groups["events"]
 sitemap_list = sitemap_pages + sitemap_galleries + sitemap_events
-sitemap_list.remove('home')
+#sitemap_list.remove('home')
 sitemap_list.remove('cart')
 sitemap_list.remove('build-individual-event')
 sitemap_list.insert(0, '')
