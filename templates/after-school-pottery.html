@@ -46,9 +46,15 @@
   padding-bottom: 10px;
   margin-bottom: 10px;
 }
+#pottery-images img {
+  max-width: 200px;
+}
 @media only screen and (max-width: 600px) {
   #pottery-images img {
     width: 200px;
+  }
+  label {
+    display: inline;
   }
 }
 #customer_name, #customer_phone {
@@ -80,10 +86,13 @@ ul {
 </center>
 
 <div id="pottery-images">
-	<!--
-<img src="/img/small/20210424_154335-01.jpeg">
-<img src="/img/small/20210622_115227.jpg">
-	-->
+<img src="/img/after-school-pottery-1a.jpg">
+<img src="/img/after-school-pottery-1b.jpg">
+<img src="/img/after-school-pottery-1c.jpg">
+<!-- <img src="/img/after-school-pottery-1d.jpg"> -->
+<img src="/img/after-school-pottery-1e.jpg">
+<img src="/img/after-school-pottery-1f.jpg">
+<img src="/img/after-school-pottery-1g.jpg">
 </div>
 
 <div class="row">
@@ -191,7 +200,7 @@ function chooseWeek(eid) {
 function chooseGuests(eid) {
   document.getElementById("recap").style.display = "block";
   var week_number_of_guests = document.getElementById("choose-guests-select-" + eid).value
-  var week_subtotal = week_number_of_guests * 1; // 35
+  var week_subtotal = week_number_of_guests * 35;
   calculate_subtotal();
 }
 
@@ -224,9 +233,10 @@ function calculate_subtotal() {
       guest_count_list.push(this_guest_count);
       event_dates_list.push(this_event_date);
       event_titles_list.push(this_event_title);
-      weekly_subtotal = this_guest_count * 1; // 35
-      event_details_json_str += '{"event_id": ' + this_event_id + ', "guest_count": ' + this_guest_count + ', "event_date": "' + this_event_date + '", "event_title": "' + this_event_title + '"},';
-      event_details_string += this_event_date + " " + this_event_title.replace("Weekly Wednesday Afterschool Pottery Class", "") + " " + this_guest_count + " guests week subtotal " + weekly_subtotal + "<br>";
+      weekly_subtotal = this_guest_count * 35;
+      this_event_title = this_event_title.replace("Weekly Wednesday Afterschool Pottery Class", "");
+      event_details_json_str += '{"event_id": ' + this_event_id + ', "guest_count": ' + this_guest_count + '"},';
+      event_details_string += this_event_date + ", " + this_event_title + ", " + this_guest_count + " guests, week subtotal: " + weekly_subtotal + "<br>";
     }
 
   }
@@ -234,7 +244,7 @@ function calculate_subtotal() {
   var event_details_json_str =  event_details_json_str.replace(/,$/, "") + "]";
 
   console.log(event_details_json_str);
-  var subtotal = overall_guest_count * 1; // 35
+  var subtotal = overall_guest_count * 35;
   document.getElementById("multiple_events_details").value = event_details_json_str;
   document.getElementById("subtotal").innerHTML = subtotal;
   document.getElementById("total_cost").value= subtotal;
