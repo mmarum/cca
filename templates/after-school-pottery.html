@@ -86,32 +86,30 @@ ul {
 </center>
 
 <div id="pottery-images">
-<img src="/img/after-school-pottery-1a.jpg">
-<img src="/img/after-school-pottery-1b.jpg">
-<img src="/img/after-school-pottery-1c.jpg">
-<!-- <img src="/img/after-school-pottery-1d.jpg"> -->
-<img src="/img/after-school-pottery-1e.jpg">
-<img src="/img/after-school-pottery-1f.jpg">
-<img src="/img/after-school-pottery-1g.jpg">
+<img src="/img/after-school-pottery-2a.jpg">
+<img src="/img/after-school-pottery-2b.jpg">
+<img src="/img/after-school-pottery-2c.jpg">
+<img src="/img/after-school-pottery-2d.jpg">
+<img src="/img/pottery-promo-2024-1.jpg">
 </div>
 
 <div class="row">
 
 <div class="col-md-12">
 
-<form name="pottery_form" id="pottery_form" action="/checkout/" method="POST">
-
-	<!-- the following three are to satisfy the /checkout/ requirement -->
-	<input type="hidden" name="event_id" id="event_id" value="N/A">
-	<input type="hidden" name="event_date" id="event_date" value="N/A">
-	<input type="hidden" name="event_title" id="event_title" value="After School Pottery">
-        <input type="hidden" id="guest_quantity" name="guest_quantity" value="0">
-        <input type="hidden" id="event_details_string" name="event_details_string" value="">
-
-	<p>Price: $35 per guest.</p>
-	<p>Choose at least one class from the following list:</p>
+  <form name="pottery_form" id="pottery_form" action="/checkout/" method="POST">
+  <!-- the following three are to satisfy the /checkout/ requirement -->
+  <input type="hidden" name="event_id" id="event_id" value="N/A">
+  <input type="hidden" name="event_date" id="event_date" value="N/A">
+  <input type="hidden" name="event_title" id="event_title" value="After School Pottery">
+  <input type="hidden" id="guest_quantity" name="guest_quantity" value="0">
+  <input type="hidden" id="event_details_string" name="event_details_string" value="">
 
 {% for event in events %}
+
+  {% if loop.index == 1 %}
+    <p>{{ event.description }}</p>
+  {% endif %}
 
   {% if orders_count[event.eid] and orders_count[event.eid] >= event.elimit %}
     <!-- class reached limit already -->

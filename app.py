@@ -771,6 +771,7 @@ def app(environ, start_response):
             registration_config_data = {}
             registration_config_files = [f for f in listdir("../registration/config/") if isfile(join("../registration/config/", f))]
             for config_file in registration_config_files:
+                print("config_file", config_file)
                 config_file_contents = json.loads(read_file(f"../registration/config/{config_file}"))
                 epoch_date = config_file_contents["create_date_epoch"]
                 registration_config_data[epoch_date] = config_file_contents
@@ -786,7 +787,7 @@ def app(environ, start_response):
                 special = "AND order_id is not NULL"
                 orderby = "session_detail"
 
-            db.query(f"SELECT * FROM registration where session_detail LIKE '%2024%' {special} ORDER BY {orderby}")
+            db.query(f"SELECT * FROM registration where session_detail LIKE '%2025%' {special} ORDER BY {orderby}")
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 

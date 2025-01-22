@@ -1,6 +1,6 @@
 {% extends "base-site.html" %}
 
-{% block title %}Catalyst Creative Arts: Art Camp 2024 Registration{% endblock %}
+{% block title %}Catalyst Creative Arts: Art Camp 2025 Registration{% endblock %}
 
 {% block html_head %}
 <style>
@@ -33,14 +33,14 @@ h3, h5 {
 {% block content %}
 
 <center>
-<h3>Art Camp 2024 Registration & Release Form</h3>
+<h3>Art Camp 2025 Registration & Release Form</h3>
 </center>
 
 {% if form %}
   {% if form.session_detail.data %}
-    {% set session_name = form.session_detail.data %}
+    {% set session_detail = form.session_detail.data %}
   {% elif session_detail %}
-    {% set session_name = session_detail %}
+    <!-- do nothing -->
   {% else %}
     <p style="background-color: red; color: white; padding: 10px; margin: 100px; 0 100px 0;">
       ERROR: (A) You must <a href="/art-camp.html" style="color: white;">choose a specific art camp</a>
@@ -48,9 +48,9 @@ h3, h5 {
   {% endif %}
 {% elif data and rid %}
   {% if data["session_detail"] %}
-    {% set session_name = data["session_detail"] %}
+    {% set session_detail = data["session_detail"] %}
   {% elif session_detail %}
-    {% set session_name = session_detail %}
+    <!-- do nothing -->
   {% else %}
     <p style="background-color: red; color: white; padding: 10px; margin: 100px; 0 100px 0;">
       ERROR: (B) You must <a href="/art-camp.html" style="color: white;">choose a specific art camp</a>
@@ -62,58 +62,48 @@ h3, h5 {
 
 <div id="session_detail_box">
 
-{% if session_detail == "art_camp_2024_oakridge" %}
-{% set camper_max = 8 %}
-{% else %}
-{% set camper_max = 16 %}
-{% endif %}
+{% set camper_max = 20 %}
 
 {% if camper_count and camper_count >= camper_max %}
+
   CLASS IS FULL
   <script>var class_full = true;</script>
-{% elif session_name == "art_camp_2024_1" or session_name == "art_camp_2024_2" or session_name == "art_camp_2024_4" or session_name == "art_camp_2024_8" %}
-  CLASS IS CLOSED
-  <script>var class_full = true;</script>
+
 {% else %}
+
   <p><b>
-
-  "Art Camp {{ session_name|replace("art_camp_2024_", "") }}"
-
-  {% if session_name == "art_camp_2024_2" or session_name == "art_camp_2024_5" or session_name == "art_camp_2024_8" or session_name == "art_camp_2024_oakridge" %}
+  "Art Camp {{ session_detail|replace("art-camp-2025-", "") }}"
+  {% if session_detail == "art-camp-2025-2" 
+      or session_detail == "art-camp-2025-5" 
+      or session_detail == "art-camp-2025-7" %}
     Ages 11 and up
   {% else %}
     Ages 6 and up
   {% endif %}
-
   </b></p>
 
   <p>Begins
-    {% if session_name == "art_camp_2024_1" %}
-    June 3-7
-    {% elif session_name == "art_camp_2024_2" %}
-    June 10-14
-    {% elif session_name == "art_camp_2024_3" %}
-    June 17-21
-    {% elif session_name == "art_camp_2024_4" %}
-    June 24-28
-    {% elif session_name == "art_camp_2024_5" %}
-    July 8-12
-    {% elif session_name == "art_camp_2024_6" %}
-    July 15-19
-    {% elif session_name == "art_camp_2024_7" %}
-    July 22-26
-    {% elif session_name == "art_camp_2024_8" %}
-    July 29 - Aug 2
-    {% elif session_name == "art_camp_2024_oakridge" %}
-    June 24-28 1:30pm
+    {% if session_detail == "art-camp-2025-1" %}
+    Jun 9-13
+    {% elif session_detail == "art-camp-2025-2" %}
+    Jun 16-20
+    {% elif session_detail == "art-camp-2025-3" %}
+    Jun 23-27
+    {% elif session_detail == "art-camp-2025-4" %}
+    Jul 7-11
+    {% elif session_detail == "art-camp-2025-5" %}
+    Jul 14-18
+    {% elif session_detail == "art-camp-2025-6" %}
+    Jul 21-25
+    {% elif session_detail == "art-camp-2025-7" %}
+    Jul 28 - Aug 1
+    {% elif session_detail == "art-camp-2025-8" %}
+    Aug 4-8
     {% endif %}
   </p>
 
-  {% if session_name == "art_camp_2024_oakridge" %}
-    <p>DAILY 1:30pm-4:40pm</p>
-  {% else %}
-    <p>DAILY 8:30am-9am drop off, 9am Start, 12pm Finish, 12pm-12:30pm pick up</p>
-  {% endif %}
+    <p>Monday-Friday, 9am-12pm (drop off as early as 8:30am and pick up as late as 12:30pm)</p>
+    <p>Water and a light snack provided daily. Students may also bring their own.</p>
 
   <p><span style="background-color: Beige; padding: 10px;">{% if camper_count %}{{ camper_max - camper_count }}{% else %}{{ camper_max }}{% endif %} (of {{ camper_max }}) spots left</span></p>
 
@@ -138,26 +128,24 @@ h3, h5 {
 
 <input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
 
-<input type="hidden" name="event_title" value="Art Camp Registration 2024">
+<input type="hidden" name="event_title" value="Art Camp Registration 2025">
 
-{% if session_name == "art_camp_2024_1" %}
-  <input type="hidden" name="event_date" value="June 3-7 2024">
-{% elif session_name == "art_camp_2024_2" %}
-  <input type="hidden" name="event_date" value="June 10-14 2024">
-{% elif session_name == "art_camp_2024_3" %}
-  <input type="hidden" name="event_date" value="June 17-21 2024">
-{% elif session_name == "art_camp_2024_4" %}
-  <input type="hidden" name="event_date" value="June 24-28 2024">
-{% elif session_name == "art_camp_2024_5" %}
-  <input type="hidden" name="event_date" value="July 8-12 2024">
-{% elif session_name == "art_camp_2024_6" %}
-  <input type="hidden" name="event_date" value="July 15-19 2024">
-{% elif session_name == "art_camp_2024_7" %}
-  <input type="hidden" name="event_date" value="July 22-26 2024">
-{% elif session_name == "art_camp_2024_8" %}
-  <input type="hidden" name="event_date" value="July 29 - Aug 2 2024">
-{% elif session_name == "art_camp_2024_oakridge" %}
-  <input type="hidden" name="event_date" value="June 24-28 2024 1:30pm">
+{% if session_detail == "art-camp-2025-1" %}
+  <input type="hidden" name="event_date" value="June 9-13 2025">
+{% elif session_detail == "art-camp-2025-2" %}
+  <input type="hidden" name="event_date" value="June 16-20 2025">
+{% elif session_detail == "art-camp-2025-3" %}
+  <input type="hidden" name="event_date" value="June 23-27 2025">
+{% elif session_detail == "art-camp-2025-4" %}
+  <input type="hidden" name="event_date" value="July 7-11 2025">
+{% elif session_detail == "art-camp-2025-5" %}
+  <input type="hidden" name="event_date" value="July 14-18 2025">
+{% elif session_detail == "art-camp-2025-6" %}
+  <input type="hidden" name="event_date" value="July 21-25 2025">
+{% elif session_detail == "art-camp-2025-7" %}
+  <input type="hidden" name="event_date" value="July 28 - August 1 2025">
+{% elif session_detail == "art-camp-2025-8" %}
+  <input type="hidden" name="event_date" value="August 4-8 2025">
 {% endif %}
 
 <!-- TAKE EMAIL OFF THE PAGE CUZ CC PAGE COLLECTS IT -->
@@ -229,7 +217,7 @@ h3, h5 {
 
 <!-- BELOW IS THE INITIAL AND EDIT SCREEN -->
 
-<form action="/registration/{{ registration_name }}/confirm" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
+<form action="/registration/{{ camp_type }}/{{ session_detail }}/confirm" method="POST" enctype="text/plain" name="registration_form" id="registration_form">
 {{ form.rid }}
 {{ form.session_detail }}
 
@@ -437,7 +425,7 @@ if (page == "confirm") {
 }
 
 function edit() {
-  document.registration_form.action = "/registration/{{ registration_name }}/edit";
+  document.registration_form.action = "/registration/{{ camp_type }}/{{ session_detail }}/edit";
   document.registration_form.submit();
   return true;
 }

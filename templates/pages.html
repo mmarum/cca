@@ -22,6 +22,47 @@ h5 {
     margin-top: 166px;
   }
 }
+
+hr {
+	margin: 20px;
+}
+.specialty_column {
+  float: left;
+  width: 50%;
+}
+.specialty_row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.column_s {
+  float: left;
+  width: 33.3%;
+  padding: 10px;
+  margin: 10px;
+}
+
+.row_s:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media screen and (max-width: 600px) {
+  .column_s {
+    width: 100%;
+  }
+}
+
+.specialty-image {
+  width: 300px;
+}
+
 </style>
 
 {% endblock %}
