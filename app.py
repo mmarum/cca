@@ -752,17 +752,19 @@ def app(environ, start_response):
                 response = template.render(pages=pages)
 
 
-        elif environ['PATH_INFO'] == '/admin/signups':
-            signup_path = "../registration/data/"
+        elif environ['PATH_INFO'] == '/admin/signup':
+            #signup_path = "../registration/data/"
             signup_data = {}
-            signup_files = [f for f in listdir(signup_path) if isfile(join(signup_path, f))]
-            for signup_file in signup_files:
-                if not signup_file.endswith("json"):
-                    continue
-                signup_contents = json.loads(read_file(f"{signup_path}{signup_file}"))
-                signup_key = signup_file.replace(".json", "")
-                signup_data[signup_key] = signup_contents
-            template = env.get_template("admin-signups-list.html")
+            #signup_files = [f for f in listdir(signup_path) if isfile(join(signup_path, f))]
+            #for signup_file in signup_files:
+            #    if not signup_file.endswith("json"):
+            #        continue
+            signup_path = "../signup/data/"
+            signup_file = "wheel-wars-2025.json" # temporary: will expand when we get other signups going
+            signup_contents = json.loads(read_file(f"{signup_path}{signup_file}"))
+            signup_key = signup_file.replace(".json", "")
+            signup_data[signup_key] = signup_contents
+            template = env.get_template("admin-signup-list.html")
             response = template.render(signup_data=signup_data)
 
 

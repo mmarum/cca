@@ -1,0 +1,35 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin View Signup{% endblock %}
+
+{% block html_head %}
+<style>
+td, th {
+  padding: 10px;
+  border: 1px dashed LightGray;
+}
+th {
+  background-color: LightGray;
+  border: 1px dashed White;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h1>Signups</h1>
+
+{% for signup_name, signup_items in signup_data.items()  %}
+
+  <h3>{{ signup_name }}</h3>
+
+  {% for item_dict in signup_items %}
+    <p>
+    {% for key, val in item_dict.items() %}
+      <b>{{ key }}</b>: {{ val }}<br>
+    {% endfor %}
+    </p>
+  {% endfor %}
+
+{% endfor %}
+
+{% endblock %}
