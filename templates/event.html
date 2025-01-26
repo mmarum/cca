@@ -208,7 +208,7 @@ select, input {
     {% endif %}
     {# REGULAR EVENT END #}
 
-    {% if "Wheel Wars" not in event.title and "Paint Wars" not in event.title %}
+    {% if "wheel wars" not in event.title.lower() and "paint wars" not in event.title.lower() %}
     <input type="text" id="customer_name" name="customer_name" placeholder="Your name" required class="form-control">
     <input type="tel" id="customer_phone" name="customer_phone" placeholder="Your phone" required class="form-control">
 
@@ -272,10 +272,10 @@ select, input {
     <input type="hidden" name="event_id" id="event_id" value="{{ event.eid }}">
 
 
-    {% if "community-event" in event.tags %}
-      {% if "Wheel Wars" in event.title %}
+    {% if "community-event" in event.tags or "wheel wars" in event.title.lower() or "paint pars" in event.title.lower() %}
+      {% if "wheel wars" in event.title.lower() %}
         <input type="submit" name="submit" id="register" value="Get details & register" class="btn btn-warning" onclick="register();">
-      {% elif "Paint Wars" in event.title %}
+      {% elif "paint pars" in event.title.lower() %}
 	<button type="button" class="btn btn-success" onclick="location.href='/paint-wars.html'" style="display: block; margin: 20px;">See Paint Wars details and register</button>
       {% else %}
         <input type="submit" name="submit" id="signup" value="Sign Up" class="btn btn-warning" onclick="signup();">
@@ -297,7 +297,7 @@ select, input {
 
 <script>
 {% if "community-event" in event.tags %}
-  {% if "Wheel Wars" in event.title %}
+  {% if "wheel wars" in event.title.lower() %}
     document.quantity_form.action = "/wheel-wars.html";
   {% else %}
     document.quantity_form.action = "/signup/{{ event.eid }}";

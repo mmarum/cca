@@ -11,74 +11,6 @@ source /home/catalystcreative/virtualenv/app/3.6/bin/activate; cd /home/catalyst
 
 domain = "https://www.catalystcreativearts.com"
 
-# TODO: the lists below need to be de-duped or automated
-
-f = open("data/upcoming_event_ids.json", "r")
-upcoming_event_ids = json.loads(f.read())
-f.close()
-
-upcoming = [f"event/{x}" for x in upcoming_event_ids]
-
-groups = {
-"pages": [
-    "index",
-    "calendar",
-    "private-events", 
-    "specialty-classes",
-    "gift-card", 
-    #"about-contact", 
-    "about-us", 
-    "media",
-    #"reviews",
-    #"custom-built",
-    "after-school",
-    #"summer-camp",
-    "art-camp",
-    "wheel-wars",
-    "paint-wars",
-    "3-wednesdays-workshop",
-    "cart",
-    "build-individual-event",
-    "crafts-gallery",
-    "listening-room",
-    "pottery-lessons",
-    "after-school-pottery",
-    #"pottery-lessons-test",
-    "community-events",
-    "mural-2024"
-  ],
-"galleries": [
-    "commissioned-art",
-    "acrylic-painting",
-    "watercolor-painting",
-    "paint-your-pet",
-    "artist-guided-family-painting",
-    #"alcohol-ink",
-    "fluid-art",
-    "handbuilt-pottery",
-    "paint-your-own-pottery",
-    "fused-glass",
-    "leathercraft",
-    "resin-crafts",
-    "water-marbling",
-    "specialty-classes",
-    "pottery-painting",
-    "string-art",
-    "pottery-lessons"
-  ],
-"events": upcoming
-}
-
-sitemap_pages = groups["pages"]
-sitemap_galleries = groups["galleries"]
-sitemap_events = groups["events"]
-sitemap_list = sitemap_pages + sitemap_galleries + sitemap_events
-#sitemap_list.remove('home')
-sitemap_list.remove('cart')
-sitemap_list.remove('build-individual-event')
-sitemap_list.insert(0, '')
-#print("sitemap_list", sitemap_list)
-
 
 def read_file(file_name):
     f = open(file_name, "r")
@@ -91,8 +23,26 @@ def write_file(file_name, content):
     f = open(file_name, "w")
     f.write(content)
     f.close()
-    return True
 
+
+valid_pages = json.loads(read_file("data/valid-pages.json"))
+valid_galleries = json.loads(read_file("data/valid-galleries.json"))
+upcoming_event_ids = json.loads(read_file("data/upcoming_event_ids.json"))
+upcoming = [f"event/{x}" for x in upcoming_event_ids]
+
+groups = {
+    "pages": valid_pages,
+    "galleries": valid_galleries,
+    "events": upcoming
+}
+
+sitemap_pages = groups["pages"]
+sitemap_galleries = groups["galleries"]
+sitemap_events = groups["events"]
+sitemap_list = sitemap_pages + sitemap_galleries + sitemap_events
+sitemap_list.remove('cart')
+sitemap_list.remove('build-individual-event')
+sitemap_list.insert(0, '')
 
 sitemap_content = ""
 for x in sitemap_list:
@@ -101,7 +51,6 @@ for x in sitemap_list:
     else:
         sitemap_content += f"{domain}/{x}.html\n"
 write_file("../www/sitemap.txt", sitemap_content)
-#print("sitemap_content\n", sitemap_content)
 
 
 user = "catalystcreative"

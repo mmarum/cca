@@ -3,8 +3,11 @@
 
 {% block html_head %}
 <style>
-input, textarea, label, button {
-  margin: 10px;
+input, textarea, button {
+  margin: 5px 10px 5px 10px;
+}
+label {
+  margin: 15px 0 0 15px;
 }
 textarea.form-control {
   height: 100px;
@@ -20,7 +23,9 @@ textarea.form-control {
   margin: 10px;
   border-radius: 5px;
 }
-
+small {
+  margin-left: 15px;
+}
 </style>
 <!-- https://jqueryui.com/datepicker/ -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -113,6 +118,8 @@ function appendTime() {
 
     {% if field.name == "title" %}
       <small id="title_note" class="form-text text-muted">Add "private event" anywhere in title for unlisted events; Other keywords: Studio closed, scarf, gift card, wheel wars</small>
+    {% elif field.name == "elimit" %}
+      <small id="title_note" class="form-text text-muted">Max number of guests. If left at zero, no checkout options OR BUTTONS will be shown</small>
     {% elif field.name == "price_text" %}
       <small id="price_text_notes" class="form-text-muted">Example price_text: 16 x 20 inch canvas @ $45, 18 x 24 inch canvas @ $65</small>
     {% elif field.name == "tags" %}
