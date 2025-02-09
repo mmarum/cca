@@ -109,6 +109,11 @@ select, input {
     <p id="location">Location: {{ event.location }}</p>
 
 
+    {% if event.price|int == 0 %}
+      Price: FREE
+    {% endif %}
+
+
     {% if event.elimit != 0 %}
 
 
@@ -387,7 +392,7 @@ function getSubtotal() {
 
 
 function checkTime(edatetime) {
-  var d = edatetime * 10000; // 1000
+  var d = edatetime * 1000;
   var n = Date.now();
   var dd = new Date(d);
   var nn = new Date(n);

@@ -1,0 +1,55 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin View Guests{% endblock %}
+
+{% block html_head %}
+{% endblock %}
+
+{% block content %}
+
+<h1>Guests</h1>
+
+<p><a href="#registration">Registration (camps)</a> | <a href="#signup">Signup (wars)</a></p>
+
+<h5 id="registration">Registration</h5>
+
+<table class="table table-striped">
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Phone</th>
+</tr>
+{% for session, guest_list in registration_data.items() %}
+<tr><th colspan=3><span style="background-color: Orange; padding: 5px">{{ session }}</span></th></tr>
+{% for guest in guest_list %}
+<tr>
+<td>{{ guest[0] }}</td>
+<td>{{ guest[1] }}</td>
+<td>{{ guest[2] }}</td>
+</tr>
+{% endfor %}
+{% endfor %}
+</table>
+
+<hr style="padding: 20px">
+
+<h5 id="signup">Signup</h5>
+
+{% for signup_name, signup_row in signup_data.items() %}
+
+<h6 style="background-color: LightGray;">{{ signup_name }}</h6>
+
+{% for guest_row in signup_row %}
+
+<p>
+{% for k, v in guest_row.items() %}
+{% if "name" in k or "phone" in k or "email" in k or "title" in k %}
+<b>{{ k }}:</b> {{ v.replace("%40", "@").replace("%3A", ":").replace("%21", "!").replace("%28", "(").replace("%29", ")").replace("%2B", "+").replace("%3B", ";").replace("%3A", ":").replace("%2F", "/") }}<br>
+{% endif %}
+{% endfor %}
+</p>
+
+{% endfor %}
+
+{% endfor %}
+
+{% endblock %}

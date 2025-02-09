@@ -1,0 +1,121 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin View Registration{% endblock %}
+
+{% block html_head %}
+<style>
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1350px;
+  }
+}
+td {
+  padding: 10px;
+  border-right: 1px dashed LightGray;
+}
+.tr_regs {
+  border: 1px dashed LightGray;
+}
+.tr_divider {
+  height: 50px;
+}
+.new_title {
+  background-color: Khaki;
+  padding: 5px;
+  margin: 5px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h1>Registration</h1>
+
+<table>
+
+<tr>
+  <td colspan="4">
+    <div id="add_new_link"><a href="/app/admin/registration/add-edit">+</a></div>
+  </td>
+</tr>
+
+<tr style="background-color: LightGray;">
+  <td>Camper</td>
+  <td>Parent</td>
+  <td>Pickup</td>
+  <td>Order</td>
+</tr>
+
+{% for camp, regs in new_reg_dict.items() %}
+
+<tr>
+  <td colspan="3"><span class="new_title"><b>
+
+    {% if camp == "art-camp-2025-1" %}
+    June 9-13
+    {% elif camp == "art-camp-2025-2" %}
+    June 16-20
+    {% elif camp == "art-camp-2025-3" %}
+    June 23-27
+    {% elif camp == "art-camp-2025-4" %}
+    July 7-11
+    {% elif camp == "art-camp-2025-5" %}
+    July 14-18
+    {% elif camp == "art-camp-2025-6" %}
+    July 21-25
+    {% elif camp == "art-camp-2025-7" %}
+    July 28 - Aug 1
+    {% elif camp == "art-camp-2025-8" %}
+    Aug 4-8
+    {% endif %}
+
+  </b> {{ camp }}</td>
+</tr>
+
+{% for reg in regs %}
+  <tr class="tr_regs">
+    <td>
+	{{ reg["camper1_name"] }}
+	{{ reg["camper1_age"] }}
+	{% if reg["camper2_name"] %}<br> {{ reg["camper2_name"] }} {% endif %}
+	{% if reg["camper2_age"] and reg["camper2_age"] != 0 %} {{ reg["camper2_age"] }} {% endif %}
+	{% if reg["camper3_name"] %}<br> {{ reg["camper3_name"] }} {% endif %}
+	{% if reg["camper3_age"] and reg["camper3_age"] != 0 %} {{ reg["camper3_age"] }} {% endif %}
+    </td>
+    <td>
+        {{ reg["parent_name"] }}<br>
+        {{ reg["parent_address"] }}
+        {{ reg["parent_city"] }}
+        {{ reg["parent_state"] }}
+        {{ reg["parent_zip"] }}<br>
+        {{ reg["parent_email"] }}<br>
+        {{ reg["parent_phone"] }}
+    </td>
+    <td>
+        {{ reg["parent_em_name"] }}
+        {{ reg["parent_em_phone"] }}<br>
+        {{ reg["pickup1_name"] }}
+        {{ reg["pickup1_phone"] }}<br>
+        {{ reg["pickup2_name"] }}
+        {{ reg["pickup2_phone"] }}
+    </td>
+    <td>
+
+    {% set order_id = reg["order_id"] %}
+    {% if order_id.startswith("pi_") %}
+      <a href="https://dashboard.stripe.com/payments/{{ order_id }}" target="_blank">{{ order_id }}</a>
+    {% else %}
+      {{ order_id }}
+    {% endif %}
+
+    </td>
+  </tr>
+{% endfor %}
+
+<tr class="tr_divider">
+  <td colspan="3"></td>
+</tr>
+
+{% endfor %}
+</table>
+
+{% endblock %}

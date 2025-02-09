@@ -169,18 +169,6 @@ def app(environ, start_response):
             response = template.render(form=form, children=children)
 
 
-        elif environ['PATH_INFO'] == '/admin/registration/add-edit':
-            if len(environ['QUERY_STRING']) > 1:
-                rid = environ['QUERY_STRING'].split("=")[1]
-                config_file_contents = json.loads(read_file(f"../registration/config/{rid}.json"))
-                form = SignupForm(**config_file_contents)
-            else:
-                form = SignupForm()
-            template = env.get_template("admin-registration-add-edit.html")
-            response = template.render(form=form)
-
-
-
         elif environ['PATH_INFO'] == "/admin/events/delete":
             eid = int(environ['QUERY_STRING'].split("=")[1])
             if type(eid) == int:
@@ -753,12 +741,7 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/signup':
-            #signup_path = "../registration/data/"
             signup_data = {}
-            #signup_files = [f for f in listdir(signup_path) if isfile(join(signup_path, f))]
-            #for signup_file in signup_files:
-            #    if not signup_file.endswith("json"):
-            #        continue
             signup_path = "../signup/data/"
             signup_file = "wheel-wars-2025.json" # temporary: will expand when we get other signups going
             signup_contents = json.loads(read_file(f"{signup_path}{signup_file}"))
@@ -768,15 +751,44 @@ def app(environ, start_response):
             response = template.render(signup_data=signup_data)
 
 
-        elif environ['PATH_INFO'] == '/admin/registration':
+        elif environ['PATH_INFO'] == '/admin/guests':
+            c = db.cursor()
+            c.execute("select distinct parent_name, parent_email, parent_phone, session_detail from registration order by session_detail")
+            registration_data = c.fetchall()
+            c.close()
 
-            registration_config_data = {}
-            registration_config_files = [f for f in listdir("../registration/config/") if isfile(join("../registration/config/", f))]
-            for config_file in registration_config_files:
-                print("config_file", config_file)
-                config_file_contents = json.loads(read_file(f"../registration/config/{config_file}"))
-                epoch_date = config_file_contents["create_date_epoch"]
-                registration_config_data[epoch_date] = config_file_contents
+            # group by session:
+            registration_data_dict = {}
+            for guest_row in registration_data:
+                name, email, phone, session = guest_row
+
+                # format phone numbers:
+                if re.match('\d{10}', phone):
+                    phone = f"({phone[:3]}){phone[3:6]}-{phone[6:]}"
+
+                try:
+                    registration_data_dict[session].append([name, email, phone])
+                except:
+                    registration_data_dict[session] = []
+                    registration_data_dict[session].append([name, email, phone])
+
+            signup_data = {}
+            for m in ["signup", "registration"]:
+                path = f"../{m}/data/"
+                files = [f for f in listdir(path) if isfile(join(path, f))]
+                for file in files:
+                    if not file.endswith("json"):
+                        continue
+                    contents = json.loads(read_file(f"{path}{file}"))
+                    signup_data[file.replace(".json", "")] = contents
+
+            template = env.get_template("admin-guests.html")
+            response = template.render(registration_data=registration_data_dict, signup_data=signup_data)
+
+
+
+
+        elif environ['PATH_INFO'] == '/admin/registration/list':
 
             view = ""
             if environ['QUERY_STRING'] and "view" in environ['QUERY_STRING']:
@@ -793,9 +805,6 @@ def app(environ, start_response):
             r = db.store_result()
             allrows = r.fetch_row(maxrows=100, how=1)
 
-            reg_data = json.loads(read_file("../registration/data/wheel-wars.json"))
-
-
             # GROUP BY CAMP:
             new_reg_dict = {}
             for row in allrows:
@@ -808,29 +817,21 @@ def app(environ, start_response):
                     new_reg_dict[sd] = []
                     new_reg_dict[sd].append(row)
 
-            signup_files = [f for f in listdir("../signup/data/") if isfile(join("../signup/data/", f))]
-
-            file_data_dict = {}
-            for f in signup_files:
-                file_data = json.loads(read_file(f"../signup/data/{f}"))
-
-                new_entry_list = []
-                for entry in file_data:
-                    new_dict = {}
-                    for k, v in entry.items():
-                        new_dict[k] = unquote(v)
-                    new_entry_list.append(new_dict)
-
-                file_data_dict[f.replace(".json", "")] = new_entry_list
-
-            template = env.get_template("admin-registration.html")
-            response = template.render(registration_config_data=registration_config_data, allrows=allrows, reg_data=reg_data, new_reg_dict=new_reg_dict, file_data_dict=file_data_dict)
+            template = env.get_template("admin-registration-list.html")
+            response = template.render(new_reg_dict=new_reg_dict)
 
 
-        #elif environ['PATH_INFO'] == '/admin/registration2':
-        #    data = json.loads(read_file("../registration/data/wheel-wars.json"))
-        #    template = env.get_template("admin-registration2.html")
-        #    response = template.render(data=data)
+
+        elif environ['PATH_INFO'] == '/admin/registration/add-edit':
+            if len(environ['QUERY_STRING']) > 1:
+                rid = environ['QUERY_STRING'].split("=")[1]
+                this_reg_data = {}
+                form = RegistrationForm(**this_reg_data)
+            else:
+                form = RegistrationForm()
+            template = env.get_template("admin-registration-add-edit.html")
+            response = template.render(form=form)
+
 
 
         elif environ['PATH_INFO'] == '/summer-camp-registration':
@@ -1043,30 +1044,6 @@ def app(environ, start_response):
 
     ####
     ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/registration/add-edit":
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-        data_object = manage_post_input(post_input)
-        if len(data_object["create_date"]) == 0:
-            data_object["create_date"] = iso_now
-            data_object["create_date_epoch"] = epoch_now
-
-        data_object["page_path"] = data_object["page_path"].lower().replace(" ", "-")
-        page_path = data_object["page_path"]
-        create_date_epoch = data_object["create_date_epoch"]
-        write_file(f"../registration/config/{page_path}-{create_date_epoch}.json", json.dumps(data_object, indent=4))
-
-        fields = data_object["fields"]
-        template = env.get_template("include-signup.html")
-        include_html = template.render(page_path=page_path, fields=fields)
-        #write_file(f"../www/includes/signups/{page_path}_{create_date_epoch}.html", include_html)
-        write_file(f"templates/include-{page_path}.html", include_html)
-
-        response = '<meta http-equiv="refresh" content="0; url=/app/admin/registration" />'
-
-
-    ####
-    ####
     elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/products/add-edit":
 
         length = int(environ.get('CONTENT_LENGTH', '0'))
@@ -1139,6 +1116,39 @@ def app(environ, start_response):
         template = env.get_template("admin-products-image.html")
         response = template.render(product_data=data_object, image_form=image_form,
             sql={"sql":sql}, pid={"pid":pid}, sql2={"sql2":sql2})
+
+
+    ####
+    ####
+    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/registration/add-edit":
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+        data_object = {}
+        data_array = []
+        post_input_array = post_input.split('------')
+        for d in post_input_array:
+            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
+            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
+            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and not post_data_val.startswith('-----'):
+                data_object[post_data_key] = post_data_val
+                data_array.append(post_data_val)
+        del data_object["rid"]
+        fields = ""
+        for k in data_object.keys():
+            fields += f"{k},"
+        fields = fields.rstrip(",")
+        del data_array[0]
+        values = ""
+        for v in data_array:
+            values += f"'{v}',"
+        values = values.rstrip(",")
+        sql = f"INSERT INTO registration ({ fields }) VALUES ({ values })"
+        print(sql)
+        c = db.cursor()
+        c.execute(sql)
+        c.close()
+        template = env.get_template("admin-registration-add-edit.html")
+        response = template.render(sql=sql)
 
 
     ####

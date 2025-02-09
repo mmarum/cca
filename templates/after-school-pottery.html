@@ -233,7 +233,7 @@ function calculate_subtotal() {
       event_titles_list.push(this_event_title);
       weekly_subtotal = this_guest_count * 35;
       this_event_title = this_event_title.replace("Weekly Wednesday Afterschool Pottery Class", "");
-      event_details_json_str += '{"event_id": ' + this_event_id + ', "guest_count": ' + this_guest_count + '"},';
+      event_details_json_str += '{"event_id": ' + this_event_id + ', "guest_count": ' + this_guest_count + '},';
       event_details_string += this_event_date + ", " + this_event_title + ", " + this_guest_count + " guests, week subtotal: " + weekly_subtotal + "<br>";
     }
 

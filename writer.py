@@ -59,8 +59,8 @@ passw = json.loads(read_file("data/passwords.json"))[user]
 
 def get_page_contents(path):
     r = requests.get(f'{domain}/app/{path}', auth=(f'{user}', f'{passw}'))
-    print(r.url)
-    print(r.status_code)
+    #print(r.url)
+    #print(r.status_code)
     if r.status_code == 200 and len(r.text) > 10:
         return r.text
     else:

@@ -25,7 +25,7 @@ th {
   {% for item_dict in signup_items %}
     <p>
     {% for key, val in item_dict.items() %}
-      <b>{{ key }}</b>: {{ val }}<br>
+      <b>{{ key }}</b>: {{ val.replace("%40", "@").replace("%3A", ":").replace("%21", "!").replace("%28", "(").replace("%29", ")").replace("%2B", "+").replace("%3B", ";").replace("%3A", ":").replace("%2F", "/") }}<br>
     {% endfor %}
     </p>
   {% endfor %}
