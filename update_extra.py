@@ -1,9 +1,11 @@
 import os
 import sys
 import json
-import MySQLdb
+from sql_mgr import query
+
 
 # mysql -u catalystcreative_cca catalystcreative_arts -p
+
 
 """
 Usage:
@@ -14,11 +16,6 @@ u.set_via_purchase("Feb 7 1-3pm")
 u.update_extra()
 """
 
-dbuser = "catalystcreative_cca"
-dbname = "catalystcreative_arts"
-f = open("data/passwords.json", "r")
-dbpass = json.loads(f.read())[dbuser]
-f.close()
 
 class UpdateExtra:
 
@@ -32,15 +29,12 @@ class UpdateExtra:
             raise ValueError("contents must not contain semicolon")
 
         # GET EXISTING extra_data value
-        db = MySQLdb.connect(host="localhost", user=dbuser, passwd=dbpass, db=dbname)
-        db.query(f"SELECT extra_data FROM events WHERE eid = {self.eid}")
-        r = db.store_result()
+        sql = f"SELECT extra_data FROM events WHERE eid = {self.eid}"
         try:
-            row = r.fetch_row(maxrows=1, how=1)[0]
+            row = query(sql)[0]
             self.existing_data = json.loads(row["extra_data"])
         except:
             self.existing_data = ""
-        db.close()
         print("self.existing_data", self.existing_data)
 
 
@@ -78,8 +72,5 @@ class UpdateExtra:
 
     def update_extra(self):
         if self.sql != "":
-            db = MySQLdb.connect(host="localhost", user=dbuser, passwd=dbpass, db=dbname)
-            c = db.cursor()
-            c.execute(self.sql)
-            c.close()
+            query(sql)
 

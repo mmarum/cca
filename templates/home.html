@@ -183,72 +183,79 @@ mark {
 
   <div class="col-md-3">
 
+
     <!-- first column start -->
+
 
     <div class="home_caption">
     <h2>
-    <a href="/after-school-pottery.html">
-    <div class="home_event_date">Weekly Wednesday</div>
-    <div class="home_section_label">After School Pottery</div>
-    <div class="home_event_title">Jan 15 thru Feb 19</div>
+    <a href="/wheel-wars-2026.html">
+    <div class="home_section_label">Wheel Wars 5! 2026</div>
+    <div class="home_event_date">Special 5th Anniversary Edition!</div>
+    <div class="home_event_title">Sat Mar 21 at 2 PM</div>
     </a>
     </h2>
     </div>
-    <a href="/after-school-pottery.html">
-      <img alt="" src="/img/small/InShot_20241105_153401597.jpg" class="event_image"/>
+    <!-- <img alt="" src="/img/wheel-wars-2026-promo-2.jpg" class="event_image"/> -->
+      <video width="100%" controls poster="/img/WW5-trophy-poster.jpg">
+        <source src="/img/WW5-trophy.mp4" type="video/mp4">
+      </video>
+    <hr>
+
+
+    <div class="home_caption">
+    <h2>
+    <a href="/art-camp.html">
+    <div class="home_section_label">Art Camp 2026</div>
+    <div class="home_event_date">Signup open</div>
+    </a>
+    </h2>
+    </div>
+    <a href="/art-camp.html">
+    <img alt="" src="/img/art-camp-2026-promo.jpg" class="event_image"/>
+    </a>
+    <hr>
+
+
+    <div class="home_caption">
+    <h2>
+    <a href="/art-camp.html">
+    <div class="home_section_label">Pottery Camp 2026</div>
+    <div class="home_event_date">Signup open</div>
+    </a>
+    </h2>
+    </div>
+    <a href="/art-camp.html">
+    <img alt="" src="/img/pottery-camp-2026-promo.jpg" class="event_image"/>
+    </a>
+    <hr>
+
+    <div class="home_caption">
+    <h2>
+    <a href="/event/1555.html">
+    <div class="home_section_label">Pottery Intensive Series</div>
+    <div class="home_event_date">Two Day Workshops</div>
+    </a>
+    </h2>
+    </div>
+    <a href="/event/1555.html">
+    <img alt="" src="/img/pottery-intensive-workshops-promo.jpg" class="event_image"/>
     </a>
     <hr>
  
     <!--
     <div class="home_caption">
     <h2>
-    <a href="/event/1235.html">
-    <div class="home_section_label">Eclipse Pottery Exhibition</div>
-    <div class="home_event_date">Nov 1-10, 2024</div>
-    <div class="home_event_title">Please join us as we celebrate 4 local artists displaying their ceramics</div>
+    <a href="/pottery-lessons.html">
+    <div class="home_section_label">Gift a private pottery wheel lesson</div>
     </a>
     </h2>
-    </div>
-    <a href="/event/1235.html">
-      <img alt="Eclipse Pottery Exhibition" src="/img/eclipse-pottery-2024.jpg" class="event_image"/>
-    </a>
-    <div class="home_caption">
-    <div class="home_gallery_hours">
-    <p style="padding: 10px 0 0 10px">Eclipse gallery hours:</p>
-    <p style="padding-left: 10px">
-    Fri 11/1 - 6-9:30pm<br>
-    Sat 11/2 - 2-8pm<br>
-    Sun 11/3 - 12-4pm<br>
-    Mon 11/4 - 5-8pm<br>
-    Tue 11/5 - 5-8pm<br>
-    Wed 11/6 - 5-8pm<br>
-    Thu 11/7 - 5-8pm<br>
-    Fri 11/8 - 5-9:30pm<br>
-    Sat 11/9 - 2-8pm<br>
-    Sun 11/10 - 12-4pm
-    </p>
-    </div>
+      <a href="/pottery-lessons.html">
+      <img alt="Gift a private pottery wheel lesson" src="/img/gift-private-pottery-wheel-lesson-500-a.jpg" class="event_image"/>
+      </a>
     </div>
     <hr>
     -->
- 
-
-    {% if next_event %}
-    <div class="home_caption">
-    <h2>
-    <a href="/event/{{ next_event.eid }}.html">
-    <div class="home_section_label">Next Event</div>
-    <div class="home_event_date">{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</div>
-    <div class="home_event_title">{{ next_event.title }}</div>
-    </a>
-    </h2>
-    </div>
-    <a href="/event/{{ next_event.eid }}.html">
-      <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
-    </a>
-    <hr>
-    {% endif %}
-
 
     {% if events_tagged_home %}
     {% for event in events_tagged_home %}
@@ -262,14 +269,14 @@ mark {
     </h2>
     </div>
     <a href="/event/{{ event.eid }}.html" class="event_link">
-      <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
+    <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
     </a>
     <hr>
     {% endfor %}
     {% endif %}
 
 
-    <!--
+    {#
     <div class="home_caption">
     <h2>
     <a href="/event/964.html">
@@ -277,14 +284,14 @@ mark {
     </a>
     </h2>
     <a href='/event/964.html'>
-      <img src='/img/small/CCA_DOTS-02.jpeg' class='event_image'>
+    <img src='/img/small/CCA_DOTS-02.jpeg' class="event_image">
     </a>
     </div>
     <hr>
-    -->
+    #}
 
 
-    <!--
+    {#
     <div class="home_caption">
     <h2>
     <a href="/event/1019.html">
@@ -294,15 +301,15 @@ mark {
     </a>
     </h2>
     </div>
-        <a href="/event/1019.html">
-        <img src="/img/handbuilt-pottery-vase.gif" class="event_image">
-        </a>
-        <center class="home_event_title"><a href="https://www.youtube.com/embed/ycTQr45zFII">See more on YouTube</a></center>
+    <a href="/event/1019.html">
+    <img src="/img/handbuilt-pottery-vase.gif" class="event_image">
+    </a>
+    <center class="home_event_title"><a href="https://www.youtube.com/embed/ycTQr45zFII">See more on YouTube</a></center>
     <hr>
-    -->
+    #}
 
 
-    <!--
+    {#
     <div class="home_caption">
     <h2>
     <a href="/event/781.html">
@@ -313,23 +320,10 @@ mark {
     </h2>
     </div>
     <a href="/event/781.html">
-      <img src="/img/small/20200707_135954-2.jpg" class="event_image">
+    <img src="/img/small/20200707_135954-2.jpg" class="event_image">
     </a>
     <hr>
-    -->
-
-
-    <div class="home_caption">
-    <h2>
-    <a href="/wheel-wars-2025.html">
-    <div class="home_section_label">Wheel Wars!</div>
-    </a>
-    </h2>
-    </div>
-    <a href='/wheel-wars-2025.html'>
-    <img src="/img/wheel-wars-2024-trophy.jpg" class="event_image">
-    </a>
-    <hr>
+    #}
 
 
     <!-- first column end -->
@@ -338,21 +332,6 @@ mark {
   <div class="col-md-3">
 
     <!-- second column start -->
-
-    <!--
-    <div class="home_caption">
-    <h2>
-    <a href="/art-camp.html">
-    <div class="home_section_label">Art Camp 2024</div>
-    <div class="home_event_date">Registration open</div>
-    </a>
-    </h2>
-    </div>
-    <a href='/art-camp.html'>
-      <img src='/img/art-camp/2023/art-camp-2023-07.jpg' class='event_image'>
-    </a>
-    <hr>
-    -->
 
 
     <div class="home_caption">
@@ -363,12 +342,13 @@ mark {
     </h2>
     </div>
     <a href="/pottery-lessons.html">
-      <img alt="pottery lessons" src="/img/pottery-promo-2024-1.jpg" class="event_image"/>
+    <!-- <img alt="pottery lessons" src="/img/pottery-promo-2025-1.jpg" class="event_image"/> -->
+    <img alt="pottery lessons" src="/img/jaime-marum-pottery.jpg" class="event_image"/>
     </a>
     <hr>
 
 
-    <!--
+    {#
     <div class="home_caption">
     <h2>
     <a href="/shop/">
@@ -378,38 +358,73 @@ mark {
     </h2>
     </div>
     <a href='/shop'>
-      <img src='/img/scarves-shop-ig.jpg' class='event_image'>
+    <img src='/img/scarves-shop-ig.jpg' class="event_image">
     </a>
     <hr>
-    -->
+    #}
 
-    <!--
     {% if random_product %}
     <div class="home_caption">
     <h2>
     <a href="/shop/product/{{ random_product.pid }}">
     <div class="home_section_label">Shop the Online store</div>
     <div class="home_event_date">{{ random_product.name }} ${{ random_product.price }}</div>
-    <img src="/img/small/{{ random_product.image_path_array.split(",")[1] }}" class='event_image'>
+    <img src="/img/small/{{ random_product.image_path_array.split(",")[1] }}" class="event_image">
     </h2>
     </a>
     </div>
     <hr>
     {% endif %}
-    -->
+
+    
+    {#
+    <div class="home_caption">
+    <h2>
+    <a href="/mural-2025.html">
+    <div class="home_event_title"><b>Mural 2025</b></div>
+    <div class="home_section_label" style="background-color: beige; padding: 5px 5px 5px 0px; margin: 5px 5px 5px 0px;">Call for artists!</div>
+    <div class="home_event_date"><i>We're providing a community art mural opportunity for a local DFW artist</i></div>
+    <div class="home_event_title">We are going to take applications and award this space to a new artist on Mar 26</div>
+    </a>
+    </h2>
+    </div>
+    <a href="/mural-2025.html">
+    <img src="/img/small/mural-2025.jpg" class="event_image">
+    </a>
+    <hr>
+    #}
+
+
+    {% if next_event %}
+    <div class="home_caption">
+    <h2>
+    {% if "private" not in next_event.title.lower() %}<a href="/event/{{ next_event.eid }}.html">{% endif %}
+    <div class="home_section_label">Next Event</div>
+    <div class="home_event_date">{{ next_event.edatetime.strftime('%a %b %d at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</div>
+    <div class="home_event_title">{{ next_event.title }}</div>
+    {% if "private" not in next_event.title.lower() %}</a>{% endif %}
+    </h2>
+    </div>
+    {% if next_event.image %}
+    <a href="/event/{{ next_event.eid }}.html">
+    <img alt="{{ next_event.image }}" src="/img/small/{{ next_event.image }}" class="event_image"/>
+    </a>
+    {% endif %}
+    <hr>
+    {% endif %}
 
 
     <div class="home_caption">
     <h2>
-    <a href="/mural-2024.html">
-    <div class="home_section_label">Local Artist Mural Series</div>
-    <div class="home_event_date"><i>Rein Free</i></div>
-    <div class="home_event_title">by Trey Wilder</div>
+    <a href="/mural-2025.html">
+    <div class="home_section_label">This Year's Local Artist Mural Series</div>
+    <div class="home_event_date"><i>Opposites Attract</i></div>
+    <div class="home_event_title">by Megan Najera</div>
     </a>
     </h2>
     </div>
-    <a href="/mural-2024.html">
-      <img src="/mural-2024/img/small/20240412_133312.jpg" class="event_image">
+    <a href="/mural-2025.html">
+    <img src="/mural-2025/img/small/mural-2025-1.jpg" class="event_image">
     </a>
     <hr>
 
@@ -420,9 +435,11 @@ mark {
   </div>
   <div class="col-md-3">
 
+
     <!-- third column start -->
 
-    <!--
+
+    {#
     <div class="home_caption">
     <h2>
     <a href="https://arlington.market">
@@ -433,20 +450,20 @@ mark {
     </h2>
     </div>
     <a href="https://arlington.market">
-      <img src="/img/market-mini-gnome.jpg" class="event_image">
+    <img src="/img/market-mini-gnome.jpg" class="event_image">
     </a>
     <hr>
-    -->
+    #}
 
 
-    <!--
+    {#
     <div class="home_caption">
     <h2>
     <div class="home_section_label">Crafts Gallery Spotlight</div>
     <div class="home_event_title"><a href="/{{ random_gallery["category_path"] }}.html">{{ random_gallery["name"] }}</a></div>
     </h2>
     <a href="/{{ random_gallery["category_path"] }}.html">
-      <img src="{{ random_gallery["image_file"] }}" class='event_image'>
+    <img src="{{ random_gallery["image_file"] }}" class="event_image">
     </a>
     <h2>
     <a href="/crafts-gallery.html">
@@ -455,9 +472,10 @@ mark {
     </h2>
     </div>
     <hr>
-    -->
+    #}
 
-    <!--
+
+    {#
     <div class="home_caption">
     <h2>
     <a href="/paint-wars.html">
@@ -468,12 +486,13 @@ mark {
     </h2>
     </div>
     <a href="/paint-wars.html">
-      <img src="/img/small/20230617_205634-01.jpeg" class="event_image">
+    <img src="/img/small/20230617_205634-01.jpeg" class="event_image">
     </a>
     <hr>
-    -->
+    #}
 
 
+    {#
     <div class="home_caption">
     <h2>
     <a href="/art-camp.html">
@@ -482,10 +501,11 @@ mark {
     </a>
     </h2>
     <a href='/art-camp.html'>
-      <img src='/img/art-camp-2025-1.jpg' class='event_image'>
+    <img src='/img/art-camp-2025-1.jpg' class="event_image">
     </a>
     </div>
     <hr>
+    #}
 
 
     <div class="home_caption">
@@ -495,7 +515,7 @@ mark {
     </a>
     </h2>
     <a href='/specialty-classes.html'>
-      <img src='/img/fluid-art-2024.jpg' class='event_image'>
+	<img src="/img/small/20200707_135954-2.jpg" class="event_image">
     </a>
     </div>
     <hr>
@@ -506,19 +526,55 @@ mark {
     <div class="home_section_label">Water Marbling on Silk Scarf</div>
     </h2>
     </div>
-        <!-- https://www.youtube.com/watch?v=xHXKFyoceSI -->
-        <iframe class="youtube_embed" src="https://www.youtube.com/embed/xHXKFyoceSI" 
-            title="EBRU Water Marbling on Silk Scarf Large Flower Design" 
-            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <!-- https://www.youtube.com/watch?v=xHXKFyoceSI -->
+    <iframe class="youtube_embed" src="https://www.youtube.com/embed/xHXKFyoceSI" 
+        title="EBRU Water Marbling on Silk Scarf Large Flower Design" 
+        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+	allowfullscreen>
+    </iframe>
     <hr>
+
+
+    <div class="home_caption">
+    <h2>
+    <a href="/jaime-marum.html">
+    <div class="home_section_label">About owner Jaime Marum</div>
+    </a>
+    </h2>
+    <a href='/jaime-marum.html'>
+	<img src="/img/small/jaime-bio/jaime-bio-14.jpg" class="event_image">
+    </a>
+    </div>
+    <hr>
+
+
+
+    <div class="home_caption">
+    <h2>
+    <a href="/community-events.html">
+    <div class="home_section_label">Community Art Project</div>
+    <div class="home_event_date">Clay Tile Quilt</div>
+    </a>
+    </h2>
+      <video width="100%" controls poster="/img/TileQuiltPoster.jpg">
+        <source src="/img/TileQuiltSmallest.mp4" type="video/mp4">
+      </video>
+    </div>
+    <hr>
+
+
 
 
     <!-- third column end -->
 
+
   </div>
 
   <div class="col-md-3">
+
+
     <!-- fourth column start -->
+
 
     <div id="paper_calendar"></div>
     {{ calendar.html|safe }}
@@ -533,7 +589,23 @@ mark {
 
 
 
+    <div class="home_caption">
+    <h2>
+    <a href="/wheel-wars-2025.html">
+    <div class="home_section_label">Wheel Wars 2025</div>
+    <div class="home_event_date">Results and pics</div>
+    </a>
+    </h2>
+    </div>
+    <a href='/wheel-wars-2025.html'>
+    <img src="/img/wheel-wars-2025-trophy.jpg" class="event_image">
+    </a>
+    <hr>
+
+
     <!-- fourth column end -->
+
+
   </div>
 
 </div>

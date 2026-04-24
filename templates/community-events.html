@@ -36,8 +36,14 @@ h2 {
    margin-bottom: 10px;
    }
 }
+        #paint-wars-2025-video {
+                width: 600px;
+        }
 
 @media only screen and (max-width: 400px) {
+	#paint-wars-2025-video {
+		width: 100%;
+	}
    .art-brew {
    font-size: 50px;
    padding-top: 5px;
@@ -76,11 +82,23 @@ h2 {
   Arts events are a great way for people to engage with the art community and learn about the artists.
 </div>
 </center>
+<hr>
 
+<center>
+<div>
+<h2>Paint Wars 2025 (From Oct 18)</h2>
+  <video controls id="paint-wars-2025-video" poster="/img/paint-wars-2025-poster.jpg">
+    <source src="/img/paint-wars-2025-video.mp4" type="video/mp4">
+  </video>
+</div>
+</center>
+<hr>
 
+{% if events|length > 0 %}
 <center>
 <h3 style="padding: 20px;">Upcoming community events:</h3>
 </center>
+{% endif %}
 
 
 {% for event in events %}
@@ -134,29 +152,113 @@ h2 {
     </div>
   </div>
 
+  <hr>
+
 {% endfor %}
 
-<hr>
+{% if past_events|length > 0 %}
+<center>
+<h3 style="padding: 20px;">Recent community events:</h3>
+</center>
+{% endif %}
+
+{% for event in past_events %}
+
+  <div class="row event_row top-buffer date_{{ event.edatetime.strftime('%Y-%m-%d') }}" id="eid_{{ event.eid }}">
+    <div class="col-sm-1">
+    </div>
+    <div class="col-md-4">
+
+      {% if "private event" in event.title|lower or "private event" in event.description|lower %}
+   {% set private_event = "True" %}
+      {% else %}
+   {% set private_event = "False" %}
+      {% endif %}
+
+      {% if private_event == "True" %}
+   <img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/>
+      {% else %}
+   <a href="/event/{{ event.eid }}.html"><img alt="{{ event.image }}" src="/img/small/{{ event.image }}" class="event_image"/></a>
+      {% endif %}
+
+    </div>
+    <div class="col-md-6">
+      {% if event.eid == 964 or "gift card" in event.title.lower() %}
+      {% else %}
+   <h2>{{ event.edatetime.strftime('%a %b %d, %Y at %I:%M %p')|replace(' 0', ' ')|replace(':00', '') }}</h2>
+      {% endif %}
+      <h3>
+
+      {% if private_event == "True" %}
+   {{ event.title }}
+      {% else %}
+   <a href="/event/{{ event.eid }}.html">{{ event.title }}</a>
+      {% endif %}
+
+      </h3>
+      <div>
+   {# event.description|safe #}
+   {% set event_desc = event.description.split('\n') %}
+   {% for e in event_desc %}
+     {% if e.startswith("http") %}
+  <a href="{{ e }}">Buy tickets</a>
+     {% else %}
+  {{ e|safe }}
+     {% endif %}
+   {% endfor %}
+
+      </div>
+    </div>
+    <div class="col-sm-1">
+    </div>
+  </div>
+
+  <hr>
+
+{% endfor %}
 
     <center>
-    <h3 style="padding: 20px;">Recent community events:</h3>
+    <h3 style="padding: 20px;">Past community events highlights:</h3>
     </center>
 
-    <div class="row">
+    <div class="row" style="padding-top: 10px; margin-top: 10px; border-top: 1px dashed LightGray;">
+    <div class="col-sm-4">
+    <h4>Saturday, March 29, 2025</h4>
+    <a href="/wheel-wars-2025.html">
+    <h5>Wheel Wars! 2025</h5>
+    <img src="/wheel-wars-2025/img/small/20250329_153745_small-landscape.jpg" class="event_image">
+    </a>
+    </div>
+    <div class="col-sm-4">
+    <h4>April 2025</h4>
+    <a href="/mural-2025.html">
+    <h5>Local Artist Mural Feature Series: Opposites Attract by Megan Najera</h5>
+    <img src="/mural-2025/img/small/20250409_132237_small.jpg" class="event_image">
+    </a>
+    </div>
+    <div class="col-sm-4">
+    <h4></h4>
+    <a href="">
+    <h5></h5>
+    <img src="" class="event_image">
+    </a>
+    </div>
+    </div>
+
+    <div class="row" style="padding-top: 10px; margin-top: 10px; border-top: 1px dashed LightGray;">
 
     <div class="col-sm-4">
-
 
     <h4>November 1, 2024</h4>
     <a href="/event/1235.html">
     <h5>Eclipse Pottery Exhibition</h5>
-    <img alt="Eclipse Pottery Exhibition" src="/img/eclipse-pottery-2024.jpg" class="event_image"/>
+    <div style="width: 300px; height: 250px; overflow: hidden;">
+    <img src="/img/eclipse-pottery-2024.jpg" style="width: 300px; height: auto;">
+    </div>
     </a>
-
 
     </div>
     <div class="col-sm-4">
-
 
     <h4>October 12, 2024</h4>
     <a href="/paint-wars-2024.html">
@@ -164,17 +266,14 @@ h2 {
     <img src="/img/small/20230617_205634-01.jpeg" class="event_image">
     </a>
 
-
     </div>
     <div class="col-sm-4">
-
 
     <h4>April 2024</h4>
     <a href="/mural-2024.html">
     <h5>Local artist mural series</h5>
     <img src="/mural-2024/img/small/20240412_133312.jpg" class="event_image">
     </a>
-
 
     </div>
 
@@ -184,22 +283,18 @@ h2 {
 
     <div class="col-sm-4">
 
-
     <h4>March 30, 2024</h4>
     <a href='/wheel-wars-2024.html'>
-    <h5>Wheel Wars!</h5>
-    <img src="/img/wheel-wars-trophy.gif" class="event_image">
+    <h5>Wheel Wars 2024!</h5>
+    <img src="/wheel-wars-2024/img/new/20240330_161738-01.jpg" class="event_image">
     </a>
-
 
     </div>
     <div class="col-sm-4">
 
-
     <h4>Jun 11, 2020</h4>
     <h5>Downtown Arlington Urban Market</h5>
     <img src="/img/market-mini-gnome.jpg" class="event_image">
-
 
     </div>
     <div class="col-sm-4">

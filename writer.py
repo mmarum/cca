@@ -2,28 +2,14 @@ import requests
 import os
 import sys
 import json
+from tools import read_file, write_file
 
-"""
-cron:
-source /home/catalystcreative/virtualenv/app/3.6/bin/activate; cd /home/catalystcreative/app; python writer.py pages
-source /home/catalystcreative/virtualenv/app/3.6/bin/activate; cd /home/catalystcreative/app; python writer.py galleries
-"""
 
 domain = "https://www.catalystcreativearts.com"
 
-
-def read_file(file_name):
-    f = open(file_name, "r")
-    content = f.read()
-    f.close()
-    return content
-
-
-def write_file(file_name, content):
-    f = open(file_name, "w")
-    f.write(content)
-    f.close()
-
+headers = {
+    "User-Agent": "Mozilla/5.0"
+}
 
 valid_pages = json.loads(read_file("data/valid-pages.json"))
 valid_galleries = json.loads(read_file("data/valid-galleries.json"))
@@ -57,55 +43,28 @@ user = "catalystcreative"
 passw = json.loads(read_file("data/passwords.json"))[user]
 
 
-def get_page_contents(path):
-    r = requests.get(f'{domain}/app/{path}', auth=(f'{user}', f'{passw}'))
-    #print(r.url)
-    #print(r.status_code)
-    if r.status_code == 200 and len(r.text) > 10:
-        return r.text
-    else:
-        print(f'get_page_contents fail: {domain}/app/{path} {r.status_code}')
-        raise ValueError(f'get_page_contents fail: {domain}/app/{path} {r.status_code}')
-
-
 def scrape_and_write(path):
-    page_contents = "x"
-    try:
-
-        #try:
-        #    page_contents = str(get_page_contents(path).encode())
-        #except:
-        #    page_contents = get_page_contents(path)
-        page_contents = get_page_contents(path)
-
-        if len(page_contents) > 10:
-            if path in ["cart", "some-other"]:
-                write_file(f"../www/{path}/index.html", page_contents)
-            else:
-                write_file(f"../www/{path}.html", page_contents)
-        else:
-            print(f'page_contents failure: {path}')
-    except:
-        print(f'page_contents OR write_file failure: {path}')
-
-
-try:
-    # "galleries" NEEDS TO BE CALLED VIA CRON
-    # "home" and "calendar" should also be on cron
-    if sys.argv[1] in ["pages", "galleries"]:
-        group = sys.argv[1]
-        print(group)
-        for item in groups[group]:
-            try:
-                print(item)
-                scrape_and_write(item)
-            except:
-                print('error. bad scrape')
-                #pass
+    r = requests.get(f'{domain}/app/{path}', auth=(f'{user}', f'{passw}'), headers=headers)
+    print(r.url, r.status_code)
+    if r.status_code == 200 and len(r.text) > 10:
+        if path == "cart":
+        	path += "/index"
+        write_file(f"../www/{path}.html", r.text)
     else:
-        print('Needs to be pages or galleries')
-        #pass
-except:
-    #print('error. probably no argument')
-    pass
+        raise ValueError('scrape_and_write fail')
+
+
+def loop_thru_pages(mode):
+    if mode not in ["pages", "galleries"]:
+    	raise ValueError('must be pages or galleries')
+    for item in groups[mode]:
+        scrape_and_write(item)
+
+
+if __name__ == '__main__':
+	mode = sys.argv[1]
+	loop_thru_pages(mode)
+	#page = sys.argv[1]
+    #scrape_and_write(page)
+
 

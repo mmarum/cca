@@ -18,17 +18,33 @@ th {
 
 <h1>Signups</h1>
 
-{% for signup_name, signup_items in signup_data.items()  %}
+<p>
+Quick links:
+{% for data in signups %}
+  {% for name, items in data.items()  %}
+    <a href="#{{ name }}">{{ name }}</a>
+  {% endfor %}{{ "-" if not loop.last }}
+{% endfor %}
+</p>
 
-  <h3>{{ signup_name }}</h3>
+{% for data in signups %}
 
-  {% for item_dict in signup_items %}
-    <p>
-    {% for key, val in item_dict.items() %}
-      <b>{{ key }}</b>: {{ val.replace("%40", "@").replace("%3A", ":").replace("%21", "!").replace("%28", "(").replace("%29", ")").replace("%2B", "+").replace("%3B", ";").replace("%3A", ":").replace("%2F", "/") }}<br>
+  {% for name, items in data.items()  %}
+
+  <h3 id="{{ name }}">{{ name }}</h3>
+
+    {% for item in items %}
+      <p>
+      {% for key, val in item.items() %}
+        <b>{{ key }}</b>:
+	{{ val.replace("%40", "@").replace("%3A", ":").replace("%21", "!").replace("%28", "(").replace("%29", ")").replace("%2B", "+").replace("%3B", ";").replace("%3A", ":").replace("%2F", "/") }}<br>
+      {% endfor %}
+      </p>
     {% endfor %}
-    </p>
+
   {% endfor %}
+
+  <hr><hr>
 
 {% endfor %}
 

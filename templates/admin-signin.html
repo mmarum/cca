@@ -1,0 +1,35 @@
+{% extends "base-admin.html" %}
+{% block title %}Admin Signin{% endblock %}
+
+{% block html_head %}
+{% endblock %}
+
+{% block content %}
+
+{% if data_object %}
+  <p>data_object: {{ data_object }}</p>
+{% endif %}
+
+{% if login_result %}
+  <p>login_result: {{ login_result }}</p>
+  {% if login_result["login"] == "success" %}
+    <p>login success</p>
+    {% set username = login_result["username"] %}
+    {% set passhash = login_result["passhash"] %}
+    <script>
+    document.cookie = "admin={{ username }}:{{ passhash }}; expires=Tue, 11 Jun 2120 12:00:00 UTC; path=/";
+    location.href="/app/";
+    </script>
+  {% else %}
+    {{ login_result }}
+  {% endif %}
+{% endif %}
+
+<p>log in:</p>
+<form action="" method="POST">
+<p>Username: <input type="text" name="username"></p>
+<p>Password: <input type="password" name="password"></p>
+<p><input type="submit" name="submit" value="submit"></p>
+</form>
+
+{% endblock %}

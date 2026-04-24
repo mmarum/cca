@@ -23,7 +23,7 @@ select, input {
 {% set desc = event.description.split('\n') %}
 {% set img = event.image.replace(" ", "%20") %}
 
-{% if event.location.startswith("300 West Main St") and "private event" not in event.title.lower() %}
+{% if event.location.startswith("2238 Michigan") and "private event" not in event.title.lower() %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -38,9 +38,9 @@ select, input {
     "name": "Studio",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "300 West Main St",
+      "streetAddress": "2238 Michigan Ave, Suite G",
       "addressLocality": "Arlington",
-      "postalCode": "76011",
+      "postalCode": "76013",
       "addressRegion": "TX",
       "addressCountry": "US"
     }
@@ -195,10 +195,7 @@ select, input {
     {% if "," in event.price_text and ("am" in event.price_text or "pm" in event.price_text) %}
     {% else %}
 
-    {% if event.eid == 964 or 
-        "gift card" in event.title.lower() or 
-        "still life" in event.title.lower() or
-        "community-event" in event.tags %}
+    {% if event.eid == 964 or "gift card" in event.title.lower() or "still life" in event.title.lower() or "community-event" in event.tags %}
 
       <input type="hidden" id="guest_quantity" name="guest_quantity" value="1">
 
@@ -279,7 +276,7 @@ select, input {
 
     {% if "community-event" in event.tags or "wheel wars" in event.title.lower() or "paint pars" in event.title.lower() %}
       {% if "wheel wars" in event.title.lower() %}
-        <input type="submit" name="submit" id="register" value="Get details & register" class="btn btn-warning" onclick="register();">
+        <input type="submit" name="submit" id="register" value="Get details" class="btn btn-warning" onclick="register();">
       {% elif "paint pars" in event.title.lower() %}
 	<button type="button" class="btn btn-success" onclick="location.href='/paint-wars.html'" style="display: block; margin: 20px;">See Paint Wars details and register</button>
       {% else %}
@@ -302,8 +299,11 @@ select, input {
 
 <script>
 {% if "community-event" in event.tags %}
+  //document.quantity_form.method = "GET";
   {% if "wheel wars" in event.title.lower() %}
-    document.quantity_form.action = "/wheel-wars.html";
+    document.quantity_form.action = "/wheel-wars-2026.html";
+  {% elif "paint wars" in event.title.lower() %}
+    document.quantity_form.action = "/paint-wars.html";
   {% else %}
     document.quantity_form.action = "/signup/{{ event.eid }}";
   {% endif %}

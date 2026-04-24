@@ -11,7 +11,7 @@ class EventsForm(Form):
     duration = StringField("Duration", description="Duration")
     price = StringField("Price", description="Price")
     elimit = StringField("Limit", description="Limit")
-    location = StringField("Location", description="Location", default="300 West Main St Arlington, TX 76010")
+    location = StringField("Location", description="Location", default="2238 Michigan Ave, Suite G, Arlington, TX 76013")
     image = HiddenField("Image Path", description="Image Path")
     description = TextAreaField("Description", description="Description")
     price_text = StringField("Variable", description="Variable time or price")

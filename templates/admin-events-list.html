@@ -19,27 +19,19 @@ img {
   <td><div id="add_new_link"><a href="/app/admin/events/add-edit">+</a></div></td>
   <td>Date</td>
   <td>Title</td>
-  <td>Variable</td>
+  <!-- <td>Variable</td> -->
 </tr>
-
 
 {% for row in rows %}
   <tr>
     <td>
-      <a class="event_id" href="/app/admin/events/add-edit?eid={{ row[0] }}">
-        {{ row[0] }}
-      </a>
+      <a class="event_id" href='/app/admin/events/add-edit?eid={{ row["eid"] }}'>{{ row["edatetime"] }}</a>
     </td>
     <td>
-      <b>{{ row[1].strftime('%a %b %d %I:%M %p')|replace(' 0', ' ') }}</b>
+      <b>{{ row["edatetime"].strftime('%a %b %d %I:%M %p')|replace(' 0', ' ') }}</b>
     </td>
     <td>
-      <a class="event_id" href="/app/admin/events/add-edit?eid={{ row[0] }}">
-        {{ row[2] }}
-      </a>
-    </td>
-    <td>
-      {{ row[9] }}
+      <a class="event_id" href="/app/admin/events/add-edit?eid={{ row["eid"] }}">{{ row["title"] }}</a>
     </td>
   </tr>
 {% endfor %}

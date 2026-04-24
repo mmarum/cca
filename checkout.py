@@ -64,23 +64,30 @@ def clean_text(text):
 
 
 def calculate_reg_amount(form_data):
-    """
-    $230 per camper. $210 per additional sibling.
-    """
-
     guest_quantity = int(form_data["guest_quantity"])
     print("guest_quantity", guest_quantity)
     total_cost = int(form_data["total_cost"])
     print("total_cost", total_cost)
 
+    # Stripe counts by cents
+
     if guest_quantity == 1:
-        return int(230 * 100) # Stripe counts by cents
+        if total_cost == 250:
+            return int(250 * 100)
+        elif total_cost == 300:
+            return int(300 * 100)
 
     elif guest_quantity == 2:
-        return int(440 * 100)
+        if total_cost == 500:
+            return int(500 * 100)
+        elif total_cost == 600:
+            return int(600 * 100)
 
     elif guest_quantity == 3:
-        return int(650 * 100)
+        if total_cost == 750:
+            return int(750 * 100)
+        elif total_cost == 900:
+            return int(900 * 100)
 
 
 def calculate_asp_amount(form_data):

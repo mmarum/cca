@@ -74,12 +74,14 @@ td {
 {% for reg in regs %}
   <tr class="tr_regs">
     <td>
+        <a href="/app/admin/registration/add-edit?rid={{ reg["rid"] }}">
 	{{ reg["camper1_name"] }}
 	{{ reg["camper1_age"] }}
 	{% if reg["camper2_name"] %}<br> {{ reg["camper2_name"] }} {% endif %}
 	{% if reg["camper2_age"] and reg["camper2_age"] != 0 %} {{ reg["camper2_age"] }} {% endif %}
 	{% if reg["camper3_name"] %}<br> {{ reg["camper3_name"] }} {% endif %}
 	{% if reg["camper3_age"] and reg["camper3_age"] != 0 %} {{ reg["camper3_age"] }} {% endif %}
+	</a>
     </td>
     <td>
         {{ reg["parent_name"] }}<br>

@@ -1,0 +1,51 @@
+{% extends "base-site.html" %}
+
+{% block title %}Catalyst Creative Arts: Paint Wars 2025{% endblock %}
+
+{% block html_head %}
+<style>
+    .form-control {
+        margin-bottom: 30px;
+    }
+    ul#paint-bullet {
+        margin-left: -20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<center>
+    <h1 class="art-brew">Paint Wars! 2025</h1>
+</center>
+
+<div class="row">
+
+<div class="col-sm-2 bg-light"></div>
+
+<div class="col-sm-8 bg-light">
+
+{% if form_data %}
+    <p>Thank you for signing up</p>
+    {% for k, v in form_data.items() %}
+        {{ k }}: {{ v}}<br>
+    {% endfor %}
+{% else %}
+
+    <center>
+    <h5 style="padding-top: 10px;">
+      Oct 18, 6-8pm (2 hrs) @ Division Brewing
+    </h5>
+    <p>Location: Division Brewing, 506 E Main St, Arlington, TX 76010</p>
+    </center>
+
+    {{ form_html|safe }}
+{% endif %}
+
+</div>
+
+<div class="col-sm-2 bg-light"></div>
+
+</div>
+
+{% endblock %}

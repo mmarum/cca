@@ -1,14 +1,8 @@
 import json
 import datetime
-import MySQLdb
 import requests
-
-
-def read_file(file_name):
-    f = open(file_name, "r")
-    content = f.read()
-    f.close()
-    return content
+from sql_mgr import query
+from tools import read_file
 
 
 def get_tomorrow_iso():
@@ -19,22 +13,14 @@ def get_tomorrow_iso():
 
 
 def get_events():
-    query = f"select eid, edatetime as date, title, location from events where edatetime like '{get_tomorrow_iso()}%'"
-    #print("query", query)
-    db.query(query)
-    r = db.store_result()
-    rows = r.fetch_row(maxrows=100, how=1)
-    #print("rows", rows)
+    sql = f"select eid, edatetime as date, title, location from events where edatetime like '{get_tomorrow_iso()}%'"
+    rows = query(sql)
     return rows
 
 
 def get_orders(eid):
-    query = f"select email, CONCAT(first_name, ' ', last_name) as name from orders where eid = {eid}"
-    #print("query", query)
-    db.query(query)
-    r = db.store_result()
-    rows = r.fetch_row(maxrows=100, how=1)
-    #print("rows", rows)
+    sql= f"select email, CONCAT(first_name, ' ', last_name) as name from orders where eid = {eid}"
+    rows = query(sql)
     return rows
 
 
@@ -67,14 +53,4 @@ def stitch_and_send():
 
             print("data", data)
             send_email(data)
-
-
-passwd = json.loads(read_file("data/passwords.json"))
-db = MySQLdb.connect(host="localhost", user="catalystcreative_cca", 
-    passwd=passwd["catalystcreative_cca"], db="catalystcreative_arts")
-
-
-stitch_and_send()
-
-db.close()
 

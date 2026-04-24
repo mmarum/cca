@@ -34,22 +34,22 @@
 
 <h5 id="signup">Signup</h5>
 
-{% for signup_name, signup_row in signup_data.items() %}
+  {% for name, row in signup_data.items() %}
 
-<h6 style="background-color: LightGray;">{{ signup_name }}</h6>
+    <h6 style="background-color: LightGray;">{{ signup_name }}</h6>
 
-{% for guest_row in signup_row %}
+    {% for guest in row %}
 
 <p>
-{% for k, v in guest_row.items() %}
+{% for k, v in guest.items() %}
 {% if "name" in k or "phone" in k or "email" in k or "title" in k %}
 <b>{{ k }}:</b> {{ v.replace("%40", "@").replace("%3A", ":").replace("%21", "!").replace("%28", "(").replace("%29", ")").replace("%2B", "+").replace("%3B", ";").replace("%3A", ":").replace("%2F", "/") }}<br>
 {% endif %}
 {% endfor %}
 </p>
 
-{% endfor %}
+    {% endfor %}
 
-{% endfor %}
+  {% endfor %}
 
 {% endblock %}

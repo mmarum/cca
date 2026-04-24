@@ -1,6 +1,6 @@
 {% extends "base-site.html" %}
 
-{% block title %}Catalyst Creative Arts: Art Camp 2025 Registration{% endblock %}
+{% block title %}Catalyst Creative Arts: Art Camp 2026 Registration{% endblock %}
 
 {% block html_head %}
 <style>
@@ -33,7 +33,7 @@ h3, h5 {
 {% block content %}
 
 <center>
-<h3>Art Camp 2025 Registration & Release Form</h3>
+<h3>Art Camp 2026 Registration & Release Form</h3>
 </center>
 
 {% if form %}
@@ -62,53 +62,45 @@ h3, h5 {
 
 <div id="session_detail_box">
 
-{% set camper_max = 20 %}
+{% if session_detail == "art-camp-2026-1" or session_detail == "art-camp-2026-3" %}
+{% set camper_max = 16 %}
+{% else %}
+{% set camper_max = 12 %}
+{% endif %}
 
 {% if camper_count and camper_count >= camper_max %}
-
   CLASS IS FULL
+  <script>var class_full = true;</script>
+
+{% elif session_detail in ["art-camp-2026-0", "art-camp-2026-00"] %}
+  CLASS IS CLOSED
   <script>var class_full = true;</script>
 
 {% else %}
 
   <p><b>
-  "Art Camp {{ session_detail|replace("art-camp-2025-", "") }}"
-  {% if session_detail == "art-camp-2025-2" 
-      or session_detail == "art-camp-2025-5" 
-      or session_detail == "art-camp-2025-7" %}
-    Ages 11 and up
+  Art Camp {{ session_detail|replace("art-camp-2026-", "") }}:
+  {% if session_detail == "art-camp-2026-2" 
+      or session_detail == "art-camp-2026-4" %}
+    POTTERY
   {% else %}
-    Ages 6 and up
+    ART
   {% endif %}
   </b></p>
 
   <p>Begins
-    {% if session_detail == "art-camp-2025-1" %}
-    Jun 9-13
-    {% elif session_detail == "art-camp-2025-2" %}
-    Jun 16-20
-    {% elif session_detail == "art-camp-2025-3" %}
-    Jun 23-27
-    {% elif session_detail == "art-camp-2025-4" %}
-    Jul 7-11
-    {% elif session_detail == "art-camp-2025-5" %}
-    Jul 14-18
-    {% elif session_detail == "art-camp-2025-6" %}
-    Jul 21-25
-    {% elif session_detail == "art-camp-2025-7" %}
-    Jul 28 - Aug 1
-    {% elif session_detail == "art-camp-2025-8" %}
-    Aug 4-8
+    {% if session_detail == "art-camp-2026-1" %}
+    Jun 8-12, 9am-1pm, $250, 8yrs+, 16 campers max
+    {% elif session_detail == "art-camp-2026-2" %}
+    Jun 15-19 + Glaze Day, 9am-1pm, $300, 10yrs+, 12 campers max
+    {% elif session_detail == "art-camp-2026-3" %}
+    ART, Jul 13-17, 9am-1pm, $250, 11yrs+, 16 campers max
+    {% elif session_detail == "art-camp-2026-4" %}
+    POTTERY, Jul 20-24 + Glaze Day, 9am-1pm, $300 12yrs+, 12 campers max
     {% endif %}
   </p>
 
-    <p>Monday-Friday, 9am-12pm (drop off as early as 8:30am and pick up as late as 12:30pm)</p>
-    <p>Water and a light snack provided daily. Students may also bring their own.</p>
-
   <p><span style="background-color: Beige; padding: 10px;">{% if camper_count %}{{ camper_max - camper_count }}{% else %}{{ camper_max }}{% endif %} (of {{ camper_max }}) spots left</span></p>
-
-  <p>Price: $230</p>
-  <p>$210 for 2nd family registrant</p>
 
 {% endif %}
 
@@ -128,24 +120,16 @@ h3, h5 {
 
 <input type="hidden" name="rid" id="rid" value="{{ rid }}"/>
 
-<input type="hidden" name="event_title" value="Art Camp Registration 2025">
+<input type="hidden" name="event_title" value="Art Camp Registration 2026">
 
-{% if session_detail == "art-camp-2025-1" %}
-  <input type="hidden" name="event_date" value="June 9-13 2025">
-{% elif session_detail == "art-camp-2025-2" %}
-  <input type="hidden" name="event_date" value="June 16-20 2025">
-{% elif session_detail == "art-camp-2025-3" %}
-  <input type="hidden" name="event_date" value="June 23-27 2025">
-{% elif session_detail == "art-camp-2025-4" %}
-  <input type="hidden" name="event_date" value="July 7-11 2025">
-{% elif session_detail == "art-camp-2025-5" %}
-  <input type="hidden" name="event_date" value="July 14-18 2025">
-{% elif session_detail == "art-camp-2025-6" %}
-  <input type="hidden" name="event_date" value="July 21-25 2025">
-{% elif session_detail == "art-camp-2025-7" %}
-  <input type="hidden" name="event_date" value="July 28 - August 1 2025">
-{% elif session_detail == "art-camp-2025-8" %}
-  <input type="hidden" name="event_date" value="August 4-8 2025">
+{% if session_detail == "art-camp-2026-1" %}
+  <input type="hidden" name="event_date" value="Jun 8-12 2026">
+{% elif session_detail == "art-camp-2026-2" %}
+  <input type="hidden" name="event_date" value="Jun 15-19 2026">
+{% elif session_detail == "art-camp-2026-3" %}
+  <input type="hidden" name="event_date" value="Jul 13-17 2026">
+{% elif session_detail == "art-camp-2026-4" %}
+  <input type="hidden" name="event_date" value="Jul 20-24 2026">
 {% endif %}
 
 <!-- TAKE EMAIL OFF THE PAGE CUZ CC PAGE COLLECTS IT -->
@@ -391,8 +375,13 @@ function calculate() {
   var total = 0;
   var number_of_campers = 0;
 
-  var first_camper_price = 230;
-  var more_camper_price = 210;
+  {% if session_detail == "art-camp-2026-1" or session_detail == "art-camp-2026-3" %}
+  var first_camper_price = 250;
+  var more_camper_price = 250;
+  {% else %}
+  var first_camper_price = 300;
+  var more_camper_price = 300;
+  {% endif %}
 
   for (i = 1; i <= 3; i++) {
     try {

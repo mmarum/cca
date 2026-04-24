@@ -1,0 +1,57 @@
+{% extends "base-site.html" %}
+{% block title %}Catalyst Creative Arts Contact{% endblock %}
+
+{% block html_head %}
+<style>
+.form_item {
+  padding: 10px;
+  margin: 10px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="form_item" class="row">
+<div class="col-lg-12">
+
+{% if form_vals %}
+
+{% if error %}
+  <p style="color: red">Message NOT sent. Error: {{ error }}</p>
+{% endif %}
+
+{% for k, v in form_vals.items() %}
+
+  <p>{{ k }} {{ v }}</p>
+
+{% endfor %}
+
+{% else %}
+
+<form id="contact_form" name="contact_form" class="form-group" action="/contact/" method="POST">
+<input type="hidden" id="subject" name="subject" value="Inquiry from CCA contact form">
+<div class="form_item">
+  <input type="text" id="name" name="name" placeholder="Name" required="" class="form-control">
+</div>
+<div class="form_item">
+  <input type="email" id="email" name="email" placeholder="Email" required="" class="form-control">
+</div>
+<div class="form_item">
+  <input type="tel" id="phone" name="phone" placeholder="Phone" required="" class="form-control">
+</div>
+<div class="form_item">
+  <textarea class="form-control" id="comment" name="comment" placeholder="Comment"></textarea>
+</div>
+<div class="form_item">
+  <input type="submit" name="submit" id="submit" value="Submit" class="btn btn-warning">
+</div>
+</form>
+
+</div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+

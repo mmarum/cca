@@ -1,6 +1,8 @@
 import calendar
+from sql_mgr import query
 
-def make_cal(db, month, year):
+
+def make_cal(month, year):
     this_calendar = calendar.HTMLCalendar(calendar.SUNDAY)
     combined_cals = ""
 
@@ -31,53 +33,42 @@ def make_cal(db, month, year):
         else:
             prev_month = m - 1
 
-        #print(f"month: {m}")
-        #print(f"year: {year}")
-
         one_month_cal = this_calendar.formatmonth(year, m)
         one_month_cal = one_month_cal.replace("&nbsp;"," ")
         prev_link = f"<div id='prev_link'><a href='#' onclick='showMonth({prev_month}); return false;'>&#171; Prev</a></div>\n"
         next_link = f"<div id='next_link'><a href='#' onclick='showMonth({next_month}); return false;'>Next &#187;</a></div>\n"
         one_month_cal = f"<div id='month{m}'>\n{one_month_cal}\n{prev_link} {next_link}\n</div>\n"
-        c = db.cursor()
 
-        c.execute(f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) \
-            and tags NOT LIKE '%pottery-lesson%'")
-        allrows = c.fetchall()
+        sql = f"SELECT edatetime FROM events WHERE MONTH(edatetime) = {m} AND YEAR(edatetime) = {year} AND edatetime >= CURTIME() \
+            and (tags <> 'invisible' or tags is null) \
+            and tags NOT LIKE '%pottery-lesson%'"
+        allrows = query(sql)
 
-        #print(allrows)
-
-        c.close()
         zm = "0"+str(m) if len(str(m)) == 1 else m
         for d in allrows:
-            day = str(d[0])
+            day = str(d["edatetime"])
             day = day.split(' ')[0].split('-')[2].lstrip('0')
             zd = "0"+str(day) if len(str(day)) == 1 else day
             one_month_cal = one_month_cal.replace(f'">{day}<', f' event"><a href="/calendar.html#{year}-{zm}-{zd}" >{day}</a><')
         combined_cals += one_month_cal
-
-        #print(combined_cals)
 
         prev_month = m
 
     return combined_cals
 
 
-def make_list(db):
-    c = db.cursor()
-    c.execute(f"select eid, edatetime, title, description from events where edatetime > now() and (tags <> 'invisible' or tags is null) \
+def make_list():
+    sql = f"select eid, edatetime, title, description from events where edatetime > now() and (tags <> 'invisible' or tags is null) \
         and title != 'Studio Closed' \
-        and tags NOT LIKE '%pottery-lesson%' \
-        limit 7")
-    allrows = c.fetchall()
-    c.close()
+        and tags NOT LIKE '%pottery-lesson%' limit 7"
+    allrows = query(sql)
     event_list_string = ""
     for d in allrows:
-        eid = d[0]
-        edatetime = d[1]
+        eid = d["eid"]
+        edatetime = d["edatetime"]
         date_string = edatetime.strftime("%b %d %Y")
-        title = d[2]
-        description = d[3]
+        title = d["title"]
+        description = d["description"]
         if "private event" in title.lower() or "private event" in description.lower() or "studio closed" in title.lower():
             event_list_string += f'<div class="event_item">{date_string} <br> {title}</div>\n'
         else:

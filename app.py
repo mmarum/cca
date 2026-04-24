@@ -6,10 +6,11 @@ import time
 import base64
 import random
 import datetime
+import collections
 
+from PIL import Image
+from sql_mgr import query
 from urllib.parse import unquote
-from database import Database
-
 from os import listdir
 from gallery import Gallery
 from os.path import isfile, join
@@ -18,18 +19,14 @@ from update_extra import UpdateExtra
 from custom_filters import get_inventory, slugify
 from paper_calendar import make_cal, make_list
 from jinja2 import Environment, PackageLoader, select_autoescape
+from forms import ProductsForm, EventsForm, ImageForm, \
+    RegistrationForm, BookingForm, SignupForm
+from blauth import logged_in, login
+from tools import read_file, write_file, manage_post_input
 
-# https://wtforms.readthedocs.io/en/stable/index.html
-from forms import ProductsForm, EventsForm, ImageForm, RegistrationForm, BookingForm, SignupForm
 
-# https://pillow.readthedocs.io/en/stable/
-from PIL import Image
 
-# https://github.com/PyMySQL/mysqlclient-python
-# https://mysqlclient.readthedocs.io/user_guide.html
-import MySQLdb
-
-import collections
+refresh_to_signin = '<meta http-equiv="refresh" content="0; url=/app/admin/signin" />'
 
 env = Environment(
     loader=PackageLoader('app', 'templates'),
@@ -39,48 +36,7 @@ env = Environment(
 env.filters["get_inventory"] = get_inventory
 env.filters["slugify"] = slugify
 
-
 sys.path.insert(0, os.path.dirname(__file__))
-
-
-def read_file(file_name):
-    f = open(file_name, "r")
-    content = f.read()
-    f.close()
-    return content
-
-
-def write_file(file_name, content):
-    f = open(file_name, "w")
-    f.write(content)
-    f.close()
-    return True
-
-
-def manage_post_input(post_input):
-    post_input_array = post_input.split('------')
-    data_object = {}
-    for d in post_input_array:
-        post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
-        post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-        if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
-
-            if "[]" in post_data_key:
-                post_data_key = post_data_key.replace("[]", "")
-                post_data_key = post_data_key.replace("_indiv", "")
-                try:
-                    data_object[post_data_key].append(post_data_val)
-                except:
-                    data_object[post_data_key] = []
-                    data_object[post_data_key].append(post_data_val)
-            else:
-                data_object[post_data_key] = post_data_val
-
-    return data_object
-
-
-dbuser = "catalystcreative_cca"
-passwd = json.loads(read_file("data/passwords.json"))[dbuser]
 
 
 def app(environ, start_response):
@@ -96,12 +52,29 @@ def app(environ, start_response):
     galleries_list = list(galleries_dict.keys())
     galleries_dict_vals = list(galleries_dict.values())
 
-    db = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_arts")
-
     global_settings = json.loads(read_file("data/global_settings.json"))
     path = environ['PATH_INFO']
-    d = Database()
+    http_cookie = environ.get("HTTP_COOKIE", "")
 
+
+    if "admin" in environ['PATH_INFO']:
+        if path == '/admin/signin':
+            data_object=None
+            login_result=None
+            if environ['REQUEST_METHOD'] == "POST":
+                length = int(environ.get('CONTENT_LENGTH', '0'))
+                post_input = environ['wsgi.input'].read(length).decode('UTF-8')
+                data_object = manage_post_input(post_input)
+                login_result = login(data_object)
+            template = env.get_template("admin-signin.html")
+            response = template.render(data_object=data_object, login_result=login_result)
+            return [response.encode()]
+        elif path == '/admin/signout':
+            template = env.get_template("admin-signout.html")
+            response = template.render()
+            return [response.encode()]
+        elif logged_in(http_cookie) == False:
+            return [refresh_to_signin.encode()]
 
     ####
     ####
@@ -109,8 +82,8 @@ def app(environ, start_response):
 
         if path == '/admin/events/list':
 
-            sql = f"SELECT * FROM events WHERE edatetime >= CURDATE() ORDER BY edatetime"
-            rows = d.query(sql)
+            sql = f"select * from events where edatetime >= CURDATE() order by edatetime"
+            rows = query(sql)
             template = env.get_template("admin-events-list.html")
             response = template.render(rows=rows)
             return [response.encode()]
@@ -125,9 +98,8 @@ def app(environ, start_response):
                 where a.cart_order_id = b.cart_order_id \
                 and b.product_id = c.pid"
 
-            db.query(f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is NULL")
-            r = db.store_result()
-            unshipped = r.fetch_row(maxrows=100, how=1)
+            sql = f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is NULL"
+            unshipped = query(sql)
 
             shipping_info = {}
             for d in unshipped:
@@ -138,14 +110,10 @@ def app(environ, start_response):
                 except:
                     pass
 
-            db.query(f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is not NULL")
-            r = db.store_result()
-            shipped = r.fetch_row(maxrows=100, how=1)
-
-            db.query(f"{base_sql} and create_date >= '2023-09-23' and status is NULL order by a.create_date desc")
-            r = db.store_result()
-            unpurchased = r.fetch_row(maxrows=100, how=1)
-
+            sql = f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is not NULL"
+            shipped = query(sql)
+            sql = f"{base_sql} and create_date >= '2023-09-23' and status is NULL order by a.create_date desc"
+            unpurchased = query(sql)
             template = env.get_template("admin-orders-list.html")
             response = template.render(unshipped=unshipped, shipped=shipped, unpurchased=unpurchased, shipping_info=shipping_info)
 
@@ -153,15 +121,11 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == '/admin/events/add-edit':
             if len(environ['QUERY_STRING']) > 1:
                 eid = environ['QUERY_STRING'].split("=")[1]
-                db.query(f"SELECT * FROM events WHERE eid = {eid}")
-                r = db.store_result()
-                row = r.fetch_row(maxrows=1, how=1)[0]
+                sql = f"select * from events where eid = {eid}"
+                row = query(sql)[0]
                 form = EventsForm(**row)
-
-                c = db.cursor()
-                c.execute(f"SELECT * FROM events WHERE tags like '%series={eid}%'")
-                children = c.fetchall()
-                c.close()
+                sql = f"select * from events where tags like '%series={eid}%'"
+                children = query(sql)
             else:
                 form = EventsForm()
                 children = None
@@ -171,26 +135,18 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == "/admin/events/delete":
             eid = int(environ['QUERY_STRING'].split("=")[1])
-            if type(eid) == int:
-
-                # FIRST UPDATE THE HTML PAGE !!!!
-                db.query(f"SELECT * FROM events WHERE eid = {eid}")
-                e = db.store_result()
-                event = e.fetch_row(maxrows=1, how=1)[0]
-                event["quantity_sum"] = 0
-                event["remaining_spots"] = 0
-                template = env.get_template("event.html")
-                content = template.render(event=event, deleted=True)
-                write_file(f"../www/event/{eid}.html", content)
-
-                sql = f"DELETE FROM events WHERE eid = {eid}"
-                c = db.cursor()
-                c.execute(sql)
-                c.close()
-
-                response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
-            else:
+            if type(eid) != int:
                 response = ""
+            sql = f"select * from events where eid = {eid}"
+            event = query(sql)[0]
+            event["quantity_sum"] = 0
+            event["remaining_spots"] = 0
+            template = env.get_template("event.html")
+            content = template.render(event=event, deleted=True)
+            write_file(f"../www/event/{eid}.html", content)
+            sql = f"delete from events where eid = {eid}"
+            query(sql)
+            response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
 
         #### ####
@@ -198,12 +154,11 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == '/build-individual-event':
             if environ['QUERY_STRING']:
                 eid = int(environ['QUERY_STRING'].split("=")[1])
-                db.query(f"SELECT * FROM events WHERE eid = {eid}")
+                sql = f"select * from events where eid = {eid}"
             else:
-                db.query("SELECT * FROM events WHERE edatetime >= CURTIME() \
-                    and (tags <> 'invisible' or tags is null) ORDER BY edatetime")
-            e = db.store_result()
-            allrows = e.fetch_row(maxrows=100, how=1)
+                sql = "select * from events where edatetime >= CURTIME() order by edatetime"
+                #    #and (tags <> 'invisible' or tags is null) order by edatetime")
+            allrows = query(sql)
 
             template = env.get_template("event.html")
             upcoming_event_ids = []
@@ -211,9 +166,8 @@ def app(environ, start_response):
                 eid = event["eid"]
                 elimit = event["elimit"]
 
-                db.query(f"select sum(quantity) as quantity_sum from orders where eid = {eid}")
-                q = db.store_result()
-                quantity_sum = q.fetch_row(maxrows=1, how=1)[0]["quantity_sum"]
+                sql = f"select sum(quantity) as quantity_sum from orders where eid = {eid}"
+                quantity_sum = query(sql)[0]["quantity_sum"]
 
                 try:
                     event["quantity_sum"] = int(quantity_sum)
@@ -224,6 +178,7 @@ def app(environ, start_response):
 
                 upcoming_event_ids.append(eid)
                 content = template.render(event=event)
+
                 write_file(f"../www/event/{eid}.html", content)
             write_file(f"data/upcoming_event_ids.json", json.dumps(upcoming_event_ids, indent=4))
             response = "build-individual-event"
@@ -233,15 +188,14 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/list/events' or environ['PATH_INFO'] == '/calendar':
 
-            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags NOT LIKE '%pottery-lesson%' ORDER BY edatetime")
-            r = db.store_result()
-            allrows = r.fetch_row(maxrows=1000, how=1)
+            sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
+                    or tags is null) and tags NOT LIKE '%pottery-lesson%' order by edatetime"
+            allrows = query(sql)
 
-            db.query("SELECT eid, SUM(quantity) as sum_quantity FROM orders GROUP BY eid")
+            sql = "select eid, SUM(quantity) as sum_quantity from orders GROUP BY eid"
             # TODO: May need to add join to events table above
             # so as to only pull future event dates
-            r = db.store_result()
-            orders_count = r.fetch_row(maxrows=1000, how=1)
+            orders_count = query(sql)
 
             orders_count_object = {}
             for item in orders_count:
@@ -283,52 +237,12 @@ def app(environ, start_response):
 
         elif environ['PATH_INFO'] == '/pottery-lessons':
 
+            sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
+                    or tags is null) and (tags LIKE '%pottery-lesson%' OR tags like '%PL4%') order by edatetime ASC"
+            allrows = query(sql)
 
-            """
-            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags LIKE '%pottery-lesson%' ORDER BY edatetime ASC")
-            r = db.store_result()
-            allrows = r.fetch_row(maxrows=1000, how=1)
-
-            db.query("SELECT eid, SUM(quantity) as sum_quantity FROM orders GROUP BY eid")
-            r = db.store_result()
-            orders_count = r.fetch_row(maxrows=1000, how=1)
-
-            orders_count_object = {}
-            for item in orders_count:
-                key = int(item['eid'])
-                val = int(item['sum_quantity'])
-                orders_count_object[key] = val
-
-            events_object = {}
-            for row in allrows:
-                eid = row["eid"]
-                events_object[eid] = {}
-                events_object[eid]["date"] = int(row["edatetime"].timestamp())
-                events_object[eid]["title"] = row["title"]
-                events_object[eid]["price"] = row["price"]
-                events_object[eid]["price_text"] = row["price_text"]
-
-            events_object = json.dumps(events_object)
-
-            template = env.get_template("pottery-lessons.html")
-            response = template.render(events=allrows, 
-                orders_count=orders_count_object, 
-                events_object=events_object)
-
-
-        ####
-
-        elif environ['PATH_INFO'] == '/pottery-lessons-test':
-
-            """
-
-            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and (tags LIKE '%pottery-lesson%' OR tags like '%PL4%') ORDER BY edatetime ASC")
-            r = db.store_result()
-            allrows = r.fetch_row(maxrows=1000, how=1)
-
-            db.query("SELECT eid, SUM(quantity) as sum_quantity FROM orders GROUP BY eid")
-            r = db.store_result()
-            orders_count = r.fetch_row(maxrows=1000, how=1)
+            sql = "select eid, SUM(quantity) as sum_quantity from orders GROUP BY eid"
+            orders_count = query(sql)
 
             orders_count_object = {}
             for item in orders_count:
@@ -354,20 +268,18 @@ def app(environ, start_response):
                 orders_count=orders_count_object, 
                 events_object=events_object)
 
-
         ####
 
 
         elif environ['PATH_INFO'] == '/after-school-pottery':
 
 
-            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and (tags LIKE '%after-school-pottery%') ORDER BY edatetime ASC")
-            r = db.store_result()
-            allrows = r.fetch_row(maxrows=1000, how=1)
+            sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
+                    or tags is null) and (tags LIKE '%after-school-pottery%') order by edatetime ASC"
+            allrows = query(sql)
 
-            db.query("SELECT eid, SUM(quantity) as sum_quantity FROM orders GROUP BY eid")
-            r = db.store_result()
-            orders_count = r.fetch_row(maxrows=1000, how=1)
+            sql = "select eid, SUM(quantity) as sum_quantity from orders GROUP BY eid"
+            orders_count = query(sql)
 
             orders_count_object = {}
             for item in orders_count:
@@ -386,7 +298,6 @@ def app(environ, start_response):
                 events_object[eid]["tags"] = row["tags"]
 
             events_object = json.dumps(events_object)
-
             template = env.get_template("after-school-pottery.html")
             response = template.render(events=allrows, 
                 orders_count=orders_count_object, 
@@ -396,21 +307,13 @@ def app(environ, start_response):
         ####
 
 
-
-
         elif environ['PATH_INFO'] == '/community-events':
-            db.query("SELECT * FROM events WHERE edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags LIKE '%community-event%' ORDER BY edatetime ASC")
-            r = db.store_result()
-            allrows = r.fetch_row(maxrows=1000, how=1)
+            sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags LIKE '%community-event%' order by edatetime ASC"
+            allrows = query(sql)
+            sql = "select * from events where edatetime < CURTIME() and (tags <> 'invisible' or tags is null) and tags LIKE '%community-event%' order by edatetime DESC"
+            past_events = query(sql)
             template = env.get_template("community-events.html")
-            response = template.render(events=allrows)
-
-        ####
-
-
-        #elif environ['PATH_INFO'] == '/mural-2024':
-        #    template = env.get_template("mural-2024.html")
-        #    response = template.render()
+            response = template.render(events=allrows, past_events=past_events)
 
         ####
 
@@ -421,9 +324,8 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/products':
-            db.query("SELECT * FROM products WHERE active = 1")
-            r = db.store_result()
-            allrows = r.fetch_row(maxrows=100, how=1)
+            sql = "select * from products where active = 1"
+            allrows = query(sql)
             template = env.get_template("list-products.html")
             response = template.render(products=allrows)
 
@@ -433,23 +335,18 @@ def app(environ, start_response):
             product_name = path_parts[2]
             product_id = path_parts[3]
             pid = int(product_id)
-            db.query(f"SELECT * FROM products WHERE pid = {pid}")
-            r = db.store_result()
-            row = r.fetch_row(maxrows=1, how=1)[0]
+            sql = f"select * from products where pid = {pid}"
+            row = query(sql)[0]
             template = env.get_template("product-detail.html")
             response = template.render(row=row)
 
 
         elif environ['PATH_INFO'] == '/book/event':
             eid = environ['QUERY_STRING'].split("=")[1]
-            db.query(f"SELECT * FROM events WHERE eid = {eid}")
-            r = db.store_result()
-            row = r.fetch_row(maxrows=1, how=1)[0]
-
-            db.query(f"SELECT count(id) as cnt FROM orders WHERE eid = {eid}")
-            o = db.store_result()
-            order_count = o.fetch_row(maxrows=1, how=1)[0]["cnt"]
-
+            sql = f"select * from events where eid = {eid}"
+            row = query(sql)[0]
+            sql = f"select count(id) as cnt from orders where eid = {eid}"
+            order_count = query(sql)[0]["cnt"]
             template = env.get_template("book-event.html")
             response = template.render(event_data=row, order_count=order_count)
 
@@ -553,13 +450,9 @@ def app(environ, start_response):
                             fields = "order_id, eid, create_time, email, first_name, last_name, quantity, cost, paid, variable_time, extra_data, transaction_id, buyer_name, buyer_phone"
                             #vals = str(data_array).lstrip('[').rstrip(']')
                             vals = data_array
-                            #sql = f"INSERT INTO orders ({fields}) VALUES ({vals})"
-                            sql = f"INSERT INTO orders ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-                            c = db.cursor()
-                            #c.execute(sql)
-                            c.execute(sql, vals)
-                            c.close()
+                            #sql = f"insert into orders ({fields}) values ({vals})"
+                            sql = f"insert into orders ({fields}) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                            query(sql)
 
                         except:
                             pass
@@ -577,18 +470,12 @@ def app(environ, start_response):
                         os.rename(f"orders/{f}", f"orders/loaded/{f}")
 
             # PART-2: Select future-event-date orders from database for admin view
-            #c = db.cursor()
-            query = f"SELECT e.title, e.edatetime, e.elimit, o.* \
-                FROM events e, orders o WHERE e.eid = o.eid AND e.edatetime {gtlt} CURDATE() ORDER BY e.edatetime {ascdesc}"
-            #c.execute(query)
-            #allrows = c.fetchall()
-            #c.close()
 
-            # NOTE: changing from db.cursor / c.execute to db.query / db.store_result for use of dict in template
+            sql = f"select e.title, e.edatetime, e.elimit, o.* \
+                from events e, orders o where e.eid = o.eid AND \
+                e.edatetime {gtlt} CURDATE() order by e.edatetime {ascdesc}"
 
-            db.query(query)
-            r = db.store_result()
-            allrows = r.fetch_row(maxrows=1000, how=1)
+            allrows = query(sql)
 
             # GROUP BY EVENT ID:
             new_booking_dict = {}
@@ -621,16 +508,13 @@ def app(environ, start_response):
         ####
         elif environ['PATH_INFO'] == '/admin/booking/add-edit':
 
-            c = db.cursor()
-            c.execute(f"SELECT * FROM events WHERE edatetime > CURTIME() order by edatetime asc")
-            allevents = c.fetchall()
-            c.close()
+            sql = f"select * from events where edatetime > CURTIME() order by edatetime asc"
+            allevents = query(sql)
 
             if len(environ['QUERY_STRING']) > 1:
                 order_id = environ['QUERY_STRING'].split("=")[1]
-                db.query(f"SELECT * FROM orders WHERE id = {order_id}")
-                r = db.store_result()
-                row = r.fetch_row(maxrows=1, how=1)[0]
+                sql = f"select * from orders where id = {order_id}"
+                row = query(sql)[0]
                 form = BookingForm(**row)
             else:
                 form = BookingForm()
@@ -643,37 +527,34 @@ def app(environ, start_response):
             # UP-NEXT EVENT
             month = int(this_now.strftime("%m"))
             year = int(this_now.strftime("%Y"))
-            html_cal = make_cal(db, month, year)
+            html_cal = make_cal(month, year)
 
-            sql = f"SELECT * FROM events WHERE edatetime > CURTIME() \
+            sql = f"select * from events where edatetime > CURTIME() \
                 and (tags <> 'invisible' or tags is null) \
                 and title != 'Private Event' \
                 and description not like '%Private Event%' \
                 and title not like '%Studio Closed%' \
                 and title != 'Studio Closed' \
                 and tags NOT LIKE '%pottery-lesson%' \
-                ORDER BY edatetime limit 1"
-            db.query(sql)
-            r = db.store_result()
-            next_event = r.fetch_row(maxrows=1, how=1)[0]
+                order by edatetime limit 1"
+
+            next_event = query(sql)[0]
 
             # FEATURED / PINNED EVENTS
-            sql = f"SELECT * FROM events \
-                WHERE edatetime > CURTIME() \
+            sql = f"select * from events \
+                where edatetime > CURTIME() \
                 and tags = 'home' and tags NOT LIKE '%pottery-lesson%' \
-                ORDER BY edatetime limit 10"
-            db.query(sql)
-            r = db.store_result()
-            events_tagged_home = r.fetch_row(maxrows=10, how=1)
+                order by edatetime limit 10"
+
+            events_tagged_home = query(sql)
 
             # RANDOM PRODUCT
             sql = f"select pid, name, image_path_array, price \
                 from products where inventory > 0 \
-                and active = 1 ORDER BY RAND() LIMIT 1"
-            db.query(sql)
-            r = db.store_result()
+                and active = 1 order by RAND() LIMIT 1"
+
             try:
-                random_product = r.fetch_row(maxrows=10, how=1)[0]
+                random_product = query(sql)[0]
             except:
                 random_product = None
 
@@ -685,7 +566,7 @@ def app(environ, start_response):
             images = g.get_images()
 
             # Event List:
-            event_list_html = make_list(db)
+            event_list_html = make_list()
 
             # RANDOM CRAFTS GALLERY
             good_cats = '"Acrylic Painting", "Artist Guided Family Painting", \
@@ -697,16 +578,10 @@ def app(environ, start_response):
                 where a.id = b.image_id \
                 and b.category_id = c.id \
                 and c.name in ({good_cats}) \
-                ORDER BY RAND() \
+                order by RAND() \
                 LIMIT 1"
 
-            ####
-            db2 = MySQLdb.connect(host="localhost", user=dbuser, passwd=passwd, db="catalystcreative_66")
-            ####
-
-            db2.query(sql)
-            r = db2.store_result()
-            random_gallery = r.fetch_row(maxrows=1, how=1)[0]
+            random_gallery = query(sql)[0]
 
             rg_img_path = random_gallery["path"]
             rg_category = random_gallery["name"]
@@ -741,21 +616,22 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/signup':
-            signup_data = {}
-            signup_path = "../signup/data/"
-            signup_file = "wheel-wars-2025.json" # temporary: will expand when we get other signups going
-            signup_contents = json.loads(read_file(f"{signup_path}{signup_file}"))
-            signup_key = signup_file.replace(".json", "")
-            signup_data[signup_key] = signup_contents
+            signups = []
+            path = "../signup/data/"
+            files = [f for f in listdir(path) if isfile(join(path, f))]
+            for file in files:
+                data = {}
+                contents = json.loads(read_file(f"{path}{file}"))
+                key = file.replace(".json", "")
+                data[key] = contents
+                signups.append(data)
             template = env.get_template("admin-signup-list.html")
-            response = template.render(signup_data=signup_data)
+            response = template.render(signups=signups)
 
 
         elif environ['PATH_INFO'] == '/admin/guests':
-            c = db.cursor()
-            c.execute("select distinct parent_name, parent_email, parent_phone, session_detail from registration order by session_detail")
-            registration_data = c.fetchall()
-            c.close()
+            sql = "select distinct parent_name, parent_email, parent_phone, session_detail from registration order by session_detail"
+            registration_data = query(sql)
 
             # group by session:
             registration_data_dict = {}
@@ -801,9 +677,8 @@ def app(environ, start_response):
                 special = "AND order_id is not NULL"
                 orderby = "session_detail"
 
-            db.query(f"SELECT * FROM registration where session_detail LIKE '%2025%' {special} ORDER BY {orderby}")
-            r = db.store_result()
-            allrows = r.fetch_row(maxrows=100, how=1)
+            sql = f"select * from registration where session_detail LIKE '%2026%' {special} order by {orderby}"
+            allrows = query(sql)
 
             # GROUP BY CAMP:
             new_reg_dict = {}
@@ -825,7 +700,9 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == '/admin/registration/add-edit':
             if len(environ['QUERY_STRING']) > 1:
                 rid = environ['QUERY_STRING'].split("=")[1]
-                this_reg_data = {}
+                sql = f"select * from registration where rid = {rid}"
+                this_reg_data = query(sql)[0]
+                #print("this_reg_data", this_reg_data)
                 form = RegistrationForm(**this_reg_data)
             else:
                 form = RegistrationForm()
@@ -860,10 +737,10 @@ def app(environ, start_response):
 
 
         elif environ['PATH_INFO'] == '/admin/products/list':
-            c = db.cursor()
-            c.execute("SELECT * FROM products order by pid desc")
-            allrows = c.fetchall()
-            c.close()
+
+            sql = "select * from products order by pid desc"
+            allrows = query(sql)
+
             template = env.get_template("admin-products-list.html")
             response = template.render(allrows=allrows, global_settings=global_settings)
 
@@ -871,9 +748,8 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == '/admin/products/add-edit':
             if len(environ['QUERY_STRING']) > 1:
                 pid = environ['QUERY_STRING'].split("=")[1]
-                db.query(f"SELECT * FROM products WHERE pid = {pid}")
-                r = db.store_result()
-                row = r.fetch_row(maxrows=1, how=1)[0]
+                sql = f"select * from products where pid = {pid}"
+                row = query(sql)[0]
                 form = ProductsForm(**row)
             else:
                 form = ProductsForm()
@@ -884,14 +760,10 @@ def app(environ, start_response):
         elif environ['PATH_INFO'] == '/admin/products/delete':
             if len(environ['QUERY_STRING']) > 1:
                 pid = int(environ['QUERY_STRING'].split("=")[1])
-                sql = f"DELETE FROM products WHERE pid = {pid}"
-                c = db.cursor()
-                c.execute(sql)
-                c.close()
-                sql = f"DELETE FROM cart_order_product WHERE product_id = {pid}"
-                c = db.cursor()
-                c.execute(sql)
-                c.close()
+                sql = f"delete from products where pid = {pid}"
+                query(sql)
+                sql = f"delete from cart_order_product where product_id = {pid}"
+                query(sql)
                 response = '<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
             else:
                 response = ""
@@ -942,10 +814,8 @@ def app(environ, start_response):
         image = Image.open(f"../www/img/orig/{img_name}")
         image.thumbnail(size)
         image.save(f"../www/img/small/{img_name}", 'JPEG')
-        sql = f"UPDATE products SET image_path_array = concat(ifnull(image_path_array,''), ',{img_name}') WHERE pid = {pid}"
-        c = db.cursor()
-        c.execute(sql)
-        c.close()
+        sql = f"update products set image_path_array = concat(ifnull(image_path_array,''), ',{img_name}') where pid = {pid}"
+        query(sql)
         response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
 
 
@@ -972,10 +842,8 @@ def app(environ, start_response):
             image = Image.open(f"../www/img/orig/{img_name}")
             image.thumbnail(size)
             image.save(f"../www/img/small/{img_name}", 'JPEG')
-            sql = f"UPDATE events SET image = '{img_name}' WHERE eid = {eid}"
-            c = db.cursor()
-            c.execute(sql)
-            c.close()
+            sql = f"update events set image = '{img_name}' where eid = {eid}"
+            query(sql)
         response = f'<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
 
@@ -1084,38 +952,22 @@ def app(environ, start_response):
                 v = v.replace("'", "''")
                 keys_vals += str(f"{k}='{v}', ")
             keys_vals = keys_vals.rstrip(', ')
-            sql = f"UPDATE products SET {keys_vals} WHERE pid = {pid}"
-            #print(sql)
-            c = db.cursor()
-            c.execute(sql)
+            sql = f"update products set {keys_vals} where pid = {pid}"
+            query(sql)
+
         else:
             fields = "name, description, image_path_array, inventory, price, keywords_array, active"
-            vals = data_array
-            sql = f"INSERT INTO products ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-            c = db.cursor()
-            c.execute(sql, vals)
-        c.close()
-
-        # Next template needs to know the pid
-        if action == "Insert":
-            # Now retrieve the pid from the item we just added
-            n = data_object['name']
-            p = data_object['price']
-            sql2 = f"SELECT pid FROM products WHERE name = '{n}' AND price = '{p}'"
-            #print(sql2)
-            d = db.cursor()
-            d.execute(sql2)
-            results = d.fetchone()
-            pid = int(results[0])
-            d.close()
-        else:
-            sql2 = "just an update"
+            vals = ""
+            for val in data_array:
+                vals += f"'{val}',"
+            vals = vals.rstrip(",")
+            sql = f"insert into products ({fields}) values ({vals})"
+            pid = query(sql)
 
         image_form = ImageForm()
-
         template = env.get_template("admin-products-image.html")
         response = template.render(product_data=data_object, image_form=image_form,
-            sql={"sql":sql}, pid={"pid":pid}, sql2={"sql2":sql2})
+            sql={"sql":sql}, pid={"pid":pid})
 
 
     ####
@@ -1132,21 +984,43 @@ def app(environ, start_response):
             if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and not post_data_val.startswith('-----'):
                 data_object[post_data_key] = post_data_val
                 data_array.append(post_data_val)
-        del data_object["rid"]
-        fields = ""
-        for k in data_object.keys():
-            fields += f"{k},"
-        fields = fields.rstrip(",")
+
+        try:
+            if int(data_object['rid']) > 0:
+                action = "Update"
+                rid = data_object['rid']
+            else:
+                action = "Insert"
+        except:
+            action = "Insert"
+
+        # Cleanup: Remove "rid"
+        del data_object['rid']
         del data_array[0]
-        values = ""
-        for v in data_array:
-            values += f"'{v}',"
-        values = values.rstrip(",")
-        sql = f"INSERT INTO registration ({ fields }) VALUES ({ values })"
-        print(sql)
-        c = db.cursor()
-        c.execute(sql)
-        c.close()
+
+        if action == "Update":
+
+            keys_vals = ""
+            for k, v in data_object.items():
+                v = v.replace("'", "''")
+                keys_vals += str(f"{k}='{v}', ")
+            keys_vals = keys_vals.rstrip(', ')
+            sql = f"update registration set {keys_vals} where rid = {rid}"
+
+        elif action == "Insert":
+
+            fields = ""
+            for k in data_object.keys():
+                fields += f"{k},"
+            fields = fields.rstrip(",")
+            del data_array[0]
+            values = ""
+            for v in data_array:
+                values += f"'{v}',"
+            values = values.rstrip(",")
+            sql = f"insert into registration ({ fields }) values ({ values })"
+
+        query(sql)
         template = env.get_template("admin-registration-add-edit.html")
         response = template.render(sql=sql)
 
@@ -1222,72 +1096,22 @@ def app(environ, start_response):
                 v = v.replace("'", "''")
                 keys_vals += str(f"{k}='{v}', ")
             keys_vals = keys_vals.rstrip(', ')
-            sql = f"UPDATE events SET {keys_vals} WHERE eid = {eid}"
+            sql = f"update events set {keys_vals} where eid = {eid}"
+            query(sql)
 
-            c = db.cursor()
-            c.execute(sql)
-            #c.execute(sql, vals)
-
-
-        else:
-            # fields MUST match keys coming in via "data_array":
+        elif action == "Insert":
             fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, tags, extra_data"
-            #vals = str(data_array).lstrip('[').rstrip(']')
-            vals = data_array
-            #sql = f"INSERT INTO events ({fields}) VALUES ({vals})"
-            # Number of items (%s) MUST match num of vals coming in via "data_array":
-            sql = f"INSERT INTO events ({fields}) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-            c = db.cursor()
-            #c.execute(sql)
-            c.execute(sql, vals)
-
-
-        c.close()
-
-        # Next template needs to know the eid
-        if action == "Insert":
-            # Now retrieve the eid from the item we just added
-            e = data_object['edatetime']
-            t = data_object['title'].replace("'", "''")
-            sql2 = f"SELECT eid, price_text, elimit FROM events WHERE edatetime = '{e}' AND title = '{t}'"
-            #print("____", sql2)
-            d = db.cursor()
-            d.execute(sql2)
-            results = d.fetchone()
-            #print("____results", results)
-            #print("____type of results", type(results))
-            eid = int(results[0])
-            try:
-                price_text = results[1]
-            except:
-                price_text = ""
-            try:
-                elimit = int(results[2])
-            except:
-                elimit = ""
-            d.close()
-
-
-            #
-            # TESTING THE NEW VARIABLE-TIME STUFF:
-            if "am" in price_text or "pm" in price_text:
-                u = UpdateExtra(eid, price_text, elimit)
-                u.set_via_admin()
-                u.update_extra()
-            #
-
-
-        else:
-            sql2 = "just an update"
-
-
+            vals = ""
+            for val in data_array:
+                vals += f"'{val}',"
+            vals = vals.rstrip(",")
+            sql = f"insert into events ({fields}) values ({vals})"
+            eid = query(sql)
 
         image_form = ImageForm()
-
         template = env.get_template("admin-events-image.html")
         response = template.render(event_data=data_object, image_form=image_form,
-            sql={"sql":sql}, eid={"eid":eid}, sql2={"sql2":sql2})
+            sql={"sql":sql}, eid={"eid":eid})
 
         #scrape_and_write("calendar")
         #time.sleep(2)
@@ -1299,8 +1123,6 @@ def app(environ, start_response):
         response = "error"
 
     #response += f"<hr>{str(environ)}"
-
-    db.close()
 
     return [response.encode()]
 
