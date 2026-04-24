@@ -9,10 +9,10 @@ import datetime
 import collections
 
 from PIL import Image
-from sql_mgr import query
-from urllib.parse import unquote
 from os import listdir
+from sql_mgr import query
 from gallery import Gallery
+from urllib.parse import unquote
 from os.path import isfile, join
 from writer import scrape_and_write
 from update_extra import UpdateExtra
@@ -25,9 +25,6 @@ from blauth import logged_in, login
 from tools import read_file, write_file, post_input_mgr_1, post_input_mgr_2
 
 
-
-refresh_to_signin = '<meta http-equiv="refresh" content="0; url=/app/admin/signin" />'
-
 env = Environment(
     loader=PackageLoader('app', 'templates'),
     autoescape=select_autoescape(['html'])
@@ -37,6 +34,221 @@ env.filters["get_inventory"] = get_inventory
 env.filters["slugify"] = slugify
 
 sys.path.insert(0, os.path.dirname(__file__))
+
+refresh_to_signin = '<meta http-equiv="refresh" content="0; url=/app/admin/signin" />'
+
+
+def admin_events_list():
+    sql = f"select * from events where edatetime >= CURDATE() order by edatetime"
+    rows = query(sql)
+    template = env.get_template("admin-events-list.html")
+    response = template.render(rows=rows)
+    return response
+
+
+def admin_orders_list():
+    base_sql = "select a.cart_order_id, a.create_date, a.checkout_date, \
+        a.paypal_order_id, a.total, a.ship_date, a.session_id, b.quantity, \
+        c.pid, c.name, c.image_path_array, c.inventory, c.price \
+        from cart_order a, cart_order_product b, products c \
+        where a.cart_order_id = b.cart_order_id \
+        and b.product_id = c.pid"
+
+    sql = f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is NULL"
+    unshipped = query(sql)
+
+    shipping_info = {}
+    for d in unshipped:
+        order_id = d["paypal_order_id"]
+        try:
+            webhook_metada = json.loads(read_file(f"../store-checkout/purchases/{order_id}.json"))
+            shipping_info[order_id] = webhook_metada
+        except:
+            pass
+
+    sql = f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is not NULL"
+    shipped = query(sql)
+    sql = f"{base_sql} and create_date >= '2023-09-23' and status is NULL order by a.create_date desc"
+    unpurchased = query(sql)
+    template = env.get_template("admin-orders-list.html")
+    response = template.render(unshipped=unshipped, shipped=shipped, unpurchased=unpurchased, shipping_info=shipping_info)
+    return response
+
+
+def admin_events_add_edit(query_string):
+    if len(query_string) > 1:
+        eid = query_string.split("=")[1]
+        sql = f"select * from events where eid = {eid}"
+        row = query(sql)[0]
+        form = EventsForm(**row)
+        sql = f"select * from events where tags like '%series={eid}%'"
+        children = query(sql)
+    else:
+        form = EventsForm()
+        children = None
+    template = env.get_template("admin-events-add-edit.html")
+    response = template.render(form=form, children=children)
+    return response
+
+
+def admin_events_delete(query_string):
+    eid = int(query_string.split("=")[1])
+    if type(eid) != int:
+        return ""
+    sql = f"select * from events where eid = {eid}"
+    event = query(sql)[0]
+    event["quantity_sum"] = 0
+    event["remaining_spots"] = 0
+    template = env.get_template("event.html")
+    content = template.render(event=event, deleted=True)
+    write_file(f"../www/event/{eid}.html", content)
+    sql = f"delete from events where eid = {eid}"
+    query(sql)
+    response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
+    return response
+
+
+def build_individual_event(query_string):
+    if query_string:
+        eid = int(query_string.split("=")[1])
+        sql = f"select * from events where eid = {eid}"
+    else:
+        sql = "select * from events where edatetime >= CURTIME() order by edatetime"
+        #    #and (tags <> 'invisible' or tags is null) order by edatetime")
+    allrows = query(sql)
+
+    template = env.get_template("event.html")
+    upcoming_event_ids = []
+    for event in allrows:
+        eid = event["eid"]
+        elimit = event["elimit"]
+
+        sql = f"select sum(quantity) as quantity_sum from orders where eid = {eid}"
+        quantity_sum = query(sql)[0]["quantity_sum"]
+
+        try:
+            event["quantity_sum"] = int(quantity_sum)
+            event["remaining_spots"] = int(elimit) - int(quantity_sum)
+        except:
+            event["quantity_sum"] = 0
+            event["remaining_spots"] = int(elimit)
+
+        upcoming_event_ids.append(eid)
+        content = template.render(event=event)
+
+        write_file(f"../www/event/{eid}.html", content)
+    write_file(f"data/upcoming_event_ids.json", json.dumps(upcoming_event_ids, indent=4))
+    response = "build-individual-event"
+    return response
+
+
+def list_events_calendar():
+    sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
+            or tags is null) and tags NOT LIKE '%pottery-lesson%' order by edatetime"
+    allrows = query(sql)
+
+    sql = "select eid, SUM(quantity) as sum_quantity from orders GROUP BY eid"
+    # TODO: May need to add join to events table above
+    # so as to only pull future event dates
+    orders_count = query(sql)
+
+    orders_count_object = {}
+    for item in orders_count:
+        key = int(item['eid'])
+        val = int(item['sum_quantity'])
+        orders_count_object[key] = val
+
+    events_object = {}
+    parent = {}
+    for row in allrows:
+        eid = row["eid"]
+        events_object[eid] = {}
+        events_object[eid]["date"] = int(row["edatetime"].timestamp())
+        events_object[eid]["title"] = row["title"]
+        events_object[eid]["price"] = row["price"]
+        events_object[eid]["price_text"] = row["price_text"]
+
+        if "series" in row["tags"]:
+            parent[eid] = re.sub('^.*series=(\d+).*$', r'\1', row["tags"])
+        else:
+            parent[eid] = ""
+
+    events_object = json.dumps(events_object)
+    try:
+        test = query_string.split("=")[1]
+    except:
+        test = ""
+
+    template = env.get_template("list-events.html")
+    response = template.render(events=allrows, 
+        orders_count=orders_count_object, 
+        events_object=events_object, 
+        parent=parent, 
+        test=test)
+    return response
+
+
+def pottery_lessons():
+    sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
+            or tags is null) and (tags LIKE '%pottery-lesson%' OR tags like '%PL4%') order by edatetime ASC"
+    allrows = query(sql)
+
+    sql = "select eid, SUM(quantity) as sum_quantity from orders GROUP BY eid"
+    orders_count = query(sql)
+
+    orders_count_object = {}
+    for item in orders_count:
+        key = int(item['eid'])
+        val = int(item['sum_quantity'])
+        orders_count_object[key] = val
+
+    events_object = {}
+    for row in allrows:
+        eid = row["eid"]
+        events_object[eid] = {}
+        events_object[eid]["date"] = int(row["edatetime"].timestamp())
+        events_object[eid]["title"] = row["title"]
+        events_object[eid]["price"] = row["price"]
+        events_object[eid]["price_text"] = row["price_text"]
+        events_object[eid]["tags"] = row["tags"]
+
+    events_object = json.dumps(events_object)
+    template = env.get_template("pottery-lessons.html")
+    response = template.render(events=allrows, 
+        orders_count=orders_count_object, 
+        events_object=events_object)
+    return response
+
+
+def after_school_pottery():
+    sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
+            or tags is null) and (tags LIKE '%after-school-pottery%') order by edatetime ASC"
+    allrows = query(sql)
+    sql = "select eid, SUM(quantity) as sum_quantity from orders GROUP BY eid"
+    orders_count = query(sql)
+
+    orders_count_object = {}
+    for item in orders_count:
+        key = int(item['eid'])
+        val = int(item['sum_quantity'])
+        orders_count_object[key] = val
+
+    events_object = {}
+    for row in allrows:
+        eid = row["eid"]
+        events_object[eid] = {}
+        events_object[eid]["date"] = int(row["edatetime"].timestamp())
+        events_object[eid]["title"] = row["title"]
+        events_object[eid]["price"] = row["price"]
+        events_object[eid]["price_text"] = row["price_text"]
+        events_object[eid]["tags"] = row["tags"]
+
+    events_object = json.dumps(events_object)
+    template = env.get_template("after-school-pottery.html")
+    response = template.render(events=allrows, 
+        orders_count=orders_count_object, 
+        events_object=events_object)
+    return response
 
 
 def app(environ, start_response):
@@ -54,7 +266,7 @@ def app(environ, start_response):
 
     global_settings = json.loads(read_file("data/global_settings.json"))
     path = environ['PATH_INFO']
-    request_method = environ['REQUEST_METHOD'].lower()
+    req_method = environ['REQUEST_METHOD'].lower()
     query_string = environ['QUERY_STRING']
     content_length = int(environ.get('CONTENT_LENGTH', '0'))
     post_input = environ['wsgi.input'].read(content_length)
@@ -65,7 +277,7 @@ def app(environ, start_response):
         if path == '/admin/signin':
             data_object=None
             login_result=None
-            if request_method == "post":
+            if req_method == "post":
                 data_object = post_input_mgr_1(post_input.decode('UTF-8'))
                 login_result = login(data_object)
             template = env.get_template("admin-signin.html")
@@ -79,221 +291,32 @@ def app(environ, start_response):
             return [refresh_to_signin.encode()]
 
 
-    if request_method == "get":
+    if req_method == "get":
+
 
         if path == '/admin/events/list':
-
-            sql = f"select * from events where edatetime >= CURDATE() order by edatetime"
-            rows = query(sql)
-            template = env.get_template("admin-events-list.html")
-            response = template.render(rows=rows)
-            return [response.encode()]
-
+            response = admin_events_list()
 
         elif path == '/admin/orders/list':
-
-            base_sql = "select a.cart_order_id, a.create_date, a.checkout_date, \
-                a.paypal_order_id, a.total, a.ship_date, a.session_id, b.quantity, \
-                c.pid, c.name, c.image_path_array, c.inventory, c.price \
-                from cart_order a, cart_order_product b, products c \
-                where a.cart_order_id = b.cart_order_id \
-                and b.product_id = c.pid"
-
-            sql = f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is NULL"
-            unshipped = query(sql)
-
-            shipping_info = {}
-            for d in unshipped:
-                order_id = d["paypal_order_id"]
-                try:
-                    webhook_metada = json.loads(read_file(f"../store-checkout/purchases/{order_id}.json"))
-                    shipping_info[order_id] = webhook_metada
-                except:
-                    pass
-
-            sql = f"{base_sql} and checkout_date >= '2023-09-23' and status = 'complete' and ship_date is not NULL"
-            shipped = query(sql)
-            sql = f"{base_sql} and create_date >= '2023-09-23' and status is NULL order by a.create_date desc"
-            unpurchased = query(sql)
-            template = env.get_template("admin-orders-list.html")
-            response = template.render(unshipped=unshipped, shipped=shipped, unpurchased=unpurchased, shipping_info=shipping_info)
-
+            response = admin_orders_list()
 
         elif path == '/admin/events/add-edit':
-            if len(query_string) > 1:
-                eid = query_string.split("=")[1]
-                sql = f"select * from events where eid = {eid}"
-                row = query(sql)[0]
-                form = EventsForm(**row)
-                sql = f"select * from events where tags like '%series={eid}%'"
-                children = query(sql)
-            else:
-                form = EventsForm()
-                children = None
-            template = env.get_template("admin-events-add-edit.html")
-            response = template.render(form=form, children=children)
-
+            response = admin_events_add_edit(query_string)
 
         elif path == "/admin/events/delete":
-            eid = int(query_string.split("=")[1])
-            if type(eid) != int:
-                response = ""
-            sql = f"select * from events where eid = {eid}"
-            event = query(sql)[0]
-            event["quantity_sum"] = 0
-            event["remaining_spots"] = 0
-            template = env.get_template("event.html")
-            content = template.render(event=event, deleted=True)
-            write_file(f"../www/event/{eid}.html", content)
-            sql = f"delete from events where eid = {eid}"
-            query(sql)
-            response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
-
+            response = admin_events_delete(query_string)
 
         elif path == '/build-individual-event':
-            if query_string:
-                eid = int(query_string.split("=")[1])
-                sql = f"select * from events where eid = {eid}"
-            else:
-                sql = "select * from events where edatetime >= CURTIME() order by edatetime"
-                #    #and (tags <> 'invisible' or tags is null) order by edatetime")
-            allrows = query(sql)
-
-            template = env.get_template("event.html")
-            upcoming_event_ids = []
-            for event in allrows:
-                eid = event["eid"]
-                elimit = event["elimit"]
-
-                sql = f"select sum(quantity) as quantity_sum from orders where eid = {eid}"
-                quantity_sum = query(sql)[0]["quantity_sum"]
-
-                try:
-                    event["quantity_sum"] = int(quantity_sum)
-                    event["remaining_spots"] = int(elimit) - int(quantity_sum)
-                except:
-                    event["quantity_sum"] = 0
-                    event["remaining_spots"] = int(elimit)
-
-                upcoming_event_ids.append(eid)
-                content = template.render(event=event)
-
-                write_file(f"../www/event/{eid}.html", content)
-            write_file(f"data/upcoming_event_ids.json", json.dumps(upcoming_event_ids, indent=4))
-            response = "build-individual-event"
-
+            response = build_individual_event(query_string)
 
         elif path == '/list/events' or path == '/calendar':
-
-            sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
-                    or tags is null) and tags NOT LIKE '%pottery-lesson%' order by edatetime"
-            allrows = query(sql)
-
-            sql = "select eid, SUM(quantity) as sum_quantity from orders GROUP BY eid"
-            # TODO: May need to add join to events table above
-            # so as to only pull future event dates
-            orders_count = query(sql)
-
-            orders_count_object = {}
-            for item in orders_count:
-                key = int(item['eid'])
-                val = int(item['sum_quantity'])
-                orders_count_object[key] = val
-
-            events_object = {}
-            parent = {}
-            for row in allrows:
-                eid = row["eid"]
-                events_object[eid] = {}
-                events_object[eid]["date"] = int(row["edatetime"].timestamp())
-                events_object[eid]["title"] = row["title"]
-                events_object[eid]["price"] = row["price"]
-                events_object[eid]["price_text"] = row["price_text"]
-
-                if "series" in row["tags"]:
-                    parent[eid] = re.sub('^.*series=(\d+).*$', r'\1', row["tags"])
-                else:
-                    parent[eid] = ""
-
-            events_object = json.dumps(events_object)
-
-            try:
-                test = query_string.split("=")[1]
-            except:
-                test = ""
-
-            template = env.get_template("list-events.html")
-            response = template.render(events=allrows, 
-                orders_count=orders_count_object, 
-                events_object=events_object, 
-                parent=parent, 
-                test=test)
-
+            response = list_events_calendar()
 
         elif path == '/pottery-lessons':
-
-            sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
-                    or tags is null) and (tags LIKE '%pottery-lesson%' OR tags like '%PL4%') order by edatetime ASC"
-            allrows = query(sql)
-
-            sql = "select eid, SUM(quantity) as sum_quantity from orders GROUP BY eid"
-            orders_count = query(sql)
-
-            orders_count_object = {}
-            for item in orders_count:
-                key = int(item['eid'])
-                val = int(item['sum_quantity'])
-                orders_count_object[key] = val
-
-            events_object = {}
-            for row in allrows:
-                eid = row["eid"]
-                events_object[eid] = {}
-                events_object[eid]["date"] = int(row["edatetime"].timestamp())
-                events_object[eid]["title"] = row["title"]
-                events_object[eid]["price"] = row["price"]
-                events_object[eid]["price_text"] = row["price_text"]
-                events_object[eid]["tags"] = row["tags"]
-
-            events_object = json.dumps(events_object)
-
-            #template = env.get_template("pottery-lessons-test.html")
-            template = env.get_template("pottery-lessons.html")
-            response = template.render(events=allrows, 
-                orders_count=orders_count_object, 
-                events_object=events_object)
-
+            response = pottery_lessons()
 
         elif path == '/after-school-pottery':
-
-            sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
-                    or tags is null) and (tags LIKE '%after-school-pottery%') order by edatetime ASC"
-            allrows = query(sql)
-
-            sql = "select eid, SUM(quantity) as sum_quantity from orders GROUP BY eid"
-            orders_count = query(sql)
-
-            orders_count_object = {}
-            for item in orders_count:
-                key = int(item['eid'])
-                val = int(item['sum_quantity'])
-                orders_count_object[key] = val
-
-            events_object = {}
-            for row in allrows:
-                eid = row["eid"]
-                events_object[eid] = {}
-                events_object[eid]["date"] = int(row["edatetime"].timestamp())
-                events_object[eid]["title"] = row["title"]
-                events_object[eid]["price"] = row["price"]
-                events_object[eid]["price_text"] = row["price_text"]
-                events_object[eid]["tags"] = row["tags"]
-
-            events_object = json.dumps(events_object)
-            template = env.get_template("after-school-pottery.html")
-            response = template.render(events=allrows, 
-                orders_count=orders_count_object, 
-                events_object=events_object)
+            response = after_school_pottery()
 
 
         elif path == '/community-events':
@@ -758,7 +781,7 @@ def app(environ, start_response):
             response = template.render(path_info=path_info)
 
 
-    elif request_method == "post" and path == "/paypal-transaction-complete":
+    elif req_method == "post" and path == "/paypal-transaction-complete":
         form_orders = json.loads(post_input.decode('UTF-8'))
         event_id = str(form_orders['event_id'])
         try:
@@ -771,7 +794,7 @@ def app(environ, start_response):
         #scrape_and_write("calendar")
 
 
-    elif request_method == "post" and path == "/product-image/upload":
+    elif req_method == "post" and path == "/product-image/upload":
         # NOTICE: NOT DECODING post_input below FOR IMAGES
         # NOTICE: BYTES STRING below FOR IMAGES
         image_pid = post_input.split(b'Content-Disposition: form-data')[1]
@@ -791,7 +814,7 @@ def app(environ, start_response):
         response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
 
 
-    elif request_method == "post" and path == "/image/upload":
+    elif req_method == "post" and path == "/image/upload":
         # NOTICE: NOT DECODING post_input below FOR IMAGES
         # NOTICE BYTES STRING below FOR IMAGES
         image_eid = post_input.split(b'Content-Disposition: form-data')[1]
@@ -812,7 +835,7 @@ def app(environ, start_response):
         response = f'<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
 
-    elif request_method == "post" and path == "/contact":
+    elif req_method == "post" and path == "/contact":
         contactus_dict = json.loads(read_file("data/contactus.json"))
         output = post_input_mgr_2(post_input.decode('UTF-8'))
         contactus_dict[str(this_now)] = output["data_object"]
@@ -824,7 +847,7 @@ def app(environ, start_response):
         response = template.render(page_name=page_name, page_content=page_content, email=email)
 
 
-    elif request_method == "post" and path == "/admin/pages":
+    elif req_method == "post" and path == "/admin/pages":
         output = post_input_mgr_2(post_input.decode('UTF-8'))
         data_object = output["data_object"]
         page_name = data_object["page_name"]
@@ -839,7 +862,7 @@ def app(environ, start_response):
         scrape_and_write(page_name)
 
 
-    elif request_method == "post" and path == "/admin/products/add-edit":
+    elif req_method == "post" and path == "/admin/products/add-edit":
         output = post_input_mgr_2(post_input.decode('UTF-8'))
         data_object = output["data_object"]
         data_array = output["data_array"]
@@ -884,7 +907,7 @@ def app(environ, start_response):
             sql={"sql":sql}, pid={"pid":pid})
 
 
-    elif request_method == "post" and path == "/admin/registration/add-edit":
+    elif req_method == "post" and path == "/admin/registration/add-edit":
         output = post_input_mgr_2(post_input.decode('UTF-8'))
         data_object = output["data_object"]
         data_array = output["data_array"]
@@ -927,7 +950,7 @@ def app(environ, start_response):
         response = template.render(sql=sql)
 
 
-    elif request_method == "post":
+    elif req_method == "post":
         output = post_input_mgr_2(post_input.decode('UTF-8'))
         data_object = output["data_object"]
         data_array = output["data_array"]
