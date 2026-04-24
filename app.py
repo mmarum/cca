@@ -22,7 +22,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from forms import ProductsForm, EventsForm, ImageForm, \
     RegistrationForm, BookingForm, SignupForm
 from blauth import logged_in, login
-from tools import read_file, write_file, manage_post_input
+from tools import read_file, write_file, post_input_mgr_1, post_input_mgr_2
 
 
 
@@ -54,17 +54,19 @@ def app(environ, start_response):
 
     global_settings = json.loads(read_file("data/global_settings.json"))
     path = environ['PATH_INFO']
+    request_method = environ['REQUEST_METHOD'].lower()
+    query_string = environ['QUERY_STRING']
+    content_length = int(environ.get('CONTENT_LENGTH', '0'))
+    post_input = environ['wsgi.input'].read(content_length)
     http_cookie = environ.get("HTTP_COOKIE", "")
 
 
-    if "admin" in environ['PATH_INFO']:
+    if "admin" in path:
         if path == '/admin/signin':
             data_object=None
             login_result=None
-            if environ['REQUEST_METHOD'] == "POST":
-                length = int(environ.get('CONTENT_LENGTH', '0'))
-                post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-                data_object = manage_post_input(post_input)
+            if request_method == "post":
+                data_object = post_input_mgr_1(post_input.decode('UTF-8'))
                 login_result = login(data_object)
             template = env.get_template("admin-signin.html")
             response = template.render(data_object=data_object, login_result=login_result)
@@ -76,9 +78,8 @@ def app(environ, start_response):
         elif logged_in(http_cookie) == False:
             return [refresh_to_signin.encode()]
 
-    ####
-    ####
-    if environ['REQUEST_METHOD'] == "GET":
+
+    if request_method == "get":
 
         if path == '/admin/events/list':
 
@@ -118,9 +119,9 @@ def app(environ, start_response):
             response = template.render(unshipped=unshipped, shipped=shipped, unpurchased=unpurchased, shipping_info=shipping_info)
 
 
-        elif environ['PATH_INFO'] == '/admin/events/add-edit':
-            if len(environ['QUERY_STRING']) > 1:
-                eid = environ['QUERY_STRING'].split("=")[1]
+        elif path == '/admin/events/add-edit':
+            if len(query_string) > 1:
+                eid = query_string.split("=")[1]
                 sql = f"select * from events where eid = {eid}"
                 row = query(sql)[0]
                 form = EventsForm(**row)
@@ -133,8 +134,8 @@ def app(environ, start_response):
             response = template.render(form=form, children=children)
 
 
-        elif environ['PATH_INFO'] == "/admin/events/delete":
-            eid = int(environ['QUERY_STRING'].split("=")[1])
+        elif path == "/admin/events/delete":
+            eid = int(query_string.split("=")[1])
             if type(eid) != int:
                 response = ""
             sql = f"select * from events where eid = {eid}"
@@ -149,11 +150,9 @@ def app(environ, start_response):
             response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
 
-        #### ####
-        #### ####
-        elif environ['PATH_INFO'] == '/build-individual-event':
-            if environ['QUERY_STRING']:
-                eid = int(environ['QUERY_STRING'].split("=")[1])
+        elif path == '/build-individual-event':
+            if query_string:
+                eid = int(query_string.split("=")[1])
                 sql = f"select * from events where eid = {eid}"
             else:
                 sql = "select * from events where edatetime >= CURTIME() order by edatetime"
@@ -182,11 +181,9 @@ def app(environ, start_response):
                 write_file(f"../www/event/{eid}.html", content)
             write_file(f"data/upcoming_event_ids.json", json.dumps(upcoming_event_ids, indent=4))
             response = "build-individual-event"
-        #### ####
-        #### ####
 
 
-        elif environ['PATH_INFO'] == '/list/events' or environ['PATH_INFO'] == '/calendar':
+        elif path == '/list/events' or path == '/calendar':
 
             sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
                     or tags is null) and tags NOT LIKE '%pottery-lesson%' order by edatetime"
@@ -221,7 +218,7 @@ def app(environ, start_response):
             events_object = json.dumps(events_object)
 
             try:
-                test = environ['QUERY_STRING'].split("=")[1]
+                test = query_string.split("=")[1]
             except:
                 test = ""
 
@@ -233,9 +230,7 @@ def app(environ, start_response):
                 test=test)
 
 
-        ####
-
-        elif environ['PATH_INFO'] == '/pottery-lessons':
+        elif path == '/pottery-lessons':
 
             sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
                     or tags is null) and (tags LIKE '%pottery-lesson%' OR tags like '%PL4%') order by edatetime ASC"
@@ -268,11 +263,8 @@ def app(environ, start_response):
                 orders_count=orders_count_object, 
                 events_object=events_object)
 
-        ####
 
-
-        elif environ['PATH_INFO'] == '/after-school-pottery':
-
+        elif path == '/after-school-pottery':
 
             sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
                     or tags is null) and (tags LIKE '%after-school-pottery%') order by edatetime ASC"
@@ -304,34 +296,31 @@ def app(environ, start_response):
                 events_object=events_object)
 
 
-        ####
-
-
-        elif environ['PATH_INFO'] == '/community-events':
-            sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' or tags is null) and tags LIKE '%community-event%' order by edatetime ASC"
+        elif path == '/community-events':
+            sql = "select * from events where edatetime >= CURTIME() and (tags <> 'invisible' \
+                    or tags is null) and tags LIKE '%community-event%' order by edatetime ASC"
             allrows = query(sql)
-            sql = "select * from events where edatetime < CURTIME() and (tags <> 'invisible' or tags is null) and tags LIKE '%community-event%' order by edatetime DESC"
+            sql = "select * from events where edatetime < CURTIME() and (tags <> 'invisible' \
+                    or tags is null) and tags LIKE '%community-event%' order by edatetime DESC"
             past_events = query(sql)
             template = env.get_template("community-events.html")
             response = template.render(events=allrows, past_events=past_events)
 
-        ####
 
-
-        elif environ['PATH_INFO'] == '/cart':
+        elif path == '/cart':
             template = env.get_template("cart-list.html")
             response = template.render()
 
 
-        elif environ['PATH_INFO'] == '/products':
+        elif path == '/products':
             sql = "select * from products where active = 1"
             allrows = query(sql)
             template = env.get_template("list-products.html")
             response = template.render(products=allrows)
 
 
-        elif re.match('/products/[a-z-]+/[0-9]+', environ['PATH_INFO']):
-            path_parts = environ['PATH_INFO'].split('/')
+        elif re.match('/products/[a-z-]+/[0-9]+', path):
+            path_parts = path.split('/')
             product_name = path_parts[2]
             product_id = path_parts[3]
             pid = int(product_id)
@@ -341,8 +330,8 @@ def app(environ, start_response):
             response = template.render(row=row)
 
 
-        elif environ['PATH_INFO'] == '/book/event':
-            eid = environ['QUERY_STRING'].split("=")[1]
+        elif path == '/book/event':
+            eid = query_string.split("=")[1]
             sql = f"select * from events where eid = {eid}"
             row = query(sql)[0]
             sql = f"select count(id) as cnt from orders where eid = {eid}"
@@ -351,12 +340,12 @@ def app(environ, start_response):
             response = template.render(event_data=row, order_count=order_count)
 
 
-        elif environ['PATH_INFO'] == '/gallery/slideshow' or environ['PATH_INFO'].lstrip('/') in galleries_list:
+        elif path == '/gallery/slideshow' or path.lstrip('/') in galleries_list:
 
-            if environ['PATH_INFO'] == '/gallery/slideshow':
-                gid = int(environ['QUERY_STRING'].split("=")[1])
+            if path == '/gallery/slideshow':
+                gid = int(query_string.split("=")[1])
             else:
-                path_info = environ['PATH_INFO'].lstrip('/')
+                path_info = path.lstrip('/')
                 gid = int(galleries_dict[path_info])
 
             try:
@@ -371,15 +360,14 @@ def app(environ, start_response):
                 response = template.render(path_info=f"{path_info} gallery does not yet exist")
 
 
-        ####
-        elif environ['PATH_INFO'] == '/admin/booking/list':
+        elif path == '/admin/booking/list':
 
             view = ""
             gtlt = ">=" # default
             ascdesc = "asc"
 
-            if environ['QUERY_STRING'] and "view" in environ['QUERY_STRING']:
-                view = environ['QUERY_STRING'].split("=")[1]
+            if query_string and "view" in query_string:
+                view = query_string.split("=")[1]
 
                 if view == "past-events":
                     gtlt = "<"
@@ -505,14 +493,13 @@ def app(environ, start_response):
             response = template.render(orders=allrows, new_booking_dict=new_booking_dict)
 
 
-        ####
-        elif environ['PATH_INFO'] == '/admin/booking/add-edit':
+        elif path == '/admin/booking/add-edit':
 
             sql = f"select * from events where edatetime > CURTIME() order by edatetime asc"
             allevents = query(sql)
 
-            if len(environ['QUERY_STRING']) > 1:
-                order_id = environ['QUERY_STRING'].split("=")[1]
+            if len(query_string) > 1:
+                order_id = query_string.split("=")[1]
                 sql = f"select * from orders where id = {order_id}"
                 row = query(sql)[0]
                 form = BookingForm(**row)
@@ -523,7 +510,7 @@ def app(environ, start_response):
             response = template.render(form=form, allevents=allevents, this_now=this_now)
 
 
-        elif environ['PATH_INFO'] == '/index':
+        elif path == '/index':
             # UP-NEXT EVENT
             month = int(this_now.strftime("%m"))
             year = int(this_now.strftime("%Y"))
@@ -602,10 +589,10 @@ def app(environ, start_response):
                 global_settings=global_settings, random_gallery=random_gallery)
 
 
-        elif environ['PATH_INFO'] == '/admin/pages':
+        elif path == '/admin/pages':
             template = env.get_template("admin-pages.html")
-            if environ['QUERY_STRING']:
-                page_name = environ['QUERY_STRING'].split("=")[1]
+            if query_string:
+                page_name = query_string.split("=")[1]
                 try:
                     page_content = read_file(f"data/{page_name}.html")
                 except:
@@ -615,7 +602,7 @@ def app(environ, start_response):
                 response = template.render(pages=pages)
 
 
-        elif environ['PATH_INFO'] == '/admin/signup':
+        elif path == '/admin/signup':
             signups = []
             path = "../signup/data/"
             files = [f for f in listdir(path) if isfile(join(path, f))]
@@ -629,7 +616,7 @@ def app(environ, start_response):
             response = template.render(signups=signups)
 
 
-        elif environ['PATH_INFO'] == '/admin/guests':
+        elif path == '/admin/guests':
             sql = "select distinct parent_name, parent_email, parent_phone, session_detail from registration order by session_detail"
             registration_data = query(sql)
 
@@ -662,13 +649,11 @@ def app(environ, start_response):
             response = template.render(registration_data=registration_data_dict, signup_data=signup_data)
 
 
-
-
-        elif environ['PATH_INFO'] == '/admin/registration/list':
+        elif path == '/admin/registration/list':
 
             view = ""
-            if environ['QUERY_STRING'] and "view" in environ['QUERY_STRING']:
-                view = environ['QUERY_STRING'].split("=")[1]
+            if query_string and "view" in query_string:
+                view = query_string.split("=")[1]
 
             if view == "all":
                 special = ""
@@ -696,10 +681,9 @@ def app(environ, start_response):
             response = template.render(new_reg_dict=new_reg_dict)
 
 
-
-        elif environ['PATH_INFO'] == '/admin/registration/add-edit':
-            if len(environ['QUERY_STRING']) > 1:
-                rid = environ['QUERY_STRING'].split("=")[1]
+        elif path == '/admin/registration/add-edit':
+            if len(query_string) > 1:
+                rid = query_string.split("=")[1]
                 sql = f"select * from registration where rid = {rid}"
                 this_reg_data = query(sql)[0]
                 #print("this_reg_data", this_reg_data)
@@ -710,21 +694,20 @@ def app(environ, start_response):
             response = template.render(form=form)
 
 
-
-        elif environ['PATH_INFO'] == '/summer-camp-registration':
+        elif path == '/summer-camp-registration':
             template = env.get_template("summer-camp-registration.html")
             form = RegistrationForm()
             response = template.render(form=form)
 
 
-        elif environ['PATH_INFO'] == '/art-camp-registration':
+        elif path == '/art-camp-registration':
             template = env.get_template("art-camp-registration.html")
             form = RegistrationForm()
             response = template.render(form=form)
 
 
-        elif environ['PATH_INFO'].lstrip('/') in pages:
-            page_name = environ['PATH_INFO'].lstrip('/')
+        elif path.lstrip('/') in pages:
+            page_name = path.lstrip('/')
             page_content = str(read_file(f"data/{page_name}.html"))
 
             # TODO: I need to rethink how pages are managed
@@ -736,7 +719,7 @@ def app(environ, start_response):
             response = template.render(page_name=page_name, page_content=page_content)
 
 
-        elif environ['PATH_INFO'] == '/admin/products/list':
+        elif path == '/admin/products/list':
 
             sql = "select * from products order by pid desc"
             allrows = query(sql)
@@ -745,9 +728,9 @@ def app(environ, start_response):
             response = template.render(allrows=allrows, global_settings=global_settings)
 
 
-        elif environ['PATH_INFO'] == '/admin/products/add-edit':
-            if len(environ['QUERY_STRING']) > 1:
-                pid = environ['QUERY_STRING'].split("=")[1]
+        elif path == '/admin/products/add-edit':
+            if len(query_string) > 1:
+                pid = query_string.split("=")[1]
                 sql = f"select * from products where pid = {pid}"
                 row = query(sql)[0]
                 form = ProductsForm(**row)
@@ -757,9 +740,9 @@ def app(environ, start_response):
             response = template.render(form=form)
 
 
-        elif environ['PATH_INFO'] == '/admin/products/delete':
-            if len(environ['QUERY_STRING']) > 1:
-                pid = int(environ['QUERY_STRING'].split("=")[1])
+        elif path == '/admin/products/delete':
+            if len(query_string) > 1:
+                pid = int(query_string.split("=")[1])
                 sql = f"delete from products where pid = {pid}"
                 query(sql)
                 sql = f"delete from cart_order_product where product_id = {pid}"
@@ -770,37 +753,26 @@ def app(environ, start_response):
 
 
         else:
-            path_info = environ['PATH_INFO'].lstrip('/')
+            path_info = path.lstrip('/')
             template = env.get_template("main.html")
             response = template.render(path_info=path_info)
 
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/paypal-transaction-complete":
 
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-        form_orders = json.loads(post_input)
+    elif request_method == "post" and path == "/paypal-transaction-complete":
+        form_orders = json.loads(post_input.decode('UTF-8'))
         event_id = str(form_orders['event_id'])
-
         try:
             orders = json.loads(read_file(f"orders/{event_id}.json"))
         except:
             orders = []
-
         orders.append(form_orders)
         write_file(f"orders/{event_id}.json", json.dumps(orders, indent=4))
         response = "200"
-
         #scrape_and_write("calendar")
 
 
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/product-image/upload":
-        length = int(environ.get('CONTENT_LENGTH', '0'))
+    elif request_method == "post" and path == "/product-image/upload":
         # NOTICE: NOT DECODING post_input below FOR IMAGES
-        post_input = environ['wsgi.input'].read(length)
         # NOTICE: BYTES STRING below FOR IMAGES
         image_pid = post_input.split(b'Content-Disposition: form-data')[1]
         pid = re.sub(b'^.*name="pid"(.*?)------.*$', r"\1", image_pid, flags=re.DOTALL).strip()
@@ -819,15 +791,8 @@ def app(environ, start_response):
         response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
 
 
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/image/upload":
-        length = int(environ.get('CONTENT_LENGTH', '0'))
+    elif request_method == "post" and path == "/image/upload":
         # NOTICE: NOT DECODING post_input below FOR IMAGES
-        post_input = environ['wsgi.input'].read(length)
-
-        #print(post_input)
-
         # NOTICE BYTES STRING below FOR IMAGES
         image_eid = post_input.split(b'Content-Disposition: form-data')[1]
         eid = re.sub(b'^.*name="eid"(.*?)------.*$', r"\1", image_eid, flags=re.DOTALL).strip()
@@ -847,88 +812,37 @@ def app(environ, start_response):
         response = f'<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
 
 
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/contact":
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-
-        data_object = json.loads(read_file("data/contactus.json"))
-
-        post_input_array = post_input.split('------')
-
-        message_object = {}
-        for d in post_input_array:
-            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
-            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
-                message_object[post_data_key] = post_data_val
-
-            data_object[str(this_now)] = message_object
-
-        email = data_object[str(this_now)]["email"]
-
-        write_file(f"data/contactus.json", json.dumps(data_object, indent=4))
-
-        #template = env.get_template("about-us.html")
-        #response = template.render(thanks=data_object[str(this_now)])
-
+    elif request_method == "post" and path == "/contact":
+        contactus_dict = json.loads(read_file("data/contactus.json"))
+        output = post_input_mgr_2(post_input.decode('UTF-8'))
+        contactus_dict[str(this_now)] = output["data_object"]
+        email = contactus_dict[str(this_now)]["email"]
+        write_file(f"data/contactus.json", json.dumps(contactus_dict, indent=4))
         page_content = str(read_file(f"data/about-us.html"))
         template = env.get_template("pages.html")
         page_name = "about-us"
         response = template.render(page_name=page_name, page_content=page_content, email=email)
 
 
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/pages":
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-
-        post_input_array = post_input.split('------')
-
-        data_object = {}
-        for d in post_input_array:
-            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
-            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit":
-                data_object[post_data_key] = post_data_val
-
-        page_name = data_object['page_name']
-        page_content = data_object['page_content']
-
-        # Backup current version just in case cuz why not
+    elif request_method == "post" and path == "/admin/pages":
+        output = post_input_mgr_2(post_input.decode('UTF-8'))
+        data_object = output["data_object"]
+        page_name = data_object["page_name"]
+        page_content = data_object["page_content"]
         os.rename(f"data/{page_name}.html", f"data/{page_name}.html.bak")
-
         try:
             write_file(f"data/{page_name}.html", page_content)
             response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages"/>'
         except:
             os.rename(f"data/{page_name}.html.bak", f"data/{page_name}.html")
             response = "ERROR WRITING PAGE <a href='/app/admin/pages'>Go back</a>"
-
         scrape_and_write(page_name)
 
 
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/products/add-edit":
-
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-
-        data_object = {}
-        data_array = []
-
-        post_input_array = post_input.split('------')
-
-        for d in post_input_array:
-            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
-            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and not post_data_val.startswith('-----'):
-                data_object[post_data_key] = post_data_val
-                data_array.append(post_data_val)
-
+    elif request_method == "post" and path == "/admin/products/add-edit":
+        output = post_input_mgr_2(post_input.decode('UTF-8'))
+        data_object = output["data_object"]
+        data_array = output["data_array"]
         try:
             if int(data_object['pid']) > 0:
                 action = "Update"
@@ -970,20 +884,10 @@ def app(environ, start_response):
             sql={"sql":sql}, pid={"pid":pid})
 
 
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST" and environ['PATH_INFO'] == "/admin/registration/add-edit":
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-        data_object = {}
-        data_array = []
-        post_input_array = post_input.split('------')
-        for d in post_input_array:
-            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
-            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and post_data_key != "submit" and not post_data_val.startswith('-----'):
-                data_object[post_data_key] = post_data_val
-                data_array.append(post_data_val)
+    elif request_method == "post" and path == "/admin/registration/add-edit":
+        output = post_input_mgr_2(post_input.decode('UTF-8'))
+        data_object = output["data_object"]
+        data_array = output["data_array"]
 
         try:
             if int(data_object['rid']) > 0:
@@ -999,7 +903,6 @@ def app(environ, start_response):
         del data_array[0]
 
         if action == "Update":
-
             keys_vals = ""
             for k, v in data_object.items():
                 v = v.replace("'", "''")
@@ -1008,7 +911,6 @@ def app(environ, start_response):
             sql = f"update registration set {keys_vals} where rid = {rid}"
 
         elif action == "Insert":
-
             fields = ""
             for k in data_object.keys():
                 fields += f"{k},"
@@ -1025,42 +927,16 @@ def app(environ, start_response):
         response = template.render(sql=sql)
 
 
-    ####
-    ####
-    elif environ['REQUEST_METHOD'] == "POST":
-
-        #print("HERE AAA")
-
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        post_input = environ['wsgi.input'].read(length).decode('UTF-8')
-
-        #print("post_input", post_input)
-
-        data_object = {}
-        data_array = []
-
-        post_input_array = post_input.split('------')
-
-        #with open("stderr.log", "a") as logfile:
-        #    logfile.write(str(f"++++{post_input}++++"))
-
-        for d in post_input_array:
-            post_data_key = re.sub(r'^.*name="(.*?)".*$', r"\1", d, flags=re.DOTALL).strip()
-            post_data_val = re.sub(r'^.*name=".*?"(.*)$', r"\1", d, flags=re.DOTALL).strip()
-            if len(post_data_key) > 1 and not post_data_key.startswith('WebKitForm') and "submit" not in post_data_key and not post_data_val.startswith('-----'):
-                data_object[post_data_key] = post_data_val
-                data_array.append(post_data_val)
-
-        #print("data_object", data_object)
-        #print("data_array", data_array)
-
+    elif request_method == "post":
+        output = post_input_mgr_2(post_input.decode('UTF-8'))
+        data_object = output["data_object"]
+        data_array = output["data_array"]
 
         # TEMPORARILY removing series input data
         #data_object_temp = data_object
         #for k, v in data_object_temp.items():
         #    if "series" in k:
         #        del data_object[k]
-
 
         # If form passes an eid value then query
         # is an update as opposed to an insert
@@ -1117,8 +993,6 @@ def app(environ, start_response):
         #time.sleep(2)
         #scrape_and_write("home")
 
-    ####
-    ####
     else:
         response = "error"
 
