@@ -5,7 +5,6 @@ from tools import read_file
 
 def query(sql):
 
-    sql = sql.lower()
     dbname = "catalystcreative_66" if "piwigz" in sql else "catalystcreative_arts"
     dbuser = "catalystcreative_cca"
     dbpass = json.loads(read_file("data/passwords.json"))[dbuser]
@@ -21,20 +20,20 @@ def query(sql):
     with db.cursor() as cur:
 
         cur.execute(sql)
-        if "select" in sql:
+        if "select" in sql.lower():
             rows = cur.fetchmany(1000)
 
-    if "select" not in sql:
+    if "select" not in sql.lower():
         db.commit()
 
-    if "insert" in sql:
+    if "insert" in sql.lower():
         new_id = cur.lastrowid
 
     db.close()
 
-    if "select" in sql:
+    if "select" in sql.lower():
         return rows
 
-    elif "insert" in sql:
+    elif "insert" in sql.lower():
         return new_id
 

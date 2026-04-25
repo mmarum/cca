@@ -27,7 +27,6 @@ def post_input_mgr_1(post_input):
 
 
 def post_input_mgr_2(post_input):
-	post_input = post_input.decode('UTF-8') # sometimes
 	post_input_array = post_input.split('------')
 	data_object = {}
 	data_array = []
@@ -40,7 +39,6 @@ def post_input_mgr_2(post_input):
 	        and not post_data_val.startswith('-----'):
 
 	        data_object[post_data_key] = post_data_val
-	        data_object[str(this_now)] = data_object
 	        data_array.append(post_data_val)
 	return {
 	    "data_object": data_object,

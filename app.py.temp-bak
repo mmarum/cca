@@ -728,99 +728,101 @@ def app(environ, start_response):
         elif logged_in(http_cookie) == False:
             return [refresh_to_signin.encode()]
 
+
     if req_method == "get":
 
-        if path == "/admin/events/list":
+
+        if path == '/admin/events/list':
             response = admin_events_list()
 
-        elif path == "/admin/orders/list":
+        elif path == '/admin/orders/list':
             response = admin_orders_list()
 
-        elif path == "/admin/events/add-edit":
+        elif path == '/admin/events/add-edit':
             response = admin_events_add_edit(query_string)
 
         elif path == "/admin/events/delete":
             response = admin_events_delete(query_string)
 
-        elif path == "/admin/booking/list":
-            response = admin_booking_list(query_string)
-
-        elif path == "/admin/booking/add-edit":
-            response = admin_booking_add_edit(query_string, this_now)
-
-        elif path == "/admin/pages":
-            response = admin_pages(query_string)
-
-        elif path == "/admin/signup":
-            response = admin_signup()
-
-        elif path == "/admin/guests":
-            response = admin_guests()
-
-        elif path == "/admin/registration/list":
-            response = admin_registration_list(query_string)
-
-        elif path == "/admin/registration/add-edit":
-            response = admin_registration_add_edit(query_string)
-
-        elif path == "/admin/products/list":
-            response = admin_products_list(global_settings)
-
-        elif path == "/admin/products/add-edit":
-            response = admin_products_add_edit(query_string)
-
-        elif path == "/admin/products/delete":
-            response = admin_products_delete(query_string)
-
-        elif path == "/build-individual-event":
+        elif path == '/build-individual-event':
             response = build_individual_event(query_string)
 
-        elif path == "/list/events" or path == "/calendar":
+        elif path == '/list/events' or path == '/calendar':
             response = list_events_calendar()
 
-        elif path == "/pottery-lessons":
+        elif path == '/pottery-lessons':
             response = pottery_lessons()
 
-        elif path == "/after-school-pottery":
+        elif path == '/after-school-pottery':
             response = after_school_pottery()
 
-        elif path == "/community-events":
+        elif path == '/community-events':
             response = community_events()
 
-        elif path == "/cart":
+        elif path == '/cart':
             template = env.get_template("cart-list.html")
             response = template.render()
 
-        elif path == "/products":
+        elif path == '/products':
             reponse = list_products()
 
-        elif re.match("/products/[a-z-]+/[0-9]+", path):
+        elif re.match('/products/[a-z-]+/[0-9]+', path):
             response = product_detail(path)
 
-        elif path == "/book/event":
+        elif path == '/book/event':
             response = book_event(query_string)
 
-        elif path == "/gallery/slideshow" or path.lstrip("/") in galleries_list:
+        elif path == '/gallery/slideshow' or path.lstrip('/') in galleries_list:
             response = gallery_slideshow(path, query_string, galleries_dict)
 
-        elif path == "/index":
+        elif path == '/index':
             response = homepage_index(global_settings, this_now, galleries_dict_vals)
 
-        elif path == "/summer-camp-registration":
+        elif path == '/admin/booking/list':
+            response = admin_booking_list(query_string)
+
+        elif path == '/admin/booking/add-edit':
+            response = admin_booking_add_edit(query_string, this_now)
+
+        elif path == '/admin/pages':
+            response = admin_pages(query_string)
+
+        elif path == '/admin/signup':
+            response = admin_signup()
+
+        elif path == '/admin/guests':
+            response = admin_guests()
+
+        elif path == '/admin/registration/list':
+            response = admin_registration_list(query_string)
+
+        elif path == '/admin/registration/add-edit':
+            response = admin_registration_add_edit(query_string)
+
+        elif path == '/admin/products/list':
+            response = admin_products_list(global_settings)
+
+        elif path == '/admin/products/add-edit':
+            response = admin_products_add_edit(query_string)
+
+        elif path == '/admin/products/delete':
+            response = admin_products_delete(query_string)
+
+        elif path == '/summer-camp-registration':
             template = env.get_template("summer-camp-registration.html")
             form = RegistrationForm()
             response = template.render(form=form)
 
-        elif path == "/art-camp-registration":
+        elif path == '/art-camp-registration':
             template = env.get_template("art-camp-registration.html")
             form = RegistrationForm()
             response = template.render(form=form)
 
-        elif path.lstrip("/") in pages:
+        elif path.lstrip('/') in pages:
             response = custom_pages(path)
 
         else:
-            path_info = path.lstrip("/")
+            path_info = path.lstrip('/')
             template = env.get_template("main.html")
             response = template.render(path_info=path_info)
 
@@ -941,7 +943,6 @@ def app(environ, start_response):
                 fields = "name, description, image_path_array, inventory, price, keywords_array, active"
                 vals = ""
                 for val in data_array:
-                    val = val.replace("'", "''")
                     vals += f"'{val}',"
                 vals = vals.rstrip(",")
                 sql = f"insert into products ({fields}) values ({vals})"
@@ -987,7 +988,6 @@ def app(environ, start_response):
                 del data_array[0]
                 values = ""
                 for v in data_array:
-                    v = v.replace("'", "''")
                     values += f"'{v}',"
                 values = values.rstrip(",")
                 sql = f"insert into registration ({ fields }) values ({ values })"
@@ -1048,9 +1048,8 @@ def app(environ, start_response):
             elif action == "Insert":
                 fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, tags, extra_data"
                 vals = ""
-                for v in data_array:
-                    v = v.replace("'", "''")
-                    vals += f"'{v}',"
+                for val in data_array:
+                    vals += f"'{val}',"
                 vals = vals.rstrip(",")
                 sql = f"insert into events ({fields}) values ({vals})"
                 eid = query(sql)
