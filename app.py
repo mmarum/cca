@@ -23,6 +23,7 @@ from forms import ProductsForm, EventsForm, ImageForm, \
     RegistrationForm, BookingForm, SignupForm
 from blauth import logged_in, login
 from tools import read_file, write_file, post_input_mgr_1, post_input_mgr_2
+from parse_multipart import parse_multipart
 
 
 env = Environment(
@@ -140,8 +141,6 @@ def admin_booking_list(query_string):
                 try:
                     order = cca_order["paypal"]
 
-                    #print("____cca_order_id", cca_order_id)
-                    #print("____order", order)
                     data_array = []
                     # We don't necessarily want all data from orders/event_eid_value.json
                     # So let's pick and choose what data we want to keep:
@@ -860,24 +859,53 @@ def app(environ, start_response):
 
 
         elif path == "/image/upload":
-            # NOTICE: NOT DECODING post_input below FOR IMAGES
-            # NOTICE BYTES STRING below FOR IMAGES
-            image_eid = post_input.split(b'Content-Disposition: form-data')[1]
-            eid = re.sub(b'^.*name="eid"(.*?)------.*$', r"\1", image_eid, flags=re.DOTALL).strip()
-            eid = int(eid.decode('UTF-8'))
-            image_data = post_input.split(b'Content-Disposition: form-data')[2]
-            image_filename = re.sub(b'^.*filename="(.*?)".*$', r"\1", image_data, flags=re.DOTALL).strip()
-            image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
-            img_name = image_filename.decode('UTF-8')
-            if img_name and image_contents:
-                open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
+
+            print("/image/upload")
+
+            m = re.search(
+                b'name="eid"\\r\\n\\r\\n([^\\r\\n]+)',
+                post_input
+            )
+            if m:
+                eid = m.group(1).decode()
+                print(eid)
+
+            m = re.search(
+                b'filename="([^"]+)"',
+               post_input 
+            )
+            if m:
+                img_name = m.group(1).decode()
+                print(img_name)
+
+            m = re.search(
+                b'name="image".*?\\r\\n\\r\\n(.*?)\\r\\n------WebKitFormBoundary',
+                post_input,
+                flags=re.DOTALL
+            )
+            if m:
+                img_contents = m.group(1)
+                #print(image_body)
+
+            if img_name and img_contents:
+                open(f"../www/img/orig/{img_name}", 'wb').write(img_contents)
                 size = 350, 350
                 image = Image.open(f"../www/img/orig/{img_name}")
                 image.thumbnail(size)
                 image.save(f"../www/img/small/{img_name}", 'JPEG')
                 sql = f"update events set image = '{img_name}' where eid = {eid}"
                 query(sql)
-            response = f'<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
+            response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
+
+            """
+            fields, files = parse_multipart(environ)
+            eid = fields.get("eid")
+            uploaded_image = files.get("image") # or whatever your field name is
+            # Example: save file
+            if uploaded_image:
+                with open("/tmp/uploaded.jpg", "wb") as f:
+                    f.write(uploaded_image["content"])
+            """
 
 
         elif path == "/contact":
@@ -998,6 +1026,9 @@ def app(environ, start_response):
 
 
         else:
+
+            print("DEFAULT POST SECTION")
+
             output = post_input_mgr_2(post_input.decode('UTF-8'))
             data_object = output["data_object"]
             data_array = output["data_array"]
