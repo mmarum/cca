@@ -412,6 +412,7 @@ class AdminUI:
     #### #### #### ####
 
 
+    """
     def paypal_transaction_complete(self):
         form_orders = json.loads(self.post_input.decode('UTF-8'))
         event_id = str(form_orders['event_id'])
@@ -424,6 +425,7 @@ class AdminUI:
         response = "200"
         #scrape_and_write("calendar")
         return response
+    """
 
 
     def product_image_upload(self):
@@ -447,7 +449,9 @@ class AdminUI:
         return response
 
 
-    def image_upload(self):
+    def event_image_upload(self):
+        # NOTICE: NOT DECODING post_input below FOR IMAGES
+        # NOTICE: BYTES STRING below FOR IMAGES
 
         m = re.search(
             b'name="eid"\\r\\n\\r\\n([^\\r\\n]+)',
@@ -496,6 +500,7 @@ class AdminUI:
         return response
 
 
+    """
     def contact(self):
         contactus_dict = json.loads(read_file("data/contactus.json"))
         output = post_input_mgr_2(self.post_input.decode('UTF-8'))
@@ -507,6 +512,7 @@ class AdminUI:
         page_name = "about-us"
         response = template.render(page_name=page_name, page_content=page_content, email=email)
         return response
+    """
 
 
     def admin_pages(self):

@@ -44,7 +44,6 @@ refresh_to_signin = '<meta http-equiv="refresh" content="0; url=/app/admin/signi
 
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
-    this_now = datetime.datetime.now()
     epoch_now = int(time.time())
     iso_now = str(datetime.datetime.now()).split(".")[0]
 
@@ -55,7 +54,6 @@ def app(environ, start_response):
     galleries_list = list(galleries_dict.keys())
     galleries_dict_vals = list(galleries_dict.values())
 
-    global_settings = json.loads(read_file("data/global_settings.json"))
     path = environ['PATH_INFO']
     req_method = environ['REQUEST_METHOD'].lower()
     qs = environ.get("QUERY_STRING", "")
@@ -91,78 +89,51 @@ def app(environ, start_response):
         else:
             response = "admin.not_found()"
 
-
-    #elif path.startswith("/build/"):
     else:
 
-        build = Build()
+        build = Build(qs, path)
 
-        if path == "/build-individual-event":
-            response = build.individual_event(qs)
-
-        elif path == "/list/events" or path == "/calendar":
-            response = build.list_events_calendar()
-
-        elif path == "/pottery-lessons":
-            response = build.pottery_lessons()
-
-        elif path == "/after-school-pottery":
-            response = build.after_school_pottery()
-
-        elif path == "/community-events":
-            response = build.community_events()
-
-        elif path == "/cart":
-            template = env.get_template("cart-list.html")
-            response = template.render()
-
-        elif path == "/products":
-            reponse = build.list_products()
+        if path == "/gallery/slideshow" or path.lstrip("/") in galleries_list:
+            response = build.gallery_slideshow(galleries_dict)
 
         elif re.match("/products/[a-z-]+/[0-9]+", path):
-            response = build.product_detail(path)
+            response = build.product_detail()
 
-        elif path == "/book/event":
-            response = build.book_event(qs)
-
-        elif path == "/gallery/slideshow" or path.lstrip("/") in galleries_list:
-            response = build.gallery_slideshow(path, qs, galleries_dict)
-
-        elif path == "/index":
-            response = build.homepage_index(global_settings, this_now, galleries_dict_vals)
+        elif path.lstrip("/") in pages:
+            response = build.custom_pages()
 
         elif path == "/summer-camp-registration":
             template = env.get_template("summer-camp-registration.html")
             form = RegistrationForm()
             response = template.render(form=form)
 
+        elif path == "/cart":
+            template = env.get_template("cart-list.html")
+            response = template.render()
+
         elif path == "/art-camp-registration":
             template = env.get_template("art-camp-registration.html")
             form = RegistrationForm()
             response = template.render(form=form)
-
-        elif path.lstrip("/") in pages:
-            response = build.custom_pages(path)
 
         elif path == "/":
             path_info = path.lstrip("/")
             template = env.get_template("main.html")
             response = template.render(path_info=path_info)
 
-        # these next few are admin pages
-        # but first need their paths updated to starts with "/admin/"
+        else:
 
-        elif path == "/paypal-transaction-complete":
-            response = admin.paypal_transaction_complete()
-
-        elif path == "/product-image/upload":
-            response = admin.product_image_upload()
-
-        elif path == "/image/upload":
-            response = admin.image_upload()
-
-        elif path == "/contact":
-            response = admin.contact()
+            dispatch = {
+                "/build-individual-event": build.individual_event,
+                "/calendar": build.list_events_calendar,
+                "/pottery-lessons": build.pottery_lessons,
+                "/after-school-pottery": build.after_school_pottery,
+                "/community-events": build.community_events,
+                "/products": build.list_products,
+                "/book/event": build.book_event,
+                "/index": build.homepage_index
+            }
+            response = dispatch.get(path, "build.not_found")()
 
     return [response.encode()]
 

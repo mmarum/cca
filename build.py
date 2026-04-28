@@ -40,15 +40,22 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 refresh_to_signin = '<meta http-equiv="refresh" content="0; url=/app/admin/signin" />'
 
+galleries_dict = json.loads(read_file("data/galleries-dict.json"))
+galleries_list = list(galleries_dict.keys())
+galleries_dict_vals = list(galleries_dict.values())
+
 
 class Build:
-    def __init__(self):
-        self.test = "build-123"
+    def __init__(self, qs, path):
+        self.qs = qs
+        self.path = path
+        self.global_settings = json.loads(read_file("data/global_settings.json"))
+        self.datetime_now = datetime.datetime.now()
 
 
-    def individual_event(self, query_string):
-        if query_string:
-            eid = int(query_string.split("=")[1])
+    def individual_event(self):
+        if self.qs:
+            eid = int(self.qs.split("=")[1])
             sql = f"select * from events where eid = {eid}"
         else:
             sql = "select * from events where edatetime >= CURTIME() order by edatetime"
@@ -113,7 +120,7 @@ class Build:
 
         events_object = json.dumps(events_object)
         try:
-            test = query_string.split("=")[1]
+            test = self.qs.split("=")[1]
         except:
             test = ""
 
@@ -209,8 +216,8 @@ class Build:
         return response
 
 
-    def product_detail(self, path):
-        path_parts = path.split('/')
+    def product_detail(self):
+        path_parts = self.path.split('/')
         product_name = path_parts[2]
         product_id = path_parts[3]
         pid = int(product_id)
@@ -221,8 +228,8 @@ class Build:
         return response
 
 
-    def book_event(self, query_string):
-        eid = int(query_string.split("=")[1])
+    def book_event(self):
+        eid = int(self.qs.split("=")[1])
         sql = f"select * from events where eid = {eid}"
         row = query(sql)[0]
         sql = f"select count(id) as cnt from orders where eid = {eid}"
@@ -232,11 +239,11 @@ class Build:
         return response
 
 
-    def gallery_slideshow(self, path, query_string, galleries_dict):
-        if path == '/gallery/slideshow':
-            gid = int(query_string.split("=")[1])
+    def gallery_slideshow(self, galleries_dict):
+        if self.path == '/gallery/slideshow':
+            gid = int(self.qs.split("=")[1])
         else:
-            path_info = path.lstrip('/')
+            path_info = self.path.lstrip('/')
             gid = int(galleries_dict[path_info])
         try:
             g = Gallery(gid)
@@ -250,10 +257,10 @@ class Build:
         return response
 
 
-    def homepage_index(self, global_settings, this_now, galleries_dict_vals):
+    def homepage_index(self):
         # UP-NEXT EVENT
-        month = int(this_now.strftime("%m"))
-        year = int(this_now.strftime("%Y"))
+        month = int(self.datetime_now.strftime("%m"))
+        year = int(self.datetime_now.strftime("%Y"))
         html_cal = make_cal(month, year)
 
         sql = f"select * from events where edatetime > CURTIME() \
@@ -326,12 +333,12 @@ class Build:
         response = template.render(next_event=next_event, calendar={"html": html_cal}, 
             events_tagged_home=events_tagged_home, gallery=gallery, images=images, 
             event_list_html=event_list_html, random_product=random_product,
-            global_settings=global_settings, random_gallery=random_gallery)
+            global_settings=self.global_settings, random_gallery=random_gallery)
         return response
 
 
-    def custom_pages(self, path):
-        page_name = path.lstrip('/')
+    def custom_pages(self):
+        page_name = self.path.lstrip('/')
         page_content = str(read_file(f"data/{page_name}.html"))
         if page_name == "gift-card":
             template = env.get_template("gift-card.html")
