@@ -19,7 +19,7 @@ span.help-block {
 
 <h1>{% if 'value=""' in form["pid"]|safe %}Add{% else %}Edit{% endif %} Product</h1>
 
-<form action="/app/admin/products/add-edit" 
+<form action="/app/admin/products-add-edit" 
     method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
   {% if field.name == "submit" %}
@@ -36,10 +36,10 @@ span.help-block {
 {% endfor %}
 </form>
 
-<button type="button" class="btn btn-warning" onclick="location.reload();location.href='/app/admin/products/list'">Cancel</button>
+<button type="button" class="btn btn-warning" onclick="location.reload();location.href='/app/admin/products-list'">Cancel</button>
 
 {% if form.pid.data %}
-  <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure?')) location.href='/app/admin/products/delete?pid={{ form.pid.data }}';">Delete</button>
+  <button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure?')) location.href='/app/admin/products-delete?pid={{ form.pid.data }}';">Delete</button>
 {% endif %}
 
 {% if not form.pid.data %}

@@ -81,7 +81,7 @@ def app(environ, start_response):
         elif logged_in(http_cookie) == False:
             return [refresh_to_signin.encode()]
 
-        admin = AdminUI()
+        admin = AdminUI(post_input)
 
     else:
 
@@ -184,277 +184,39 @@ def app(environ, start_response):
             template = env.get_template("main.html")
             response = template.render(path_info=path_info)
 
+
     elif req_method == "post":
 
-        if path == "/paypal-transaction-complete":
-            form_orders = json.loads(post_input.decode('UTF-8'))
-            event_id = str(form_orders['event_id'])
-            try:
-                orders = json.loads(read_file(f"orders/{event_id}.json"))
-            except:
-                orders = []
-            orders.append(form_orders)
-            write_file(f"orders/{event_id}.json", json.dumps(orders, indent=4))
-            response = "200"
-            #scrape_and_write("calendar")
 
+        # TODO: Update all of the following paths to start with admin
+        # Once that's done get rid of next line
+        admin = AdminUI(post_input)
+
+
+        if path == "/paypal-transaction-complete":
+            response = admin.paypal_transaction_complete()
 
         elif path == "/product-image/upload":
-            # NOTICE: NOT DECODING post_input below FOR IMAGES
-            # NOTICE: BYTES STRING below FOR IMAGES
-            image_pid = post_input.split(b'Content-Disposition: form-data')[1]
-            pid = re.sub(b'^.*name="pid"(.*?)------.*$', r"\1", image_pid, flags=re.DOTALL).strip()
-            pid = int(pid.decode('UTF-8'))
-            image_data = post_input.split(b'Content-Disposition: form-data')[2]
-            image_filename = re.sub(b'^.*filename="(.*?)".*$', r"\1", image_data, flags=re.DOTALL).strip()
-            image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
-            img_name = image_filename.decode('UTF-8')
-            open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
-            size = 350, 350
-            image = Image.open(f"../www/img/orig/{img_name}")
-            image.thumbnail(size)
-            image.save(f"../www/img/small/{img_name}", 'JPEG')
-            sql = f"update products set image_path_array = concat(ifnull(image_path_array,''), ',{img_name}') where pid = {pid}"
-            query(sql)
-            response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
-
+            response = admin.product_image_upload()
 
         elif path == "/image/upload":
-
-            print("/image/upload")
-
-            m = re.search(
-                b'name="eid"\\r\\n\\r\\n([^\\r\\n]+)',
-                post_input
-            )
-            if m:
-                eid = m.group(1).decode()
-                print(eid)
-
-            m = re.search(
-                b'filename="([^"]+)"',
-               post_input 
-            )
-            if m:
-                img_name = m.group(1).decode()
-                print(img_name)
-
-            m = re.search(
-                b'name="image".*?\\r\\n\\r\\n(.*?)\\r\\n------WebKitFormBoundary',
-                post_input,
-                flags=re.DOTALL
-            )
-            if m:
-                img_contents = m.group(1)
-                #print(image_body)
-
-            if img_name and img_contents:
-                open(f"../www/img/orig/{img_name}", 'wb').write(img_contents)
-                size = 350, 350
-                image = Image.open(f"../www/img/orig/{img_name}")
-                image.thumbnail(size)
-                image.save(f"../www/img/small/{img_name}", 'JPEG')
-                sql = f"update events set image = '{img_name}' where eid = {eid}"
-                query(sql)
-            response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
-
-            """
-            fields, files = parse_multipart(environ)
-            eid = fields.get("eid")
-            uploaded_image = files.get("image") # or whatever your field name is
-            # Example: save file
-            if uploaded_image:
-                with open("/tmp/uploaded.jpg", "wb") as f:
-                    f.write(uploaded_image["content"])
-            """
-
+            response = admin.image_upload()
 
         elif path == "/contact":
-            contactus_dict = json.loads(read_file("data/contactus.json"))
-            output = post_input_mgr_2(post_input.decode('UTF-8'))
-            contactus_dict[str(this_now)] = output["data_object"]
-            email = contactus_dict[str(this_now)]["email"]
-            write_file(f"data/contactus.json", json.dumps(contactus_dict, indent=4))
-            page_content = str(read_file(f"data/about-us.html"))
-            template = env.get_template("pages.html")
-            page_name = "about-us"
-            response = template.render(page_name=page_name, page_content=page_content, email=email)
-
+            response = admin.contact()
 
         elif path == "/admin/pages":
-            output = post_input_mgr_2(post_input.decode('UTF-8'))
-            data_object = output["data_object"]
-            page_name = data_object["page_name"]
-            page_content = data_object["page_content"]
-            os.rename(f"data/{page_name}.html", f"data/{page_name}.html.bak")
-            try:
-                write_file(f"data/{page_name}.html", page_content)
-                response = '<meta http-equiv="refresh" content="0; url=/app/admin/pages"/>'
-            except:
-                os.rename(f"data/{page_name}.html.bak", f"data/{page_name}.html")
-                response = "ERROR WRITING PAGE <a href='/app/admin/pages'>Go back</a>"
-            scrape_and_write(page_name)
-
+            response = admin.admin_pages()
 
         elif path == "/admin/products/add-edit":
-            output = post_input_mgr_2(post_input.decode('UTF-8'))
-            data_object = output["data_object"]
-            data_array = output["data_array"]
-            try:
-                if int(data_object['pid']) > 0:
-                    action = "Update"
-                    pid = data_object['pid']
-                else:
-                    action = "Insert"
-            except:
-                action = "Insert"
-
-            # Cleanup: Remove "pid"
-            del data_object['pid']
-            del data_array[0]
-
-            # Todo: More validation
-            products_form = ProductsForm(**data_object)
-
-            # Set query based on update vs insert
-            if action == "Update":
-                keys_vals = ""
-                for k, v in data_object.items():
-                    v = v.replace("'", "''")
-                    keys_vals += str(f"{k}='{v}', ")
-                keys_vals = keys_vals.rstrip(', ')
-                sql = f"update products set {keys_vals} where pid = {pid}"
-                query(sql)
-
-            else:
-                fields = "name, description, image_path_array, inventory, price, keywords_array, active"
-                vals = ""
-                for val in data_array:
-                    val = val.replace("'", "''")
-                    vals += f"'{val}',"
-                vals = vals.rstrip(",")
-                sql = f"insert into products ({fields}) values ({vals})"
-                pid = query(sql)
-
-            image_form = ImageForm()
-            template = env.get_template("admin-products-image.html")
-            response = template.render(product_data=data_object, image_form=image_form,
-                sql={"sql":sql}, pid={"pid":pid})
-
+            response = admin.admin_products/add_edit()
 
         elif path == "/admin/registration/add-edit":
-            output = post_input_mgr_2(post_input.decode('UTF-8'))
-            data_object = output["data_object"]
-            data_array = output["data_array"]
-
-            try:
-                if int(data_object['rid']) > 0:
-                    action = "Update"
-                    rid = data_object['rid']
-                else:
-                    action = "Insert"
-            except:
-                action = "Insert"
-
-            # Cleanup: Remove "rid"
-            del data_object['rid']
-            del data_array[0]
-
-            if action == "Update":
-                keys_vals = ""
-                for k, v in data_object.items():
-                    v = v.replace("'", "''")
-                    keys_vals += str(f"{k}='{v}', ")
-                keys_vals = keys_vals.rstrip(', ')
-                sql = f"update registration set {keys_vals} where rid = {rid}"
-
-            elif action == "Insert":
-                fields = ""
-                for k in data_object.keys():
-                    fields += f"{k},"
-                fields = fields.rstrip(",")
-                del data_array[0]
-                values = ""
-                for v in data_array:
-                    v = v.replace("'", "''")
-                    values += f"'{v}',"
-                values = values.rstrip(",")
-                sql = f"insert into registration ({ fields }) values ({ values })"
-
-            query(sql)
-            template = env.get_template("admin-registration-add-edit.html")
-            response = template.render(sql=sql)
-
+            response = admin.admin_registration_add_edit()
 
         else:
+            response = admin.default_admin_post()
 
-            print("DEFAULT POST SECTION")
-
-            output = post_input_mgr_2(post_input.decode('UTF-8'))
-            data_object = output["data_object"]
-            data_array = output["data_array"]
-
-            # TEMPORARILY removing series input data
-            #data_object_temp = data_object
-            #for k, v in data_object_temp.items():
-            #    if "series" in k:
-            #        del data_object[k]
-
-            # If form passes an eid value then query
-            # is an update as opposed to an insert
-
-            try:
-                if int(data_object['eid']) > 0:
-                    action = "Update"
-                    eid = data_object['eid']
-                else:
-                    action = "Insert"
-            except:
-                action = "Insert"
-
-            # Cleanup: Remove "eid"
-            del data_object['eid']
-            del data_array[0]
-
-            # Cleanup: Remove "append_time"
-            del data_object['append_time']
-            del data_array[1]
-
-            # For the variable-field stuff:
-            price_text = data_object["price_text"]
-            elimit = data_object["elimit"]
-
-            # Todo: More validation
-            events_form = EventsForm(**data_object)
-
-            # Set query based on update vs insert
-            if action == "Update":
-                keys_vals = ""
-                for k, v in data_object.items():
-                    v = v.replace("'", "''")
-                    keys_vals += str(f"{k}='{v}', ")
-                keys_vals = keys_vals.rstrip(', ')
-                sql = f"update events set {keys_vals} where eid = {eid}"
-                query(sql)
-
-            elif action == "Insert":
-                fields = "edatetime, title, duration, price, elimit, location, image, description, price_text, tags, extra_data"
-                vals = ""
-                for v in data_array:
-                    v = v.replace("'", "''")
-                    vals += f"'{v}',"
-                vals = vals.rstrip(",")
-                sql = f"insert into events ({fields}) values ({vals})"
-                eid = query(sql)
-
-            image_form = ImageForm()
-            template = env.get_template("admin-events-image.html")
-            response = template.render(event_data=data_object, image_form=image_form,
-                sql={"sql":sql}, eid={"eid":eid})
-
-            #scrape_and_write("calendar")
-            #time.sleep(2)
-            #scrape_and_write("home")
 
     return [response.encode()]
 

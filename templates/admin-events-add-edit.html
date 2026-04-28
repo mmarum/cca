@@ -60,7 +60,7 @@ function appendTime() {
 
 <h1>{% if 'value=""' in form["eid"]|safe %}Add{% else %}Edit{% endif %} Events</h1>
 
-<form action="/app/" method="POST" enctype="multipart/form-data" name="add_edit_form" id="this_form">
+<form action="/app/admin/events-add-edit-submit" method="POST" enctype="multipart/form-data" name="add_edit_form" id="this_form">
 
 {% if form.eid.data and "series" in form.tags.data %}
 {% set items = form.tags.data %}
@@ -134,10 +134,10 @@ function appendTime() {
 
 </form>
 
-<button type="button" class="btn btn-warning" onclick="location.href='/app/admin/events/list'">Cancel</button>
+<button type="button" class="btn btn-warning" onclick="location.href='/app/admin/events-list'">Cancel</button>
 
 {% if form.eid.data %}
-<button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure?')) location.href='/app/admin/events/delete?eid={{ form.eid.data }}';">Delete</button>
+<button type="button" class="btn btn-danger" onclick="if(confirm('Are you sure?')) location.href='/app/admin/events-delete?eid={{ form.eid.data }}';">Delete</button>
 {% endif %}
 
 {% if form.eid.data and "series" not in form.tags.data %}

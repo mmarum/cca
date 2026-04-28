@@ -34,7 +34,7 @@ td {
 <table class="table table-striped">
 
 <tr class="p-3 mb-2 bg-light text-dark">
-<td><div id="add_new_link"><a href="/app/admin/booking/add-edit">+</a></div></td>
+<td><div id="add_new_link"><a href="/app/admin/booking-add-edit">+</a></div></td>
 <td>title</td>
 <td>event date</td>
 <td>email</td>
@@ -49,8 +49,8 @@ td {
 
 {% for order in orders %}
   <tr>
-  <td><a href="/app/admin/booking/add-edit?id={{ order.id }}">{{ order.id }}</a></td>
-  <td><a href="/app/admin/events/add-edit?eid={{ order.eid }}">{{ order.title }}</a></td>
+  <td><a href="/app/admin/booking-add-edit?id={{ order.id }}">{{ order.id }}</a></td>
+  <td><a href="/app/admin/events-add-edit?eid={{ order.eid }}">{{ order.title }}</a></td>
   <td>{{ order.edatetime.strftime('%b %d %I:%M')|replace(' 0', ' ') }}</td>{# '%a %b %d %Y %I:%M %p' #}
   <td>{{ order.email|replace("@", " @") }}</td>
   <td>{{ order.quantity }}</td>
@@ -71,7 +71,7 @@ td {
 
 </table>
 
-<p><a href="/app/admin/booking/list?view=past-events">Click here to see orders for events in the past</a></p>
+<p><a href="/app/admin/booking-list?view=past-events">Click here to see orders for events in the past</a></p>
 
 <hr>
 <hr>
@@ -85,7 +85,7 @@ td {
 <table>
 <tr>
 <td colspan="7">
-<div id="add_new_link"><a href="/app/admin/booking/add-edit">+</a></div>
+<div id="add_new_link"><a href="/app/admin/booking-add-edit">+</a></div>
 </td>
 </tr>
 <tr style="background-color: LightGray;">
@@ -101,7 +101,7 @@ td {
   <tr>
     <td colspan="7">
     <span class="new_title">
-    <b>{{ event_dict["date"].strftime('%b %d %I:%M %P')|replace(' 0', ' ') }}</b> <a href="/app/admin/events/add-edit?eid={{ event_id }}">{{ event_dict["title"] }}</a>
+    <b>{{ event_dict["date"].strftime('%b %d %I:%M %P')|replace(' 0', ' ') }}</b> <a href="/app/admin/events-add-edit?eid={{ event_id }}">{{ event_dict["title"] }}</a>
     {{ event_id }}
     </span>
     </td>
@@ -110,9 +110,9 @@ td {
   <tr class="tr_booking">
     {% set event_id = event["id"] %}
     {% if event["buyer_name"] %}
-      <td><a href="/app/admin/booking/add-edit?id={{ event_id }}">{{ event["buyer_name"] }}</a></td>
+      <td><a href="/app/admin/booking-add-edit?id={{ event_id }}">{{ event["buyer_name"] }}</a></td>
     {% else %}
-      <td><a href="/app/admin/booking/add-edit?id={{ event_id }}">{{ event["first_name"] }} {{ event["last_name"] }}</a></td>
+      <td><a href="/app/admin/booking-add-edit?id={{ event_id }}">{{ event["first_name"] }} {{ event["last_name"] }}</a></td>
     {% endif %}
 
     <td>{{ event["buyer_phone"] }}</td>
@@ -141,6 +141,6 @@ td {
 {% endfor %}
 </table>
 
-<p><a href="/app/admin/booking/list?view=past-events">Click here to see orders for events in the past</a></p>
+<p><a href="/app/admin/booking-list?view=past-events">Click here to see orders for events in the past</a></p>
 
 {% endblock %}

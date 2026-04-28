@@ -44,11 +44,17 @@ pages.sort()
 
 
 class AdminUI:
-    def __init__(self, post_input):
+    def __init__(self, post_input, qs):
         self.post_input = post_input
+        self.qs = qs
+        self.global_settings = json.loads(read_file("data/global_settings.json"))
+        self.datetime_now = datetime.datetime.now()
 
 
     def events_list(self):
+
+        print("AdminUI events_list method")
+
         sql = f"select * from events where edatetime >= CURDATE() order by edatetime"
         rows = query(sql)
         template = env.get_template("admin-events-list.html")
@@ -85,9 +91,9 @@ class AdminUI:
         return response
 
 
-    def events_add_edit(self, query_string):
-        if len(query_string) > 1:
-            eid = int(query_string.split("=")[1])
+    def events_add_edit(self):
+        if len(self.qs) > 1:
+            eid = int(self.qs.split("=")[1])
             sql = f"select * from events where eid = {eid}"
             row = query(sql)[0]
             form = EventsForm(**row)
@@ -101,8 +107,8 @@ class AdminUI:
         return response
 
 
-    def events_delete(self, query_string):
-        eid = int(query_string.split("=")[1])
+    def events_delete(self):
+        eid = int(self.qs.split("=")[1])
         sql = f"select * from events where eid = {eid}"
         event = query(sql)[0]
         event["quantity_sum"] = 0
@@ -112,17 +118,17 @@ class AdminUI:
         write_file(f"../www/event/{eid}.html", content)
         sql = f"delete from events where eid = {eid}"
         query(sql)
-        response = '<meta http-equiv="refresh" content="0; url=/app/admin/events/list" />'
+        response = '<meta http-equiv="refresh" content="0; url=/app/admin/events-list" />'
         return response
 
 
-    def booking_list(self, query_string):
+    def booking_list(self):
         view = ""
         gtlt = ">=" # default
         ascdesc = "asc"
 
-        if query_string and "view" in query_string:
-            view = query_string.split("=")[1]
+        if self.qs and "view" in self.qs:
+            view = self.qs.split("=")[1]
 
             if view == "past-events":
                 gtlt = "<"
@@ -245,25 +251,25 @@ class AdminUI:
         return response
 
 
-    def booking_add_edit(self, query_string, this_now):
+    def booking_add_edit(self):
         sql = f"select * from events where edatetime > CURTIME() order by edatetime asc"
         allevents = query(sql)
-        if len(query_string) > 1:
-            order_id = int(query_string.split("=")[1])
+        if len(self.qs) > 1:
+            order_id = int(self.qs.split("=")[1])
             sql = f"select * from orders where id = {order_id}"
             row = query(sql)[0]
             form = BookingForm(**row)
         else:
             form = BookingForm()
         template = env.get_template("admin-booking-add-edit.html")
-        response = template.render(form=form, allevents=allevents, this_now=this_now)
+        response = template.render(form=form, allevents=allevents, this_now=self.datetime_now)
         return response
 
 
-    def pages(self, query_string):
+    def pages(self):
         template = env.get_template("admin-pages.html")
-        if query_string:
-            page_name = query_string.split("=")[1]
+        if self.qs:
+            page_name = self.qs.split("=")[1]
             try:
                 page_content = read_file(f"data/{page_name}.html")
             except:
@@ -325,10 +331,10 @@ class AdminUI:
         return response
 
 
-    def registration_list(self, query_string):
+    def registration_list(self):
         view = ""
-        if query_string and "view" in query_string:
-            view = query_string.split("=")[1]
+        if self.qs and "view" in self.qs:
+            view = self.qs.split("=")[1]
 
         if view == "all":
             special = ""
@@ -357,9 +363,9 @@ class AdminUI:
         return response
 
 
-    def registration_add_edit(self, query_string):
-        if len(query_string) > 1:
-            rid = int(query_string.split("=")[1])
+    def registration_add_edit(self):
+        if len(self.qs) > 1:
+            rid = int(self.qs.split("=")[1])
             sql = f"select * from registration where rid = {rid}"
             this_reg_data = query(sql)[0]
             form = RegistrationForm(**this_reg_data)
@@ -370,17 +376,17 @@ class AdminUI:
         return response
 
 
-    def products_list(self, global_settings):
+    def products_list(self):
         sql = "select * from products order by pid desc"
         allrows = query(sql)
         template = env.get_template("admin-products-list.html")
-        response = template.render(allrows=allrows, global_settings=global_settings)
+        response = template.render(allrows=allrows, global_settings=self.global_settings)
         return response
 
 
-    def products_add_edit(self, query_string):
-        if len(query_string) > 1:
-            pid = int(query_string.split("=")[1])
+    def products_add_edit(self):
+        if len(self.qs) > 1:
+            pid = int(self.qs.split("=")[1])
             sql = f"select * from products where pid = {pid}"
             row = query(sql)[0]
             form = ProductsForm(**row)
@@ -390,14 +396,14 @@ class AdminUI:
         response = template.render(form=form)
         return response
 
-    def products_delete(self, query_string):
-        if len(query_string) > 1:
-            pid = int(query_string.split("=")[1])
+    def products_delete(self):
+        if len(self.qs) > 1:
+            pid = int(self.qs.split("=")[1])
             sql = f"delete from products where pid = {pid}"
             query(sql)
             sql = f"delete from cart_order_product where product_id = {pid}"
             query(sql)
-            response = '<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
+            response = '<meta http-equiv="refresh" content="0; url=/app/admin/products-list" />'
         else:
             response = ""
         return response
@@ -437,7 +443,7 @@ class AdminUI:
         image.save(f"../www/img/small/{img_name}", 'JPEG')
         sql = f"update products set image_path_array = concat(ifnull(image_path_array,''), ',{img_name}') where pid = {pid}"
         query(sql)
-        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
+        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products-list" />'
         return response
 
 
@@ -476,7 +482,7 @@ class AdminUI:
             image.save(f"../www/img/small/{img_name}", 'JPEG')
             sql = f"update events set image = '{img_name}' where eid = {eid}"
             query(sql)
-        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products/list" />'
+        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products-list" />'
 
         """
         fields, files = parse_multipart(environ)
@@ -493,8 +499,8 @@ class AdminUI:
     def contact(self):
         contactus_dict = json.loads(read_file("data/contactus.json"))
         output = post_input_mgr_2(self.post_input.decode('UTF-8'))
-        contactus_dict[str(this_now)] = output["data_object"]
-        email = contactus_dict[str(this_now)]["email"]
+        contactus_dict[str(self.datetime_now)] = output["data_object"]
+        email = contactus_dict[str(self.datetime_now)]["email"]
         write_file(f"data/contactus.json", json.dumps(contactus_dict, indent=4))
         page_content = str(read_file(f"data/about-us.html"))
         template = env.get_template("pages.html")
@@ -611,7 +617,7 @@ class AdminUI:
         return response
 
 
-    def default_admin_post(self):
+    def events_add_edit_submit(self):
         output = post_input_mgr_2(self.post_input.decode('UTF-8'))
         data_object = output["data_object"]
         data_array = output["data_array"]

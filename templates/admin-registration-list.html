@@ -34,7 +34,7 @@ td {
 
 <tr>
   <td colspan="4">
-    <div id="add_new_link"><a href="/app/admin/registration/add-edit">+</a></div>
+    <div id="add_new_link"><a href="/app/admin/registration-add-edit">+</a></div>
   </td>
 </tr>
 
@@ -74,7 +74,7 @@ td {
 {% for reg in regs %}
   <tr class="tr_regs">
     <td>
-        <a href="/app/admin/registration/add-edit?rid={{ reg["rid"] }}">
+        <a href="/app/admin/registration-add-edit?rid={{ reg["rid"] }}">
 	{{ reg["camper1_name"] }}
 	{{ reg["camper1_age"] }}
 	{% if reg["camper2_name"] %}<br> {{ reg["camper2_name"] }} {% endif %}

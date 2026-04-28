@@ -24,9 +24,9 @@
 -->
 
 <p style="padding-top: 10px;">
-<button type="button" class="btn btn-success" onclick="javascript:location.href='/app/admin/products/list'">Done</button>
+<button type="button" class="btn btn-success" onclick="javascript:location.href='/app/admin/products-list'">Done</button>
 {% if pid.pid %}
-<button type="button" class="btn btn-primary" onclick="javascript:location.href='/app/admin/products/add-edit?eid={{ pid.pid }}'">Re-edit</button>
+<button type="button" class="btn btn-primary" onclick="javascript:location.href='/app/admin/products-add-edit?eid={{ pid.pid }}'">Re-edit</button>
 <button type="button" class="btn btn-secondary" onclick="document.getElementById('upload_file').style.display='block';">Upload Image for product {{ pid.pid }}</button>
 {% endif %}
 </p>

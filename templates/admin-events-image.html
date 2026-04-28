@@ -38,9 +38,9 @@ $( function() {
 -->
 
 <p style="padding-top: 10px;">
-<button type="button" class="btn btn-success" onclick="javascript:location.href='/app/admin/events/list'">Done</button>
+<button type="button" class="btn btn-success" onclick="javascript:location.href='/app/admin/events-list'">Done</button>
 {% if eid.eid %}
-<button type="button" class="btn btn-primary" onclick="javascript:location.href='/app/admin/events/add-edit?eid={{ eid.eid }}'">Re-edit</button>
+<button type="button" class="btn btn-primary" onclick="javascript:location.href='/app/admin/events-add-edit?eid={{ eid.eid }}'">Re-edit</button>
 <button type="button" class="btn btn-secondary" onclick="document.getElementById('upload_file').style.display='block';">Upload Image for event {{ eid.eid }}</button>
 {% endif %}
 </p>

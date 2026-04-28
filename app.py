@@ -58,13 +58,13 @@ def app(environ, start_response):
     global_settings = json.loads(read_file("data/global_settings.json"))
     path = environ['PATH_INFO']
     req_method = environ['REQUEST_METHOD'].lower()
-    query_string = environ['QUERY_STRING']
+    qs = environ.get("QUERY_STRING", "")
     content_length = int(environ.get('CONTENT_LENGTH', '0'))
     post_input = environ['wsgi.input'].read(content_length)
     http_cookie = environ.get("HTTP_COOKIE", "")
 
+    if path.startswith("/admin/"):
 
-    if "admin" in path:
         if path == '/admin/signin':
             data_object=None
             login_result=None
@@ -81,59 +81,24 @@ def app(environ, start_response):
         elif logged_in(http_cookie) == False:
             return [refresh_to_signin.encode()]
 
-        admin = AdminUI(post_input)
+        admin = AdminUI(post_input, qs)
 
+        method_name = path.split("/")[2].replace("-", "_")
+        method = getattr(admin, method_name, None)
+
+        if method:
+            response = method()
+        else:
+            response = "admin.not_found()"
+
+
+    #elif path.startswith("/build/"):
     else:
 
         build = Build()
 
-
-    if req_method == "get":
-
-        if path == "/admin/events/list":
-            response = admin.events_list()
-
-        elif path == "/admin/orders/list":
-            response = admin.orders_list()
-
-        elif path == "/admin/events/add-edit":
-            response = admin.events_add_edit(query_string)
-
-        elif path == "/admin/events/delete":
-            response = admin.events_delete(query_string)
-
-        elif path == "/admin/booking/list":
-            response = admin.booking_list(query_string)
-
-        elif path == "/admin/booking/add-edit":
-            response = admin.booking_add_edit(query_string, this_now)
-
-        elif path == "/admin/pages":
-            response = admin.pages(query_string)
-
-        elif path == "/admin/signup":
-            response = admin.signup()
-
-        elif path == "/admin/guests":
-            response = admin.guests()
-
-        elif path == "/admin/registration/list":
-            response = admin.registration_list(query_string)
-
-        elif path == "/admin/registration/add-edit":
-            response = admin.registration_add_edit(query_string)
-
-        elif path == "/admin/products/list":
-            response = admin.products_list(global_settings)
-
-        elif path == "/admin/products/add-edit":
-            response = admin.products_add_edit(query_string)
-
-        elif path == "/admin/products/delete":
-            response = admin.products_delete(query_string)
-
-        elif path == "/build-individual-event":
-            response = build.individual_event(query_string)
+        if path == "/build-individual-event":
+            response = build.individual_event(qs)
 
         elif path == "/list/events" or path == "/calendar":
             response = build.list_events_calendar()
@@ -158,10 +123,10 @@ def app(environ, start_response):
             response = build.product_detail(path)
 
         elif path == "/book/event":
-            response = build.book_event(query_string)
+            response = build.book_event(qs)
 
         elif path == "/gallery/slideshow" or path.lstrip("/") in galleries_list:
-            response = build.gallery_slideshow(path, query_string, galleries_dict)
+            response = build.gallery_slideshow(path, qs, galleries_dict)
 
         elif path == "/index":
             response = build.homepage_index(global_settings, this_now, galleries_dict_vals)
@@ -179,21 +144,15 @@ def app(environ, start_response):
         elif path.lstrip("/") in pages:
             response = build.custom_pages(path)
 
-        else:
+        elif path == "/":
             path_info = path.lstrip("/")
             template = env.get_template("main.html")
             response = template.render(path_info=path_info)
 
+        # these next few are admin pages
+        # but first need their paths updated to starts with "/admin/"
 
-    elif req_method == "post":
-
-
-        # TODO: Update all of the following paths to start with admin
-        # Once that's done get rid of next line
-        admin = AdminUI(post_input)
-
-
-        if path == "/paypal-transaction-complete":
+        elif path == "/paypal-transaction-complete":
             response = admin.paypal_transaction_complete()
 
         elif path == "/product-image/upload":
@@ -204,19 +163,6 @@ def app(environ, start_response):
 
         elif path == "/contact":
             response = admin.contact()
-
-        elif path == "/admin/pages":
-            response = admin.admin_pages()
-
-        elif path == "/admin/products/add-edit":
-            response = admin.admin_products/add_edit()
-
-        elif path == "/admin/registration/add-edit":
-            response = admin.admin_registration_add_edit()
-
-        else:
-            response = admin.default_admin_post()
-
 
     return [response.encode()]
 
