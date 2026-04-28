@@ -2,28 +2,13 @@ import os
 import re
 import sys
 import json
-import time
 import base64
-import random
-import datetime
-import collections
 
-from PIL import Image
-from os import listdir
-from sql_mgr import query
-from gallery import Gallery
-from urllib.parse import unquote
-from os.path import isfile, join
-from writer import scrape_and_write
-from update_extra import UpdateExtra
-from custom_filters import get_inventory, slugify
-from paper_calendar import make_cal, make_list
 from jinja2 import Environment, PackageLoader, select_autoescape
 from forms import ProductsForm, EventsForm, ImageForm, \
     RegistrationForm, BookingForm, SignupForm
 from blauth import logged_in, login
 from tools import read_file, write_file, post_input_mgr_1, post_input_mgr_2
-from parse_multipart import parse_multipart
 
 from admin_ui import AdminUI
 from build import Build
@@ -34,9 +19,6 @@ env = Environment(
     autoescape=select_autoescape(['html'])
 )
 
-env.filters["get_inventory"] = get_inventory
-env.filters["slugify"] = slugify
-
 sys.path.insert(0, os.path.dirname(__file__))
 
 refresh_to_signin = '<meta http-equiv="refresh" content="0; url=/app/admin/signin" />'
@@ -44,8 +26,6 @@ refresh_to_signin = '<meta http-equiv="refresh" content="0; url=/app/admin/signi
 
 def app(environ, start_response):
     start_response('200 OK', [('Content-Type', 'text/html; charset=utf-8')])
-    epoch_now = int(time.time())
-    iso_now = str(datetime.datetime.now()).split(".")[0]
 
     pages = json.loads(read_file("data/pages-list.json"))
     pages.sort()
