@@ -22,11 +22,10 @@ label {
 <h1>{% if 'value=""' in form["order_id"]|safe %}Add{% else %}Edit{% endif %} Booking</h1>
 
 <form action="#" method="POST" enctype="multipart/form-data" name="add_edit_form" id="booking_form" onSubmit="submitBooking(); return false;">
-
 <select id="eid" name="eid" class="form-control browser-default custom-select">
 <option value="0" selected>Select event</option>
 {% for event in allevents %}
-  <option value="{{ event[0] }}" id="select_event_{{ event[0] }}"> {{ event[1] }} {{ event[2] }}</option>
+  <option value='{{ event["eid"] }}' id='select_event_{{ event["eid"] }}'> {{ event["title"] }} {{ event["edatetime"] }}</option>
 {% endfor %}
 </select>
 

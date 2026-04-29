@@ -23,9 +23,6 @@ from forms import ProductsForm, EventsForm, ImageForm, \
     RegistrationForm, BookingForm, SignupForm
 from blauth import logged_in, login
 from tools import read_file, write_file, post_input_mgr_1, post_input_mgr_2
-from parse_multipart import parse_multipart
-
-from admin_ui import AdminUI
 
 
 env = Environment(

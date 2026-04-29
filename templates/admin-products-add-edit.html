@@ -19,7 +19,7 @@ span.help-block {
 
 <h1>{% if 'value=""' in form["pid"]|safe %}Add{% else %}Edit{% endif %} Product</h1>
 
-<form action="/app/admin/products-add-edit" 
+<form action="/app/admin/products-add-edit-submit" 
     method="POST" enctype="multipart/form-data" name="test_form" id="test_form">
 {% for field in form %}
   {% if field.name == "submit" %}

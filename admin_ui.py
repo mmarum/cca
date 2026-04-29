@@ -23,11 +23,9 @@ from forms import ProductsForm, EventsForm, ImageForm, \
     RegistrationForm, BookingForm, SignupForm
 from blauth import logged_in, login
 from tools import read_file, write_file, post_input_mgr_1, post_input_mgr_2
-from parse_multipart import parse_multipart
 
 
 env = Environment(
-    #loader=PackageLoader('app', 'templates'),
     loader=PackageLoader('admin_ui', 'templates'),
     autoescape=select_autoescape(['html'])
 )
@@ -43,6 +41,33 @@ pages = json.loads(read_file("data/pages-list.json"))
 pages.sort()
 
 
+def parse_image_upload(post_input):
+
+    m = re.search(
+        b'name="[ep]id"\\r\\n\\r\\n([^\\r\\n]+)',
+        post_input
+    )
+    if m:
+        this_id = m.group(1).decode()
+
+    m = re.search(
+        b'filename="([^"]+)"',
+        post_input
+    )
+    if m:
+        img_name = m.group(1).decode()
+
+    m = re.search(
+        b'name="image".*?\\r\\n\\r\\n(.*?)\\r\\n------WebKitFormBoundary',
+        post_input,
+        flags=re.DOTALL
+    )
+    if m:
+        img_contents = m.group(1)
+
+    return this_id, img_name, img_contents
+
+
 class AdminUI:
     def __init__(self, post_input, qs):
         self.post_input = post_input
@@ -52,9 +77,6 @@ class AdminUI:
 
 
     def events_list(self):
-
-        print("AdminUI events_list method")
-
         sql = f"select * from events where edatetime >= CURDATE() order by edatetime"
         rows = query(sql)
         template = env.get_template("admin-events-list.html")
@@ -396,6 +418,7 @@ class AdminUI:
         response = template.render(form=form)
         return response
 
+
     def products_delete(self):
         if len(self.qs) > 1:
             pid = int(self.qs.split("=")[1])
@@ -407,9 +430,6 @@ class AdminUI:
         else:
             response = ""
         return response
-
-
-    #### #### #### ####
 
 
     """
@@ -429,55 +449,21 @@ class AdminUI:
 
 
     def product_image_upload(self):
-        # NOTICE: NOT DECODING post_input below FOR IMAGES
-        # NOTICE: BYTES STRING below FOR IMAGES
-        image_pid = self.post_input.split(b'Content-Disposition: form-data')[1]
-        pid = re.sub(b'^.*name="pid"(.*?)------.*$', r"\1", image_pid, flags=re.DOTALL).strip()
-        pid = int(pid.decode('UTF-8'))
-        image_data = self.post_input.split(b'Content-Disposition: form-data')[2]
-        image_filename = re.sub(b'^.*filename="(.*?)".*$', r"\1", image_data, flags=re.DOTALL).strip()
-        image_contents = re.sub(b'^.*Content-Type: image/jpeg(.*)$', r"\1", image_data, flags=re.DOTALL).strip()
-        img_name = image_filename.decode('UTF-8')
-        open(f"../www/img/orig/{img_name}", 'wb').write(image_contents)
-        size = 350, 350
-        image = Image.open(f"../www/img/orig/{img_name}")
-        image.thumbnail(size)
-        image.save(f"../www/img/small/{img_name}", 'JPEG')
-        sql = f"update products set image_path_array = concat(ifnull(image_path_array,''), ',{img_name}') where pid = {pid}"
-        query(sql)
+        pid, img_name, img_contents = parse_image_upload(self.post_input)
+        if img_name and img_contents:
+            open(f"../www/img/orig/{img_name}", 'wb').write(img_contents)
+            size = 350, 350
+            image = Image.open(f"../www/img/orig/{img_name}")
+            image.thumbnail(size)
+            image.save(f"../www/img/small/{img_name}", 'JPEG')
+            sql = f"update products set image_path_array = concat(ifnull(image_path_array,''), ',{img_name}') where pid = {pid}"
+            query(sql)
         response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products-list" />'
         return response
 
 
     def event_image_upload(self):
-        # NOTICE: NOT DECODING post_input below FOR IMAGES
-        # NOTICE: BYTES STRING below FOR IMAGES
-
-        m = re.search(
-            b'name="eid"\\r\\n\\r\\n([^\\r\\n]+)',
-            self.post_input
-        )
-        if m:
-            eid = m.group(1).decode()
-            print(eid)
-
-        m = re.search(
-            b'filename="([^"]+)"',
-           self.post_input 
-        )
-        if m:
-            img_name = m.group(1).decode()
-            print(img_name)
-
-        m = re.search(
-            b'name="image".*?\\r\\n\\r\\n(.*?)\\r\\n------WebKitFormBoundary',
-            self.post_input,
-            flags=re.DOTALL
-        )
-        if m:
-            img_contents = m.group(1)
-            #print(image_body)
-
+        eid, img_name, img_contents = parse_image_upload(self.post_input)
         if img_name and img_contents:
             open(f"../www/img/orig/{img_name}", 'wb').write(img_contents)
             size = 350, 350
@@ -486,17 +472,7 @@ class AdminUI:
             image.save(f"../www/img/small/{img_name}", 'JPEG')
             sql = f"update events set image = '{img_name}' where eid = {eid}"
             query(sql)
-        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/products-list" />'
-
-        """
-        fields, files = parse_multipart(environ)
-        eid = fields.get("eid")
-        uploaded_image = files.get("image") # or whatever your field name is
-        # Example: save file
-        if uploaded_image:
-            with open("/tmp/uploaded.jpg", "wb") as f:
-                f.write(uploaded_image["content"])
-        """
+        response = f'<meta http-equiv="refresh" content="0; url=/app/admin/events-list" />'
         return response
 
 
@@ -515,7 +491,7 @@ class AdminUI:
     """
 
 
-    def admin_pages(self):
+    def pages_submit(self):
         output = post_input_mgr_2(self.post_input.decode('UTF-8'))
         data_object = output["data_object"]
         page_name = data_object["page_name"]
@@ -531,7 +507,7 @@ class AdminUI:
         return response
 
 
-    def admin_products_add_edit(self):
+    def products_add_edit_submit(self):
         output = post_input_mgr_2(self.post_input.decode('UTF-8'))
         data_object = output["data_object"]
         data_array = output["data_array"]
@@ -578,7 +554,7 @@ class AdminUI:
         return response
 
 
-    def admin_registration_add_edit(self):
+    def registration_add_edit_submit(self):
         output = post_input_mgr_2(self.post_input.decode('UTF-8'))
         data_object = output["data_object"]
         data_array = output["data_array"]
